@@ -1,0 +1,67 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: qui
+  version: 1.1.0
+  category: downloads
+  description: "Modern multi-instance qBittorrent Web UI and workflow engine"
+  homepage: https://getqui.com
+  documentation: https://getqui.com/docs
+  maintainer: sdbx-official
+  tags:
+    - torrent
+    - qbittorrent
+    - cross-seeding
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: qui
+    subtitle: "Torrent console"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - host-chown
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/autobrr/qui
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+    conditional:
+      - name: QUI__BASE_URL
+        value: "{{ .Config.Routing.Path }}/"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/qui"
+      containerPath: /config
+      chown: true
+  networking:
+    networks:
+      - name: download
+routing:
+  enabled: true
+  port: 7476
+  subdomain: qui
+  path: /qui
+  pathRouting:
+    strategy: none
+  auth:
+    mode: admin-only
+  traefik:
+    network: download
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

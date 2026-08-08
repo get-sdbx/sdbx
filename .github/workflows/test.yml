@@ -1,0 +1,313 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.26.5"
+
+jobs:
+  quality:
+    name: Go quality and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Verify self-contained candidate scope
+        run: make candidate-scope
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Verify module integrity
+        run: go mod verify
+
+      - name: Verify formatting and imports
+        run: make fmt-check
+
+      - name: Run vet
+        run: go vet ./...
+
+      - name: Run race-enabled tests
+        run: go test -race -coverprofile=coverage.out ./...
+
+      - name: Run pinned linter
+        run: make lint
+
+  root-boundaries:
+    name: Root ownership and broker boundaries
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Test with the daemon capability allowlist
+        run: scripts/run-ci-container.sh root-boundaries
+
+  documentation:
+    name: Documentation truth
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Verify generated references and examples
+        run: |
+          make docs-check
+          make licenses-check
+
+  security:
+    name: Security gates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out complete history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Run vulnerability, static-security, and secret scans
+        run: make security
+
+  workflow-security:
+    name: Workflow and shell safety
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Parse shell scripts
+        run: >-
+          bash -n
+          install.sh
+          scripts/audit-catalog-images.sh
+          scripts/check-release-licenses.sh
+          scripts/check-github-controls.sh
+          scripts/check-workflow-actions.sh
+          scripts/list-release-assets.sh
+          scripts/run-ci-container.sh
+          scripts/test-amd64-acceptance-evidence.sh
+          scripts/test-installer.sh
+          scripts/test-github-controls.sh
+          scripts/test-release-assets.sh
+          scripts/test-release-reproducibility.sh
+          scripts/test-systemd-units.sh
+          scripts/test-vpn-killswitch.sh
+          scripts/test-workflow-actions.sh
+          scripts/verify-amd64-acceptance-evidence.sh
+          scripts/verify-release-artifacts.sh
+
+      - name: Run pinned ShellCheck
+        run: scripts/run-ci-container.sh shellcheck
+
+      - name: Verify exact workflow action policy
+        run: scripts/check-workflow-actions.sh
+
+      - name: Test workflow action policy regressions
+        run: scripts/test-workflow-actions.sh
+
+      - name: Test Linux amd64 acceptance evidence binding
+        run: scripts/test-amd64-acceptance-evidence.sh
+
+      - name: Test the verified installer
+        run: scripts/test-installer.sh
+
+      - name: Test the GitHub control-plane verifier
+        run: scripts/test-github-controls.sh
+
+      - name: Test the frozen release asset allowlist
+        run: scripts/test-release-assets.sh
+
+      - name: Verify systemd units and hardening
+        run: scripts/test-systemd-units.sh
+
+      - name: Verify destructive VPN test stays explicitly gated
+        run: |
+          scripts/test-vpn-killswitch.sh --plan >/dev/null
+          if scripts/test-vpn-killswitch.sh --execute; then
+            exit 1
+          fi
+          if scripts/test-vpn-killswitch.sh \
+              --execute \
+              --acknowledge-disposable-host \
+              --acknowledge-backup-tested \
+              --acknowledge-no-active-downloads \
+              --project-dir . \
+              --confirm wrong; then
+            exit 1
+          fi
+
+      - name: Run pinned actionlint
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+          license-check: true
+          allow-licenses: >-
+            0BSD,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC,MIT,MPL-2.0
+
+  catalog:
+    name: Compose ${{ matrix.expose }} / ${{ matrix.routing }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        expose:
+          - lan
+          - direct
+          - cloudflared
+        routing:
+          - subdomain
+          - path
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Build both binaries
+        run: make build
+
+      - name: Generate and validate locked Compose profile
+        env:
+          EXPOSURE_MODE: ${{ matrix.expose }}
+          ROUTING_MODE: ${{ matrix.routing }}
+        run: |
+          set -Eeuo pipefail
+          project="$(
+            mktemp -d \
+              "${TMPDIR:-/tmp}/sdbx-${EXPOSURE_MODE}-${ROUTING_MODE}.XXXXXX"
+          )"
+          cd "$project"
+          password="$(openssl rand -base64 36)"
+          args=(
+            --skip-wizard
+            --domain box.example.test
+            --expose "$EXPOSURE_MODE"
+            --routing "$ROUTING_MODE"
+            --media-server none
+            --preset none
+            --allow-unprotected-downloads
+            --admin-password-stdin
+            --yes
+          )
+          if [[ "$EXPOSURE_MODE" == "direct" ]]; then
+            args+=(--acme-email admin@example.test)
+          fi
+          printf '%s\n' "$password" |
+            "${{ github.workspace }}/bin/sdbx" --no-tui init "${args[@]}"
+          "${{ github.workspace }}/bin/sdbx" lock verify
+          docker compose -f compose.yaml config --quiet
+
+  release-snapshot:
+    name: Release snapshot
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+
+    steps:
+      - name: Check out complete history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Install pinned SBOM generator
+        run: |
+          go install \
+            -ldflags="-s -w -X main.version=1.50.0 -X main.gitDescription=v1.50.0" \
+            github.com/anchore/syft/cmd/syft@v1.50.0
+          go install github.com/anchore/grant/cmd/grant@v0.6.8
+
+      - name: Prove release reproducibility
+        run: make release-reproducibility
+
+      - name: Verify archive allowlist, checksums, binaries, and SBOMs
+        run: scripts/verify-release-artifacts.sh dist

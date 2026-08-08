@@ -1,0 +1,94 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: qbittorrent
+  version: 1.0.0
+  category: downloads
+  description: "Free and open-source BitTorrent client"
+  homepage: https://www.qbittorrent.org
+  documentation: https://github.com/qbittorrent/qBittorrent/wiki
+  maintainer: sdbx-official
+  tags:
+    - linuxserver
+    - downloads
+    - torrent
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: qbittorrent
+    subtitle: "Torrents"
+applicationAuth:
+  mode: sdbx-managed-password
+permissions:
+  - config-path
+  - downloads-path
+  - host-port
+  - network:download
+  - route:admin-only
+  - service-network:gluetun
+spec:
+  image:
+    repository: linuxserver/qbittorrent
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: UMASK
+        value: "{{ .Config.Umask }}"
+      - name: WEBUI_PORT
+        value: "8080"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/qbittorrent"
+      containerPath: /config
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  healthCheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8080"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 30s
+  ports:
+    conditional:
+      - port: "127.0.0.1:8080:8080"
+        when: "{{ not .Config.VPNEnabled }}"
+      - port: "{{ .Config.TorrentPort }}:{{ .Config.TorrentPort }}"
+        when: "{{ not .Config.VPNEnabled }}"
+      - port: "{{ .Config.TorrentPort }}:{{ .Config.TorrentPort }}/udp"
+        when: "{{ not .Config.VPNEnabled }}"
+  networking:
+    networks:
+      - name: download
+        when: '{{ not .Config.VPNEnabled }}'
+    modeTemplate: '{{ if .Config.VPNEnabled }}service:gluetun{{ else }}bridge{{ end }}'
+  dependencies:
+    conditional:
+      - name: gluetun
+        condition: service_healthy
+        when: "{{ .Config.VPNEnabled }}"
+routing:
+  enabled: true
+  port: 8080
+  subdomain: qbt
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: download
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  always: true

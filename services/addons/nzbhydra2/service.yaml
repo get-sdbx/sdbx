@@ -1,0 +1,64 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: nzbhydra2
+  version: 1.0.0
+  category: downloads
+  description: "Usenet indexer meta-search aggregator"
+  homepage: https://github.com/theotherp/nzbhydra2
+  documentation: https://github.com/theotherp/nzbhydra2/wiki
+  maintainer: sdbx-official
+  tags:
+    - downloads
+    - usenet
+    - indexer
+    - linuxserver
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: nzbhydra2
+    subtitle: "Meta indexer"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/nzbhydra2
+    tag: latest
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/{{ .Name }}"
+      containerPath: /config
+  networking:
+    mode: bridge
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 5076
+  subdomain: nzbhydra
+  path: /nzbhydra
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+conditions:
+  requireAddon: true
+integrations:
+  cloudflared:
+    enabled: true

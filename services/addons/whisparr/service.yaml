@@ -1,0 +1,85 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: whisparr
+  version: 1.1.0
+  category: media
+  description: "Whisparr v3 adult-media automation and management"
+  homepage: https://github.com/Whisparr/Whisparr
+  documentation: https://wiki.servarr.com/whisparr/installation/docker
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - adult
+    - media
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: whisparr
+    subtitle: "Adult media"
+applicationAuth:
+  mode: sdbx-managed-forms
+permissions:
+  - config-path
+  - downloads-path
+  - media-path
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/hotio/whisparr
+    tag: v3
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: UMASK
+        value: "{{ .Config.Umask }}"
+      - name: WHISPARR__AUTH__METHOD
+        value: Forms
+      - name: WHISPARR__AUTH__REQUIRED
+        value: Enabled
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/whisparr"
+      containerPath: /config
+    - name: stash
+      hostPath: "{{ .Config.MediaPath }}/stash"
+      containerPath: /adult
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 6969
+  subdomain: whisparr
+  path: /whisparr
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+  unpackerr:
+    enabled: true
+    urlEnvVar: UN_WHISPARR_0_URL
+    apiKeyEnvVar: UN_WHISPARR_0_API_KEY
+    internalUrl: "http://sdbx-whisparr:6969"
+conditions:
+  requireAddon: true

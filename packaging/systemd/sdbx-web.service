@@ -1,0 +1,50 @@
+[Unit]
+Description=SDBX authenticated management console
+Documentation=https://github.com/get-sdbx/sdbx/blob/main/docs/installation.md
+Requires=sdbxd.service
+After=sdbxd.service
+
+[Service]
+Type=simple
+User=sdbx-web
+Group=sdbx
+UMask=0077
+ExecStart=/usr/local/bin/sdbx serve \
+  --addr=0.0.0.0:18777 \
+  --broker-socket=/run/sdbx/sdbxd.sock \
+  --broker-token-file=/run/sdbx/client.token \
+  --web-token-file=/run/sdbx/console.token \
+  --tls-cert-file=/run/sdbx/console-proxy-server.pem \
+  --tls-key-file=/run/sdbx/console-proxy-server-key.pem \
+  --client-ca-file=/run/sdbx/console-proxy-ca.pem \
+  --public-host-file=/run/sdbx/console-public-host \
+  --recovery-addr=127.0.0.1:18778
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=15s
+NoNewPrivileges=true
+CapabilityBoundingSet=
+MemoryDenyWriteExecute=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ProcSubset=pid
+RemoveIPC=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallFilter=~@clock @cpu-emulation @debug @module @mount @obsolete @raw-io @reboot @swap
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

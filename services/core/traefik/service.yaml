@@ -1,0 +1,92 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: traefik
+  version: 1.0.0
+  category: networking
+  description: "Modern HTTP reverse proxy and load balancer"
+  homepage: https://traefik.io
+  documentation: https://doc.traefik.io/traefik/
+  maintainer: sdbx-official
+  tags:
+    - reverse-proxy
+    - networking
+    - core
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - host-port
+  - network:app
+  - network:download
+  - network:edge
+  - network:management
+  - secret:console_proxy_ca
+  - secret:console_proxy_client_cert
+  - secret:console_proxy_client_key
+spec:
+  image:
+    repository: traefik
+    tag: v3.7.10
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    readOnlyRootFilesystem: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m
+    pidsLimit: 128
+    capabilities:
+      drop:
+        - ALL
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/traefik/traefik.yml"
+      containerPath: /etc/traefik/traefik.yml
+      readOnly: true
+    - name: dynamic
+      hostPath: "{{ .Config.ConfigPath }}/traefik/dynamic"
+      containerPath: /etc/traefik/dynamic
+      readOnly: true
+    - name: acme-state
+      hostPath: "{{ .Config.ConfigPath }}/traefik/acme.json"
+      containerPath: /acme.json
+      when: '{{ eq .Config.Expose.Mode "direct" }}'
+  ports:
+    conditional:
+      - port: "80:80"
+        when: '{{ or (eq .Config.Expose.Mode "lan") (eq .Config.Expose.Mode "direct") }}'
+      - port: "443:443"
+        when: '{{ or (eq .Config.Expose.Mode "lan") (eq .Config.Expose.Mode "direct") }}'
+  networking:
+    networks:
+      - name: edge
+      - name: app
+      - name: download
+      - name: management
+  healthcheck:
+    test: ["CMD", "traefik", "healthcheck", "--ping"]
+    interval: 10s
+    timeout: 3s
+    retries: 10
+routing:
+  enabled: false
+secrets:
+  - name: console_proxy_ca
+    type: manual
+    description: "Private CA for the host console transport"
+  - name: console_proxy_client_cert
+    type: manual
+    description: "Traefik client certificate for the host console"
+  - name: console_proxy_client_key
+    type: manual
+    description: "Traefik client key for the host console"
+integrations:
+  cloudflared:
+    enabled: false
+conditions:
+  always: true

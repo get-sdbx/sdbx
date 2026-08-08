@@ -1,0 +1,77 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: seerr
+  version: 1.0.0
+  category: media
+  description: "Media request and discovery portal for Plex and Jellyfin"
+  homepage: https://seerr.dev
+  documentation: https://docs.seerr.dev
+  maintainer: sdbx-official
+  tags:
+    - requests
+    - plex
+    - jellyfin
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: seerr
+    subtitle: "Requests"
+applicationAuth:
+  mode: service-managed
+permissions:
+  - config-path
+  - host-chown
+  - network:app
+  - route:native-auth
+spec:
+  image:
+    repository: ghcr.io/seerr-team/seerr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    init: true
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: LOG_LEVEL
+        value: info
+      - name: PORT
+        value: "5055"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/seerr"
+      containerPath: /app/config
+      chown: true
+      chownUID: 1000
+      chownGID: 1000
+  networking:
+    networks:
+      - name: app
+  healthcheck:
+    test:
+      - CMD-SHELL
+      - wget --no-verbose --tries=1 --spider http://127.0.0.1:5055/api/v1/settings/public || exit 1
+    start_period: 20s
+    timeout: 3s
+    interval: 15s
+    retries: 3
+routing:
+  enabled: true
+  port: 5055
+  subdomain: requests
+  path: /requests
+  forceSubdomain: true
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

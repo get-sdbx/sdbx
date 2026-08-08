@@ -1,0 +1,100 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: tdarr
+  version: 1.0.0
+  category: media
+  description: "Distributed media transcoding with a safe CPU-only internal node"
+  homepage: https://home.tdarr.io
+  documentation: https://docs.tdarr.io/docs/installation/docker/run-compose/
+  maintainer: sdbx-official
+  tags:
+    - transcoding
+    - automation
+    - cpu
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: tdarr
+    subtitle: "Transcoding"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - downloads-path
+  - media-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/haveagitgat/tdarr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: UMASK_SET
+        value: "002"
+      - name: serverIP
+        value: 0.0.0.0
+      - name: serverPort
+        value: "8266"
+      - name: webUIPort
+        value: "8265"
+      - name: internalNode
+        value: "true"
+      - name: inContainer
+        value: "true"
+      - name: ffmpegVersion
+        value: "7"
+      - name: nodeName
+        value: SDBX Internal Node
+      - name: auth
+        value: "true"
+      - name: openBrowser
+        value: "false"
+      - name: maxLogSizeMB
+        value: "10"
+  volumes:
+    - name: server
+      hostPath: "{{ .Config.ConfigPath }}/tdarr/server"
+      containerPath: /app/server
+    - name: configs
+      hostPath: "{{ .Config.ConfigPath }}/tdarr/configs"
+      containerPath: /app/configs
+    - name: logs
+      hostPath: "{{ .Config.ConfigPath }}/tdarr/logs"
+      containerPath: /app/logs
+    - name: media
+      hostPath: "{{ .Config.MediaPath }}"
+      containerPath: /media
+    - name: transcode-cache
+      hostPath: "{{ .Config.DownloadsPath }}/tdarr-transcode"
+      containerPath: /temp
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 8265
+  subdomain: tdarr
+  path: /tdarr
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

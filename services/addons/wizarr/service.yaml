@@ -1,0 +1,67 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: wizarr
+  version: 1.1.0
+  category: media
+  description: "Invitation and onboarding portal for media server users"
+  homepage: https://wizarr.dev
+  documentation: https://docs.wizarr.dev/getting-started/installation
+  maintainer: sdbx-official
+  tags:
+    - invitations
+    - onboarding
+    - plex
+    - jellyfin
+presentation:
+  launcher:
+    enabled: true
+    group: management
+    icon: wizarr
+    subtitle: "Invitations"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/wizarrrr/wizarr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: DISABLE_BUILTIN_AUTH
+        value: "true"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/wizarr"
+      containerPath: /data
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 5690
+  subdomain: invites
+  path: /invites
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

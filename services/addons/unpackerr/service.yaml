@@ -1,0 +1,77 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: unpackerr
+  version: 1.0.0
+  category: utility
+  description: "Background archive extractor for completed downloads and supported Arr services"
+  homepage: https://unpackerr.zip
+  documentation: https://unpackerr.zip/docs/install/docker/
+  maintainer: sdbx-official
+  tags:
+    - extraction
+    - automation
+    - arr-stack
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - downloads-path
+  - host-chown
+  - network:app
+  - secret:unpackerr_lidarr_api_key
+  - secret:unpackerr_radarr_api_key
+  - secret:unpackerr_sonarr_api_key
+  - secret:unpackerr_whisparr_api_key
+spec:
+  image:
+    repository: ghcr.io/unpackerr/unpackerr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    user: "{{ .Config.PUID }}:{{ .Config.PGID }}"
+    readOnlyRootFilesystem: true
+    pidsLimit: 128
+    capabilities:
+      drop:
+        - ALL
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+    envFile:
+      - "{{ .Config.ConfigPath }}/unpackerr/sdbx.env"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/unpackerr"
+      containerPath: /config
+      chown: true
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: false
+secrets:
+  - name: unpackerr_sonarr_api_key
+    type: manual
+    optional: true
+    description: "Generated copy of the Sonarr API key for Unpackerr"
+  - name: unpackerr_radarr_api_key
+    type: manual
+    optional: true
+    description: "Generated copy of the Radarr API key for Unpackerr"
+  - name: unpackerr_lidarr_api_key
+    type: manual
+    optional: true
+    description: "Generated copy of the Lidarr API key for Unpackerr"
+  - name: unpackerr_whisparr_api_key
+    type: manual
+    optional: true
+    description: "Generated copy of the Whisparr API key for Unpackerr"
+conditions:
+  requireAddon: true

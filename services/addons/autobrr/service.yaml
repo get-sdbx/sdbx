@@ -1,0 +1,64 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: autobrr
+  version: 1.0.0
+  category: downloads
+  description: "IRC and RSS download automation for torrents and Usenet"
+  homepage: https://autobrr.com
+  documentation: https://autobrr.com/installation/docker
+  maintainer: sdbx-official
+  tags:
+    - torrent
+    - automation
+    - private-trackers
+    - irc
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: autobrr
+    subtitle: "Download automation"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - host-chown
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/autobrr/autobrr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/autobrr"
+      containerPath: /config
+      chown: true
+  networking:
+    networks:
+      - name: download
+routing:
+  enabled: true
+  port: 7474
+  subdomain: autobrr
+  path: /autobrr
+  pathRouting:
+    strategy: stripPrefix
+  auth:
+    mode: admin-only
+  traefik:
+    network: download
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

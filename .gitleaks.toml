@@ -1,0 +1,69 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Ignored local build and test output"
+paths = [
+  '''^\.test/''',
+  '''^bin/''',
+  '''^dist/''',
+  '''^output/''',
+]
+
+[[allowlists]]
+description = "Canonical Unpackerr API-key environment field names are schema, not values"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''^(?:services/(?:core|addons)|internal/registry/services/(?:core|addons))/(?:sonarr|radarr|lidarr|whisparr)/service\.yaml$''',
+  '''^internal/registry/validator(?:_test)?\.go$''',
+]
+regexes = [
+  '''^\s*apiKeyEnvVar:\s+UN_(?:SONARR|RADARR|LIDARR|WHISPARR)_0_API_KEY\s*$''',
+  '''^\s*(?:apiKeyEnvVar|APIKeyEnvVar):\s+"UN_(?:SONARR|RADARR|LIDARR|WHISPARR)_0_API_KEY",?\s*$''',
+]
+
+[[allowlists]]
+description = "Historical registry integration fixture stores an API-key environment variable name"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^internal/registry/types_test\.go$''']
+regexes = [
+  '''^\s*APIKeyEnvVar:\s+"[A-Z][A-Z0-9_]*_API_KEY",?\s*$''',
+]
+
+[[allowlists]]
+description = "Historical synthetic File Browser bootstrap password fixtures"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^cmd/sdbx/cmd/secrets_test\.go$''']
+regexes = [
+  '''randomly generated password:\s*(?:DcPE53AtXely0x9d|aB3xZqR1)''',
+]
+
+[[allowlists]]
+description = "Synthetic source-signing fingerprint fixture"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^cmd/sdbx/cmd/source_test\.go$''']
+regexes = ['''sourceSigningKey\s*=\s*"[0-9A-F]{40}"''']
+
+[[allowlists]]
+description = "Synthetic broker bearer token fixture"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^internal/broker/broker_test\.go$''']
+regexes = ['''strings\.Repeat\("0123456789abcdef",\s*2\)''']
+
+[[allowlists]]
+description = "Synthetic application API-key fixtures"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "line"
+paths = ['''^internal/integrate/decluttarr_test\.go$''']
+regexes = ['''(?:sonarr|radarr|lidarr)key0123456789''']

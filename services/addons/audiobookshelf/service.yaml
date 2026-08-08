@@ -1,0 +1,71 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: audiobookshelf
+  version: 1.0.0
+  category: media
+  description: "Audiobook and podcast server with multi-user progress sync"
+  homepage: https://www.audiobookshelf.org
+  documentation: https://www.audiobookshelf.org/docs
+  maintainer: sdbx-official
+  tags:
+    - audiobooks
+    - podcasts
+    - streaming
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: audiobookshelf
+    subtitle: "Audiobooks and podcasts"
+applicationAuth:
+  mode: service-managed
+permissions:
+  - config-path
+  - media-path
+  - network:app
+  - route:native-auth
+spec:
+  image:
+    repository: ghcr.io/advplyr/audiobookshelf
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: audiobooks
+      hostPath: "{{ .Config.MediaPath }}/audiobooks"
+      containerPath: /audiobooks
+    - name: podcasts
+      hostPath: "{{ .Config.MediaPath }}/podcasts"
+      containerPath: /podcasts
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/audiobookshelf/config"
+      containerPath: /config
+    - name: metadata
+      hostPath: "{{ .Config.ConfigPath }}/audiobookshelf/metadata"
+      containerPath: /metadata
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 13378
+  subdomain: audiobooks
+  path: /audiobookshelf
+  pathRouting:
+    strategy: none
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

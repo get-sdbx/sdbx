@@ -1,0 +1,669 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sdbx.one/schemas/service-v1.json",
+  "title": "SDBX Service Definition",
+  "description": "Schema for SDBX service definition files",
+  "type": "object",
+  "required": ["apiVersion", "kind", "applicationAuth", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "sdbx.one/v1",
+      "description": "API version for the service definition"
+    },
+    "kind": {
+      "type": "string",
+      "const": "Service",
+      "description": "Resource kind"
+    },
+    "applicationAuth": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "none",
+            "identity-provider",
+            "sdbx-managed-forms",
+            "sdbx-managed-password",
+            "sdbx-managed-api-key",
+            "service-managed",
+            "upstream-default"
+          ],
+          "description": "Owner and lifecycle of the application's native credential boundary"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "category", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$|^[a-z]$",
+          "description": "Service identifier (lowercase, alphanumeric, hyphens, no trailing hyphen)"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Service definition version (semver)"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["media", "downloads", "management", "utility", "networking", "auth"],
+          "description": "Service category"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description"
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri",
+          "description": "Project homepage URL"
+        },
+        "documentation": {
+          "type": "string",
+          "format": "uri",
+          "description": "Documentation URL"
+        },
+        "maintainer": {
+          "type": "string",
+          "description": "Service maintainer"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tags for search and categorization"
+        }
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "properties": {
+        "launcher": {
+          "type": "object",
+          "required": ["enabled", "group"],
+          "properties": {
+            "enabled": {
+              "const": true,
+              "description": "Expose this routed service in the built-in management dashboard launcher"
+            },
+            "group": {
+              "type": "string",
+              "enum": ["media", "downloads", "management", "utilities"],
+              "description": "Operator-facing launcher group"
+            },
+            "icon": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,31}$",
+              "description": "Local icon token; URLs, paths, extensions, and markup are forbidden"
+            },
+            "subtitle": {
+              "type": "string",
+              "maxLength": 80,
+              "description": "Short launcher description"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "permissions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "anyOf": [
+          {
+            "enum": [
+              "privileged",
+              "host-network",
+              "device",
+              "host-chown",
+              "host-mount",
+              "host-port",
+              "config-path",
+              "data-path",
+              "downloads-path",
+              "media-path",
+              "project-path",
+              "secrets-path"
+            ]
+          },
+          {
+            "pattern": "^capability:[A-Z][A-Z0-9_]*$"
+          },
+          {
+            "pattern": "^secret:[a-z][a-z0-9_]*$"
+          },
+          {
+            "pattern": "^network:(edge|app|download|management)$"
+          },
+          {
+            "pattern": "^service-network:[a-z0-9][a-z0-9-]{0,62}$"
+          },
+          {
+            "pattern": "^service-override:[a-z0-9][a-z0-9-]{0,62}$"
+          },
+          {
+            "pattern": "^route:(admin-only|protected|native-auth|public)$"
+          }
+        ]
+      },
+      "description": "Exact sensitive runtime capabilities requested by this definition"
+    },
+    "spec": {
+      "type": "object",
+      "required": ["image"],
+      "properties": {
+        "image": {
+          "type": "object",
+          "required": ["repository", "tag"],
+          "properties": {
+            "repository": {
+              "type": "string",
+              "description": "Docker image repository"
+            },
+            "tag": {
+              "type": "string",
+              "description": "Docker image tag"
+            },
+            "registry": {
+              "type": "string",
+              "description": "Container registry URL"
+            }
+          }
+        },
+        "container": {
+          "type": "object",
+          "properties": {
+            "name_template": {
+              "type": "string",
+              "default": "sdbx-{{ .Name }}",
+              "description": "Container name template"
+            },
+            "hostname": {
+              "type": "string",
+              "description": "Stable RFC 1123 hostname used as the application instance identity"
+            },
+            "restart": {
+              "type": "string",
+              "enum": ["no", "always", "on-failure", "unless-stopped"],
+              "default": "unless-stopped",
+              "description": "Restart policy"
+            },
+            "user": {
+              "type": "string",
+              "description": "Non-root numeric runtime identity, optionally UID:GID"
+            },
+            "command": {
+              "type": "string",
+              "description": "Container command override"
+            },
+            "working_dir": {
+              "type": "string",
+              "description": "Container working directory override"
+            },
+            "shm_size": {
+              "type": "string",
+              "description": "Size of the container shared-memory filesystem"
+            },
+            "sysctls": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Container-scoped sysctl values"
+            },
+            "customLabels": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Additional container labels"
+            },
+            "privileged": {
+              "type": "boolean",
+              "default": false,
+              "description": "Run container in privileged mode"
+            },
+            "readOnlyRootFilesystem": {
+              "type": "boolean",
+              "default": false,
+              "description": "Mount the container root filesystem read-only"
+            },
+            "tmpfs": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Ephemeral tmpfs mounts"
+            },
+            "pidsLimit": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Maximum number of container processes"
+            },
+            "stopGracePeriod": {
+              "type": "string",
+              "description": "Grace period before force-stopping the container"
+            },
+            "capabilities": {
+              "type": "object",
+              "properties": {
+                "add": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Linux capabilities to add"
+                },
+                "drop": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Linux capabilities to drop"
+                }
+              }
+            },
+            "devices": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Device mappings"
+            },
+            "init": {
+              "type": "boolean",
+              "default": false,
+              "description": "Run a minimal init process as PID 1"
+            }
+          }
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "static": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Environment variable name"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Environment variable value"
+                  },
+                  "valueFrom": {
+                    "type": "object",
+                    "properties": {
+                      "secretRef": {
+                        "type": "string",
+                        "description": "Reference to a secret"
+                      },
+                      "configRef": {
+                        "type": "string",
+                        "description": "Reference to a config value"
+                      }
+                    }
+                  }
+                }
+              },
+              "description": "Static environment variables"
+            },
+            "conditional": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Environment variable name"
+                  },
+                  "value": {
+                    "type": "string",
+                    "description": "Environment variable value"
+                  },
+                  "valueFrom": {
+                    "type": "object",
+                    "properties": {
+                      "secretRef": {
+                        "type": "string",
+                        "description": "Reference to a secret"
+                      },
+                      "configRef": {
+                        "type": "string",
+                        "description": "Reference to a config value"
+                      }
+                    }
+                  },
+                  "when": {
+                    "type": "string",
+                    "description": "Condition for inclusion"
+                  }
+                }
+              },
+              "description": "Conditional environment variables"
+            },
+            "envFile": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Environment files to include"
+            }
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["hostPath", "containerPath"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Volume name"
+              },
+              "hostPath": {
+                "type": "string",
+                "description": "Path on the host"
+              },
+              "containerPath": {
+                "type": "string",
+                "description": "Path inside the container"
+              },
+              "readOnly": {
+                "type": "boolean",
+                "default": false,
+                "description": "Mount as read-only"
+              },
+              "when": {
+                "type": "string",
+                "description": "Go-template condition controlling whether the volume is mounted"
+              },
+              "chown": {
+                "type": "boolean",
+                "default": false,
+                "description": "Set host-path ownership after creating the directory"
+              },
+              "chownUID": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Fixed non-root UID used when chown is enabled"
+              },
+              "chownGID": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Fixed non-root GID used when chown is enabled"
+              }
+            }
+          }
+        },
+        "ports": {
+          "type": "object",
+          "properties": {
+            "static": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Static port mappings"
+            },
+            "conditional": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["port", "when"],
+                "properties": {
+                  "port": {
+                    "type": "string",
+                    "description": "Port mapping"
+                  },
+                  "when": {
+                    "type": "string",
+                    "description": "Condition for inclusion"
+                  }
+                }
+              },
+              "description": "Conditional port mappings"
+            }
+          }
+        },
+        "networking": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "description": "Network mode (bridge, host, or service:<name>)"
+            },
+            "modeTemplate": {
+              "type": "string",
+              "description": "Template for dynamic network mode"
+            },
+            "networks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "enum": ["edge", "app", "download", "management"],
+                    "description": "SDBX trust-boundary network name"
+                  },
+                  "when": {
+                    "type": "string",
+                    "description": "Condition for joining network"
+                  }
+                }
+              },
+              "description": "Networks to join"
+            }
+          }
+        },
+        "healthcheck": {
+          "type": "object",
+          "properties": {
+            "test": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Health check command"
+            },
+            "interval": {
+              "type": "string",
+              "description": "Time between health checks"
+            },
+            "timeout": {
+              "type": "string",
+              "description": "Health check timeout"
+            },
+            "retries": {
+              "type": "integer",
+              "description": "Number of retries before marking unhealthy"
+            },
+            "start_period": {
+              "type": "string",
+              "description": "Grace period before health checks start"
+            }
+          }
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Required service dependencies"
+            },
+            "conditional": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "when"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Dependency service name"
+                  },
+                  "condition": {
+                    "type": "string",
+                    "enum": [
+                      "service_started",
+                      "service_healthy",
+                      "service_completed_successfully"
+                    ],
+                    "description": "Docker Compose dependency readiness condition"
+                  },
+                  "when": {
+                    "type": "string",
+                    "description": "When condition for inclusion"
+                  }
+                }
+              },
+              "description": "Conditional dependencies"
+            }
+          }
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the service has a web UI to expose"
+        },
+        "port": {
+          "type": "integer",
+          "description": "Internal port for the service"
+        },
+        "subdomain": {
+          "type": "string",
+          "description": "Subdomain for subdomain-based routing"
+        },
+        "path": {
+          "type": "string",
+          "description": "Path prefix for path-based routing"
+        },
+        "forceSubdomain": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force subdomain routing even when path routing is configured"
+        },
+        "pathRouting": {
+          "type": "object",
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": ["stripPrefix", "urlBase", "none"],
+              "description": "Path routing strategy"
+            },
+            "urlBaseEnvVar": {
+              "type": "string",
+              "description": "Environment variable name for URL base configuration"
+            }
+          }
+        },
+        "auth": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["admin-only", "protected", "native-auth", "public"],
+              "description": "Layer responsible for authenticating this route"
+            }
+          }
+        },
+        "traefik": {
+          "type": "object",
+          "properties": {
+            "network": {
+              "type": "string",
+              "enum": ["app", "download", "management"],
+              "description": "Trust-boundary network Traefik uses to reach the service"
+            }
+          }
+        }
+      }
+    },
+    "secrets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Secret identifier"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["auto", "manual"],
+            "description": "Secret generation type"
+          },
+          "length": {
+            "type": "integer",
+            "default": 32,
+            "description": "Length of auto-generated secret"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of the secret"
+          }
+        }
+      }
+    },
+    "conditions": {
+      "type": "object",
+      "properties": {
+        "always": {
+          "type": "boolean",
+          "description": "Always include this service (core service)"
+        },
+        "requireAddon": {
+          "type": "boolean",
+          "description": "Requires explicit addon enable"
+        },
+        "requireConfig": {
+          "type": "string",
+          "enum": [
+            "vpn_enabled",
+            "cloudflared",
+            "plex_enabled",
+            "jellyfin_enabled"
+          ],
+          "description": "Config condition that must be true"
+        }
+      }
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "cloudflared": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable Cloudflare Tunnel integration"
+            }
+          }
+        },
+        "unpackerr": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable Unpackerr integration"
+            },
+            "urlEnvVar": {
+              "type": "string",
+              "description": "Environment variable for service URL"
+            },
+            "apiKeyEnvVar": {
+              "type": "string",
+              "description": "Environment variable for API key"
+            },
+            "internalUrl": {
+              "type": "string",
+              "description": "Internal Docker network URL for the service"
+            }
+          }
+        }
+      }
+    }
+  }
+}

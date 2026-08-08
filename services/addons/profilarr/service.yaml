@@ -1,0 +1,71 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: profilarr
+  version: 1.1.0
+  category: utility
+  description: "Quality profile and custom format management for Sonarr and Radarr"
+  homepage: https://dictionarry.dev
+  documentation: https://github.com/Dictionarry-Hub/profilarr
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - quality
+    - automation
+presentation:
+  launcher:
+    enabled: true
+    group: utilities
+    icon: profilarr
+    subtitle: "Quality profiles"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/dictionarry-hub/profilarr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: PORT
+        value: "6868"
+      # Profilarr explicitly supports delegating authentication to an external
+      # proxy. The route remains admin-only and is protected by Authelia.
+      - name: AUTH
+        value: "off"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/profilarr"
+      containerPath: /config
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 6868
+  subdomain: profilarr
+  path: /profilarr
+  pathRouting:
+    strategy: stripPrefix
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

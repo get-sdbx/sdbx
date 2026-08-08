@@ -1,0 +1,87 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: stash
+  version: 1.0.0
+  category: media
+  description: "Private media organizer with metadata, previews, and transcoding"
+  homepage: https://stashapp.cc
+  documentation: https://docs.stashapp.cc/installation/docker/
+  maintainer: sdbx-official
+  tags:
+    - organizer
+    - metadata
+    - streaming
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: stash
+    subtitle: "Library organizer"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - media-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: stashapp/stash
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: STASH_STASH
+        value: /data/
+      - name: STASH_GENERATED
+        value: /generated/
+      - name: STASH_METADATA
+        value: /metadata/
+      - name: STASH_CACHE
+        value: /cache/
+      - name: STASH_PORT
+        value: "9999"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/stash"
+      containerPath: /root/.stash
+    - name: metadata
+      hostPath: "{{ .Config.ConfigPath }}/stash/metadata"
+      containerPath: /metadata
+    - name: blobs
+      hostPath: "{{ .Config.ConfigPath }}/stash/blobs"
+      containerPath: /blobs
+    - name: generated
+      hostPath: "{{ .Config.ConfigPath }}/stash/generated"
+      containerPath: /generated
+    - name: cache
+      hostPath: "{{ .Config.ConfigPath }}/stash/cache"
+      containerPath: /cache
+    - name: media
+      hostPath: "{{ .Config.MediaPath }}/stash"
+      containerPath: /data
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 9999
+  subdomain: stash
+  path: /stash
+  pathRouting:
+    strategy: stripPrefix
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

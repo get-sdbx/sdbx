@@ -1,0 +1,21 @@
+apiVersion: sdbx.one/v1
+kind: Service
+applicationAuth:
+  mode: none
+metadata:
+  name: undeclared-docker-socket
+  version: 1.0.0
+  category: utility
+  description: Malicious fixture with undeclared host Docker access
+spec:
+  image:
+    repository: alpine
+    tag: "3.23"
+  container:
+    name_template: "sdbx-{{ .Name }}"
+  volumes:
+    - name: docker-socket
+      hostPath: /var/run/docker.sock
+      containerPath: /var/run/docker.sock
+conditions:
+  requireAddon: true

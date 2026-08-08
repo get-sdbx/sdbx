@@ -1,0 +1,274 @@
+name: Release candidate
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GO_VERSION: "1.26.5"
+  GORELEASER_VERSION: "v2.17.1"
+
+jobs:
+  build:
+    name: Validate and build release artifacts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify annotated release tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -Eeuo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]
+          [[ "$(git rev-list -n 1 "$RELEASE_TAG")" == "$GITHUB_SHA" ]]
+          [[ "$(git cat-file -t "$RELEASE_TAG")" == "tag" ]]
+
+      - name: Verify self-contained candidate scope
+        run: make candidate-scope
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: go.sum
+
+      - name: Run release gates
+        run: |
+          go mod verify
+          make fmt-check
+          make docs-check
+          make licenses-check
+          go vet ./...
+          go test -race ./...
+          make lint
+          make security
+          make workflows
+
+      - name: Install pinned SBOM and license tools
+        run: |
+          go install \
+            -ldflags="-s -w -X main.version=1.50.0 -X main.gitDescription=v1.50.0" \
+            github.com/anchore/syft/cmd/syft@v1.50.0
+          go install github.com/anchore/grant/cmd/grant@v0.6.8
+
+      - name: Build without release authority
+        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        with:
+          distribution: goreleaser
+          version: ${{ env.GORELEASER_VERSION }}
+          args: release --clean --skip=publish
+
+      - name: Verify built artifacts
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: >-
+          scripts/verify-release-artifacts.sh
+          --release-tag "$RELEASE_TAG"
+          --commit "$GITHUB_SHA"
+          dist
+
+      - name: Freeze the unsigned public asset allowlist
+        run: scripts/list-release-assets.sh dist > dist/release-assets.txt
+
+      - name: Upload immutable build handoff
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sdbx-release-unsigned
+          path: dist/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  catalog-images:
+    name: Scan exact release catalog images
+    uses: ./.github/workflows/catalog-images.yml
+    permissions:
+      contents: read
+
+  sign:
+    name: Verify acceptance, sign, and attest release artifacts
+    needs:
+      - build
+      - catalog-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: github-release
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+
+    steps:
+      - name: Check out the reviewed acceptance verifier
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: scripts/verify-amd64-acceptance-evidence.sh
+          sparse-checkout-cone-mode: false
+          path: release-policy
+
+      - name: Bind maintainer acceptance to immutable amd64 evidence
+        env:
+          ACCEPTED_COMMIT: ${{ vars.SDBX_AMD64_ACCEPTANCE_COMMIT }}
+          EVIDENCE_SHA256: ${{ vars.SDBX_AMD64_ACCEPTANCE_EVIDENCE_SHA256 }}
+          EVIDENCE_URL: ${{ vars.SDBX_AMD64_ACCEPTANCE_EVIDENCE_URL }}
+          EXPECTED_MAINTAINER: ${{ vars.SDBX_RELEASE_MAINTAINER }}
+        run: |
+          bash release-policy/scripts/verify-amd64-acceptance-evidence.sh \
+            --commit "$ACCEPTED_COMMIT" \
+            --maintainer "$EXPECTED_MAINTAINER" \
+            --sha256 "$EVIDENCE_SHA256" \
+            --url "$EVIDENCE_URL"
+          [[ "$ACCEPTED_COMMIT" == "$GITHUB_SHA" ]]
+
+      - name: Set up pinned Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Download build handoff with digest enforcement
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sdbx-release-unsigned
+          path: dist
+
+      - name: Verify the frozen build handoff
+        run: |
+          set -Eeuo pipefail
+          [[ -f dist/release-assets.txt && ! -L dist/release-assets.txt ]]
+          mapfile -t asset_names < dist/release-assets.txt
+          [[ "${#asset_names[@]}" == "5" ]]
+          for asset_name in "${asset_names[@]}"; do
+            [[ "$asset_name" =~ ^(checksums\.txt|sdbx_[0-9A-Za-z.+-]+_linux_(amd64|arm64)\.tar\.gz(\.spdx\.json)?)$ ]]
+            [[ -f "dist/$asset_name" && ! -L "dist/$asset_name" ]]
+          done
+
+      - name: Install pinned signing tool
+        run: go install github.com/sigstore/cosign/v3/cmd/cosign@v3.1.3
+
+      - name: Sign checksum manifest with keyless Sigstore
+        run: >-
+          cosign sign-blob
+          --yes
+          --bundle=dist/checksums.txt.sigstore.json
+          dist/checksums.txt
+
+      - name: Verify checksum signature identity
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          cosign verify-blob \
+            --bundle dist/checksums.txt.sigstore.json \
+            --certificate-identity "https://github.com/get-sdbx/sdbx/.github/workflows/release.yml@refs/tags/$RELEASE_TAG" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            dist/checksums.txt
+
+      - name: Attest archives and checksum manifest
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-path: |
+            dist/sdbx_*.tar.gz
+            dist/checksums.txt
+
+      - name: Freeze the signed public asset allowlist
+        run: |
+          set -Eeuo pipefail
+          [[ -f dist/checksums.txt.sigstore.json && ! -L dist/checksums.txt.sigstore.json ]]
+          printf '%s\n' checksums.txt.sigstore.json >> dist/release-assets.txt
+
+      - name: Upload signed release handoff
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sdbx-release-signed
+          path: dist/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  publish-draft:
+    name: Create verified draft release
+    needs:
+      - sign
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      GH_REPO: ${{ github.repository }}
+
+    steps:
+      - name: Download signed handoff with digest enforcement
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sdbx-release-signed
+          path: dist
+
+      - name: Create the draft from the frozen allowlist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -Eeuo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]
+          [[ -f dist/release-assets.txt && ! -L dist/release-assets.txt ]]
+          mapfile -t asset_names < dist/release-assets.txt
+          [[ "${#asset_names[@]}" == "6" ]]
+
+          release_assets=()
+          for asset_name in "${asset_names[@]}"; do
+            [[ "$asset_name" =~ ^(checksums\.txt|checksums\.txt\.sigstore\.json|sdbx_[0-9A-Za-z.+-]+_linux_(amd64|arm64)\.tar\.gz(\.spdx\.json)?)$ ]]
+            [[ -f "dist/$asset_name" && ! -L "dist/$asset_name" ]]
+            release_assets+=("dist/$asset_name")
+          done
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            printf 'release already exists for %s; refusing to overwrite it\n' "$RELEASE_TAG" >&2
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" \
+            "${release_assets[@]}" \
+            --draft \
+            --generate-notes \
+            --title "SDBX $RELEASE_TAG" \
+            --verify-tag
+
+      - name: Download and compare every draft asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -Eeuo pipefail
+          [[ "$(
+            gh release view "$RELEASE_TAG" --json assets --jq '.assets | length'
+          )" == "6" ]]
+          download_dir="$RUNNER_TEMP/sdbx-release-download"
+          mkdir -p "$download_dir"
+          gh release download "$RELEASE_TAG" --dir "$download_dir"
+          mapfile -t asset_names < dist/release-assets.txt
+          for asset_name in "${asset_names[@]}"; do
+            cmp -s "dist/$asset_name" "$download_dir/$asset_name"
+          done
+          (
+            cd "$download_dir"
+            sha256sum --check checksums.txt
+          )
+          [[ "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" == "true" ]]

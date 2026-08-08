@@ -1,0 +1,76 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: navidrome
+  version: 1.0.0
+  category: media
+  description: "Subsonic-compatible music streaming server"
+  homepage: https://www.navidrome.org
+  documentation: https://www.navidrome.org/docs/installation/docker/
+  maintainer: sdbx-official
+  tags:
+    - music
+    - streaming
+    - subsonic
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: navidrome
+    subtitle: "Music streaming"
+applicationAuth:
+  mode: service-managed
+permissions:
+  - config-path
+  - host-chown
+  - media-path
+  - network:app
+  - route:native-auth
+spec:
+  image:
+    repository: deluan/navidrome
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    user: "{{ .Config.PUID }}:{{ .Config.PGID }}"
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: ND_LOGLEVEL
+        value: info
+    conditional:
+      - name: ND_BASEURL
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: data
+      hostPath: "{{ .Config.ConfigPath }}/navidrome"
+      containerPath: /data
+      chown: true
+    - name: music
+      hostPath: "{{ .Config.MediaPath }}/music"
+      containerPath: /music
+      readOnly: true
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 4533
+  subdomain: navidrome
+  path: /navidrome
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: ND_BASEURL
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

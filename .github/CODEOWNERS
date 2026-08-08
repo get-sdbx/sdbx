@@ -1,0 +1,19 @@
+# Default review owner
+* @get-sdbx/maintainers
+
+# Security, release, and trust boundaries require explicit owner review.
+/.github/ @get-sdbx/maintainers
+/.goreleaser.yaml @get-sdbx/maintainers
+/SECURITY.md @get-sdbx/maintainers
+/packaging/ @get-sdbx/maintainers
+/cmd/sdbxd/ @get-sdbx/maintainers
+/internal/backup/ @get-sdbx/maintainers
+/internal/broker/ @get-sdbx/maintainers
+/internal/generator/ @get-sdbx/maintainers
+/internal/management/ @get-sdbx/maintainers
+/internal/registry/ @get-sdbx/maintainers
+/internal/routing/ @get-sdbx/maintainers
+/internal/secrets/ @get-sdbx/maintainers
+/internal/securefs/ @get-sdbx/maintainers
+/internal/webui/ @get-sdbx/maintainers
+/services/ @get-sdbx/maintainers

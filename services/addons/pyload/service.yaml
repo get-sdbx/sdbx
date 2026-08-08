@@ -1,0 +1,72 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: pyload
+  version: 1.0.0
+  category: downloads
+  description: "Web-managed HTTP and file-hoster download client"
+  homepage: https://pyload.net
+  documentation: https://docs.linuxserver.io/images/docker-pyload-ng/
+  maintainer: sdbx-official
+  tags:
+    - downloads
+    - direct-download
+    - linuxserver
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: pyload
+    subtitle: "Direct downloads"
+applicationAuth:
+  mode: upstream-default
+permissions:
+  - config-path
+  - downloads-path
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: lscr.io/linuxserver/pyload-ng
+    tag: latest
+    registry: lscr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: UMASK
+        value: "{{ .Config.Umask }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/pyload"
+      containerPath: /config
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 8000
+  subdomain: pyload
+  path: /pyload
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

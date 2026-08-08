@@ -1,0 +1,65 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: notifiarr
+  version: 1.0.0
+  category: utility
+  description: "Notification and monitoring client for media automation services"
+  homepage: https://notifiarr.com
+  documentation: https://notifiarr.wiki/pages/client/install/
+  maintainer: sdbx-official
+  tags:
+    - notifications
+    - monitoring
+    - arr
+presentation:
+  launcher:
+    enabled: true
+    group: utilities
+    icon: notifiarr
+    subtitle: "Notifications"
+applicationAuth:
+  mode: service-managed
+permissions:
+  - config-path
+  - network:app
+  - route:native-auth
+spec:
+  image:
+    repository: ghcr.io/notifiarr/notifiarr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    hostname: notifiarr
+    restart: unless-stopped
+  environment:
+    static:
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/notifiarr"
+      containerPath: /config
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 5454
+  subdomain: notifiarr
+  path: /notifiarr
+  forceSubdomain: true
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

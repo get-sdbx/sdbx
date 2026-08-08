@@ -1,0 +1,90 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: radarr
+  version: 1.0.0
+  category: media
+  description: "Movie collection automation and management"
+  homepage: https://radarr.video
+  documentation: https://wiki.servarr.com/radarr
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - linuxserver
+    - movies
+    - media
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: radarr
+    subtitle: "Movies"
+applicationAuth:
+  mode: sdbx-managed-forms
+permissions:
+  - config-path
+  - downloads-path
+  - media-path
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/radarr
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: RADARR__AUTH__METHOD
+        value: Forms
+      - name: RADARR__AUTH__REQUIRED
+        value: Enabled
+    conditional:
+      - name: RADARR__SERVER__URLBASE
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/radarr"
+      containerPath: /config
+    - name: movies
+      hostPath: "{{ .Config.MediaPath }}/movies"
+      containerPath: /movies
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 7878
+  subdomain: radarr
+  path: /radarr
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: RADARR__SERVER__URLBASE
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+  unpackerr:
+    enabled: true
+    urlEnvVar: UN_RADARR_0_URL
+    apiKeyEnvVar: UN_RADARR_0_API_KEY
+    internalUrl: "http://sdbx-radarr:7878"
+conditions:
+  requireAddon: true

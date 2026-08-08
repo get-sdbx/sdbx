@@ -1,0 +1,43 @@
+version: "2"
+
+run:
+  tests: true
+
+output:
+  formats:
+    text:
+      path: stdout
+      print-linter-name: true
+      print-issued-lines: true
+
+linters:
+  default: none
+  enable:
+    - govet
+    - ineffassign
+  exclusions:
+    generated: lax
+    paths:
+      - vendor
+      - .github
+      - docs
+      - services
+      - website
+      - third_party$
+      - builtin$
+      - examples$
+
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - vendor
+      - .github
+      - docs
+      - services
+      - website
+      - third_party$
+      - builtin$
+      - examples$

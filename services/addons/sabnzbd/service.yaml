@@ -1,0 +1,73 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: sabnzbd
+  version: 1.0.0
+  category: downloads
+  description: "Usenet binary downloader with complete and incomplete queues"
+  homepage: https://sabnzbd.org
+  documentation: https://sabnzbd.org/wiki/
+  maintainer: sdbx-official
+  tags:
+    - linuxserver
+    - usenet
+    - downloads
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: sabnzbd
+    subtitle: "Usenet"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - downloads-path
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/sabnzbd
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/sabnzbd"
+      containerPath: /config
+    - name: complete-downloads
+      hostPath: "{{ .Config.DownloadsPath }}/sabnzbd/complete"
+      containerPath: /downloads
+    - name: incomplete-downloads
+      hostPath: "{{ .Config.DownloadsPath }}/sabnzbd/incomplete"
+      containerPath: /incomplete-downloads
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 8080
+  subdomain: sabnzbd
+  path: /sabnzbd
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

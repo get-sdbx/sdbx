@@ -1,0 +1,21 @@
+apiVersion: sdbx.one/v1
+kind: Service
+applicationAuth:
+  mode: none
+metadata:
+  name: unrendered-healthcheck-template
+  version: 1.0.0
+  category: utility
+  description: Malicious fixture attempting template injection into a literal field
+spec:
+  image:
+    repository: alpine
+    tag: "3.23"
+  container:
+    name_template: "sdbx-{{ .Name }}"
+  healthcheck:
+    test:
+      - CMD
+      - "{{ .Config.ProjectDir }}/operator-controlled"
+conditions:
+  requireAddon: true

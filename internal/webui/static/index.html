@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050611">
+  <title>SDBX Dashboard</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <section class="access-gate" id="access-gate" aria-labelledby="access-gate-title" hidden>
+    <div class="access-gate-card">
+      <span class="brand-mark access-gate-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <p class="section-label">Authorization required</p>
+      <h1 id="access-gate-title">Open an authenticated console session</h1>
+      <p>Use the public Authelia-protected URL, or run this on the SDBX host for local access:</p>
+      <code>sdbx console</code>
+      <p class="supporting">The public route is restricted to Authelia administrators; the local URL uses a separate protected token.</p>
+    </div>
+  </section>
+
+  <div class="app-shell" id="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <a class="brand" href="#overview" data-nav="overview" aria-label="SDBX overview">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>
+          <strong>SDBX</strong>
+          <small>Dashboard</small>
+        </span>
+      </a>
+
+      <nav class="primary-nav">
+        <p class="nav-label">Manage</p>
+        <button class="nav-item is-active" data-nav="overview" aria-current="page">
+          <span class="nav-index">01</span><span>Overview</span>
+        </button>
+        <button class="nav-item" data-nav="services">
+          <span class="nav-index">02</span><span>Services</span>
+        </button>
+        <button class="nav-item" data-nav="addons">
+          <span class="nav-index">03</span><span>Addons</span>
+        </button>
+        <button class="nav-item" data-nav="configuration">
+          <span class="nav-index">04</span><span>Configuration</span>
+        </button>
+        <p class="nav-label">Monitor</p>
+        <button class="nav-item" data-nav="security">
+          <span class="nav-index">05</span><span>Security</span>
+        </button>
+        <button class="nav-item" data-nav="backups">
+          <span class="nav-index">06</span><span>Backups</span>
+        </button>
+        <button class="nav-item" data-nav="diagnostics">
+          <span class="nav-index">07</span><span>Diagnostics</span>
+        </button>
+        <button class="nav-item" data-nav="audit">
+          <span class="nav-index">08</span><span>Audit</span>
+        </button>
+      </nav>
+
+      <div class="connection-card" id="connection-card">
+        <span class="pulse" aria-hidden="true"></span>
+        <div>
+          <strong id="connection-label">Connecting</strong>
+          <small>Secure host connection</small>
+        </div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="masthead">
+        <button class="mobile-menu" id="mobile-menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span></span><span></span><span></span><span class="sr-only">Toggle navigation</span>
+        </button>
+        <div>
+          <p class="kicker" id="view-kicker">Dashboard</p>
+          <h1 id="view-title">Overview</h1>
+          <p class="view-subtitle" id="view-subtitle">Current status of your SDBX services.</p>
+        </div>
+        <div class="masthead-actions">
+          <div class="header-status" aria-live="polite">
+            <span class="pulse" aria-hidden="true"></span>
+            <div>
+              <span><strong id="overview-running">—</strong> <span id="overview-total">of — services running</span></span>
+              <small id="overview-domain">Loading SDBX…</small>
+            </div>
+            <div class="runtime-bar" aria-hidden="true"><i id="runtime-progress"></i></div>
+          </div>
+          <span class="last-updated" id="last-updated">Not refreshed</span>
+          <button class="button button-quiet" id="refresh-view">
+            <span aria-hidden="true">↻</span> Refresh
+          </button>
+        </div>
+      </header>
+
+      <div class="mobile-nav" id="mobile-nav" hidden></div>
+
+      <div class="offline-banner" id="offline-banner" role="status" hidden>
+        <strong>Management service unavailable.</strong>
+        <span>Some data may be out of date. Actions are disabled until the connection returns.</span>
+        <button class="button button-small" id="retry-connection">Retry</button>
+      </div>
+
+      <main id="main-content" tabindex="-1">
+        <section class="view is-active" data-view="overview" aria-labelledby="view-title">
+          <article class="panel launcher-panel" aria-labelledby="launcher-title">
+            <div class="panel-header">
+              <div>
+                <p class="section-label">Quick access</p>
+                <h2 id="launcher-title">Open services</h2>
+              </div>
+              <button class="button button-small" data-nav="services">View all</button>
+            </div>
+            <p class="panel-copy">Open the apps enabled in your SDBX setup.</p>
+            <div id="service-launcher" class="launcher-groups" aria-live="polite">
+              <div class="skeleton-list" aria-label="Loading service launcher"><i></i><i></i><i></i></div>
+            </div>
+          </article>
+
+          <div class="metric-grid" id="overview-metrics" aria-live="polite"></div>
+
+          <div class="content-grid overview-lower">
+            <article class="panel span-2">
+              <div class="panel-header">
+                <div>
+                  <p class="section-label">Admin actions</p>
+                  <h2>Stack control</h2>
+                </div>
+                <span class="local-only">Protected actions</span>
+              </div>
+              <p class="panel-copy">SDBX checks your project before every start, restart, or stop.</p>
+              <div class="stack-actions">
+                <button class="button button-primary" data-stack="up">Start stack</button>
+                <button class="button" data-stack="restart">Restart stack</button>
+                <button class="button button-danger" data-stack="down">Stop stack</button>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="section-label">Attention needed</p>
+                  <h2>Registry warnings</h2>
+                </div>
+                <span class="count-badge" id="warning-count">0</span>
+              </div>
+              <div id="warning-list" class="compact-list">
+                <div class="empty-state compact">No catalog warnings.</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" data-view="services" hidden aria-labelledby="view-title">
+          <div class="toolbar">
+            <label class="search-field">
+              <span class="sr-only">Filter services</span>
+              <input id="service-filter" type="search" placeholder="Filter services" autocomplete="off">
+            </label>
+            <div class="segmented" aria-label="Service status filter">
+              <button class="is-active" data-service-status="all">All</button>
+              <button data-service-status="running">Running</button>
+              <button data-service-status="stopped">Stopped</button>
+            </div>
+          </div>
+          <div class="panel table-panel">
+            <div class="data-table service-table" id="services" aria-live="polite">
+              <div class="skeleton-list" aria-label="Loading services">
+                <i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+          </div>
+          <article class="panel log-panel">
+            <div class="panel-header">
+              <div>
+                <p class="section-label">Recent activity</p>
+                <h2>Service logs</h2>
+              </div>
+              <div class="log-controls">
+                <label>
+                  <span class="sr-only">Selected service</span>
+                  <select id="log-service"><option value="">All active services</option></select>
+                </label>
+                <button class="button button-small" id="load-logs">Load</button>
+                <button class="button button-small" id="toggle-live-logs" aria-pressed="false">Follow</button>
+              </div>
+            </div>
+            <pre id="logs" class="logs" tabindex="0">Choose a service and load up to 200 recent lines.</pre>
+            <p class="log-meta" id="log-meta">Follow mode is off.</p>
+          </article>
+        </section>
+
+        <section class="view" data-view="addons" hidden aria-labelledby="view-title">
+          <div class="toolbar">
+            <label class="search-field">
+              <span class="sr-only">Filter addons</span>
+              <input id="addon-filter" type="search" placeholder="Search addons" autocomplete="off">
+            </label>
+            <div class="segmented" aria-label="Addon state filter">
+              <button class="is-active" data-addon-status="all">All</button>
+              <button data-addon-status="enabled">Enabled</button>
+              <button data-addon-status="available">Available</button>
+            </div>
+          </div>
+          <div id="addons" class="card-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="view" data-view="configuration" hidden aria-labelledby="view-title">
+          <div class="notice">
+            <span aria-hidden="true">i</span>
+            <p>Changes are checked and applied together. Path changes can affect host storage.</p>
+          </div>
+          <div id="settings" class="settings-groups" aria-live="polite"></div>
+        </section>
+
+        <section class="view" data-view="security" hidden aria-labelledby="view-title">
+          <div class="security-hero" id="security-hero">
+            <div>
+              <p class="section-label">Security checks</p>
+              <h2>Loading security status</h2>
+              <p>SDBX is checking your current setup and generated files.</p>
+            </div>
+            <div class="security-score" aria-hidden="true">—</div>
+          </div>
+          <div class="evidence-grid" id="security-evidence"></div>
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="section-label">Access</p>
+                <h2>Sign-in protection</h2>
+              </div>
+            </div>
+            <div class="auth-distribution" id="auth-distribution"></div>
+          </article>
+        </section>
+
+        <section class="view" data-view="backups" hidden aria-labelledby="view-title">
+          <div class="view-intro">
+            <div>
+              <h2>Encrypted recovery archives</h2>
+              <p>Every archive uses authenticated age encryption and strict local permissions.</p>
+            </div>
+            <button class="button button-primary" id="create-backup">Create backup</button>
+          </div>
+          <div class="panel table-panel">
+            <div id="backups" class="data-table" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="view" data-view="diagnostics" hidden aria-labelledby="view-title">
+          <div class="view-intro">
+            <div>
+              <h2>Host and stack diagnostics</h2>
+              <p>SDBX checks your host and services. Some checks can take up to a minute.</p>
+            </div>
+            <button class="button button-primary" id="run-diagnostics">Run checks</button>
+          </div>
+          <div id="diagnostic-summary" class="diagnostic-summary"></div>
+          <div class="panel table-panel">
+            <div id="diagnostics" class="data-table">
+              <div class="empty-state">Run diagnostics to check Docker, paths, ports, secrets, services, and VPN status.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" data-view="audit" hidden aria-labelledby="view-title">
+          <div class="view-intro">
+            <div>
+              <h2>Privileged operation history</h2>
+              <p>Redacted record of administrator actions. Newest records appear first.</p>
+            </div>
+            <button class="button" id="refresh-audit">Refresh audit</button>
+          </div>
+          <div class="panel table-panel">
+            <div id="audit-events" class="data-table" aria-live="polite"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog class="dialog" id="impact-dialog" aria-labelledby="impact-title">
+    <form method="dialog">
+      <p class="section-label">Impact preview</p>
+      <h2 id="impact-title">Confirm operation</h2>
+      <ul id="impact-consequences"></ul>
+      <label id="impact-confirm-field" class="field" hidden>
+        <span>Type <strong id="impact-confirm-label"></strong> to continue</span>
+        <input id="impact-confirm-input" autocomplete="off" spellcheck="false">
+      </label>
+      <label id="impact-unprotected-field" class="recovery-option" hidden>
+        <input id="impact-unprotected-input" type="checkbox">
+        <span>
+          <strong>I understand that torrent traffic may use the host public IP</strong>
+          <small>This acknowledgment applies only to this VPN-disable operation. It is never selected automatically.</small>
+        </span>
+      </label>
+      <div class="dialog-actions">
+        <button class="button" value="cancel">Cancel</button>
+        <button class="button button-primary" id="impact-submit" value="confirm">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="backup-dialog" aria-labelledby="backup-dialog-title">
+    <form method="dialog">
+      <p class="section-label">Secure backup</p>
+      <h2 id="backup-dialog-title">Backup passphrase</h2>
+      <p id="backup-dialog-copy">The passphrase is held only for this operation and cleared after use.</p>
+      <input type="text" name="username" autocomplete="username" value="sdbx-local" hidden readonly>
+      <label class="field">
+        <span>Passphrase</span>
+        <input id="backup-passphrase" type="password" autocomplete="new-password" minlength="12">
+      </label>
+      <label class="field" id="backup-confirm-row">
+        <span>Confirm passphrase</span>
+        <input id="backup-passphrase-confirm" type="password" autocomplete="new-password" minlength="12">
+      </label>
+      <label class="recovery-option" id="backup-relocation-row" hidden>
+        <input id="backup-relocate-roots" type="checkbox">
+        <span>
+          <strong>Allow managed-root relocation</strong>
+          <small>Permit the archive's config and secrets paths to differ. The verified target control plane is preserved in both modes.</small>
+        </span>
+      </label>
+      <p class="field-error" id="backup-field-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="button" value="cancel">Cancel</button>
+        <button class="button button-primary" id="backup-submit" value="confirm">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+  <p class="sr-only" id="message" aria-live="assertive"></p>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

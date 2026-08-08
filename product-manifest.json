@@ -1,0 +1,995 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "go run ./cmd/sdbx-docgen --write",
+  "product": {
+    "name": "SDBX",
+    "description": "Build and operate a self-hosted seedbox from one reproducible project.",
+    "license": "MIT",
+    "repositoryUrl": "https://github.com/get-sdbx/sdbx",
+    "websiteUrl": "https://sdbx.one"
+  },
+  "release": {
+    "version": "1.0.0-RC1",
+    "tag": "v1.0.0-RC1",
+    "level": "release-candidate"
+  },
+  "platforms": [
+    {
+      "os": "linux",
+      "architecture": "amd64",
+      "hostSupport": "supported"
+    },
+    {
+      "os": "linux",
+      "architecture": "arm64",
+      "hostSupport": "compatibility"
+    }
+  ],
+  "artifacts": {
+    "archiveNameTemplate": "sdbx_{version}_linux_{architecture}.tar.gz",
+    "archives": [
+      "sdbx_1.0.0-RC1_linux_amd64.tar.gz",
+      "sdbx_1.0.0-RC1_linux_arm64.tar.gz"
+    ],
+    "checksums": "checksums.txt",
+    "checksumSignature": "checksums.txt.sigstore.json",
+    "sbomSuffix": ".spdx.json",
+    "provenance": "github-artifact-attestation"
+  },
+  "cli": {
+    "commandCount": 55,
+    "runnableCount": 46,
+    "jsonCommandCount": 23,
+    "commands": [
+      {
+        "path": "sdbx",
+        "summary": "Build and operate a self-hosted seedbox under your root",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx addon",
+        "summary": "Manage SDBX addons",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx addon disable",
+        "summary": "Disable an addon",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx addon enable",
+        "summary": "Enable an addon",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx addon info",
+        "summary": "Show detailed addon information",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx addon list",
+        "summary": "List available and enabled addons",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx addon search",
+        "summary": "Search for addons across all sources",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx backup",
+        "summary": "Backup and restore SDBX configuration",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx backup delete",
+        "summary": "Delete a backup",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx backup list",
+        "summary": "List all backups",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx backup restore",
+        "summary": "Restore from backup",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx completion",
+        "summary": "Generate the autocompletion script for the specified shell",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx completion bash",
+        "summary": "Generate the autocompletion script for bash",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx completion fish",
+        "summary": "Generate the autocompletion script for fish",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx completion powershell",
+        "summary": "Generate the autocompletion script for powershell",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx completion zsh",
+        "summary": "Generate the autocompletion script for zsh",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx config",
+        "summary": "Manage SDBX configuration",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx config get",
+        "summary": "Get configuration value(s)",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx config set",
+        "summary": "Set a configuration value",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx console",
+        "summary": "Print the authenticated local console URL",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx doctor",
+        "summary": "Run diagnostic checks on your SDBX installation",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx down",
+        "summary": "Stop all SDBX services",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx generate",
+        "summary": "Regenerate runtime files (compose.yaml, .env, integration configs)",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx help",
+        "summary": "Help about any command",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx init",
+        "summary": "Bootstrap a new SDBX project",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx integrate",
+        "summary": "Auto-configure service integrations",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx lock",
+        "summary": "Manage service version lock file",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx lock diff",
+        "summary": "Show differences from lock file",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx lock verify",
+        "summary": "Verify lock file integrity",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx logs",
+        "summary": "View logs from SDBX services",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx open",
+        "summary": "Open SDBX service URLs in browser",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx preset",
+        "summary": "Manage recommended addon stacks (tasksel-style)",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx preset apply",
+        "summary": "Enable every addon in the named preset (idempotent)",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx preset list",
+        "summary": "List available presets",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx preset show",
+        "summary": "Show one preset's addons + description",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx restart",
+        "summary": "Restart SDBX services",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx secrets",
+        "summary": "Manage SDBX secrets",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx secrets generate",
+        "summary": "Generate missing secrets",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx secrets list",
+        "summary": "List all secrets and their status",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx secrets show",
+        "summary": "Show recovery credentials for a service",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx serve",
+        "summary": "Run the SDBX web console",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx source",
+        "summary": "Manage service definition sources",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx source add",
+        "summary": "Add a new Git source",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx source info",
+        "summary": "Show detailed source information",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx source list",
+        "summary": "List configured sources",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx source remove",
+        "summary": "Remove a source",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx source update",
+        "summary": "Re-fetch and verify pinned sources",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx status",
+        "summary": "Show status of all SDBX services",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx tunnel",
+        "summary": "Inspect Cloudflare Tunnel requirements",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx tunnel routes",
+        "summary": "Show required Cloudflare published application routes",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx up",
+        "summary": "Start all SDBX services",
+        "runnable": true,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx update",
+        "summary": "Preview or apply locked service image updates",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx version",
+        "summary": "Print version information",
+        "runnable": true,
+        "supportsJson": true
+      },
+      {
+        "path": "sdbx vpn",
+        "summary": "Inspect download VPN protection",
+        "runnable": false,
+        "supportsJson": false
+      },
+      {
+        "path": "sdbx vpn status",
+        "summary": "Verify Gluetun health and compare host and tunnel egress",
+        "runnable": true,
+        "supportsJson": true
+      }
+    ]
+  },
+  "catalog": {
+    "serviceCount": 40,
+    "coreCount": 7,
+    "addonCount": 33,
+    "services": [
+      {
+        "name": "audiobookshelf",
+        "category": "media",
+        "description": "Audiobook and podcast server with multi-user progress sync",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "service-managed",
+        "launcher": {
+          "group": "media",
+          "icon": "audiobookshelf",
+          "subtitle": "Audiobooks and podcasts"
+        }
+      },
+      {
+        "name": "authelia",
+        "category": "auth",
+        "description": "Single Sign-On Multi-Factor portal",
+        "kind": "core",
+        "alwaysEnabled": true,
+        "routeAuth": "public",
+        "applicationAuth": "identity-provider"
+      },
+      {
+        "name": "autobrr",
+        "category": "downloads",
+        "description": "IRC and RSS download automation for torrents and Usenet",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "downloads",
+          "icon": "autobrr",
+          "subtitle": "Download automation"
+        }
+      },
+      {
+        "name": "bazarr",
+        "category": "media",
+        "description": "Subtitle management for movies and TV shows",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "media",
+          "icon": "bazarr",
+          "subtitle": "Subtitles"
+        }
+      },
+      {
+        "name": "calibre-web",
+        "category": "media",
+        "description": "Web interface for browsing, reading, and downloading a Calibre library",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "upstream-default",
+        "launcher": {
+          "group": "media",
+          "icon": "calibre-web",
+          "subtitle": "Books"
+        }
+      },
+      {
+        "name": "cloudflared",
+        "category": "networking",
+        "description": "Remote-managed Cloudflare Tunnel connector",
+        "kind": "core",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "cobalt",
+        "category": "downloads",
+        "description": "Self-hosted cobalt API backend for media-download requests",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "sdbx-managed-api-key",
+        "launcher": {
+          "group": "downloads",
+          "icon": "cobalt",
+          "subtitle": "API endpoint"
+        }
+      },
+      {
+        "name": "cross-seed",
+        "category": "downloads",
+        "description": "Internal cross-seeding daemon for compatible torrent trackers",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "decluttarr",
+        "category": "utility",
+        "description": "Queue cleanup automation for supported *arr applications",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "filebrowser",
+        "category": "utility",
+        "description": "Web file manager for browsing, uploading, and organising seedbox files",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-password",
+        "launcher": {
+          "group": "utilities",
+          "icon": "filebrowser",
+          "subtitle": "Files"
+        }
+      },
+      {
+        "name": "flaresolverr",
+        "category": "utility",
+        "description": "Internal challenge-solving proxy for compatible indexers",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "gluetun",
+        "category": "networking",
+        "description": "VPN client with kill switch for Docker containers",
+        "kind": "core",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "janitorr",
+        "category": "utility",
+        "description": "Scheduled media lifecycle automation for *arr and media servers",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "jellyfin",
+        "category": "media",
+        "description": "Open-source media server (Plex alternative)",
+        "kind": "core",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "service-managed",
+        "launcher": {
+          "group": "media",
+          "icon": "jellyfin",
+          "subtitle": "Media server"
+        }
+      },
+      {
+        "name": "kometa",
+        "category": "media",
+        "description": "Scheduled Plex metadata, collection, playlist, and overlay manager",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "komga",
+        "category": "media",
+        "description": "Comic, manga, and ebook library server with OPDS support",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "media",
+          "icon": "komga",
+          "subtitle": "Comics and manga"
+        }
+      },
+      {
+        "name": "lidarr",
+        "category": "media",
+        "description": "Music collection automation and management",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-forms",
+        "launcher": {
+          "group": "media",
+          "icon": "lidarr",
+          "subtitle": "Music"
+        }
+      },
+      {
+        "name": "maintainerr",
+        "category": "utility",
+        "description": "Rule-based media-library lifecycle management",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "utilities",
+          "icon": "maintainerr",
+          "subtitle": "Library lifecycle"
+        }
+      },
+      {
+        "name": "navidrome",
+        "category": "media",
+        "description": "Subsonic-compatible music streaming server",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "service-managed",
+        "launcher": {
+          "group": "media",
+          "icon": "navidrome",
+          "subtitle": "Music streaming"
+        }
+      },
+      {
+        "name": "notifiarr",
+        "category": "utility",
+        "description": "Notification and monitoring client for media automation services",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "service-managed",
+        "launcher": {
+          "group": "utilities",
+          "icon": "notifiarr",
+          "subtitle": "Notifications"
+        }
+      },
+      {
+        "name": "nzbhydra2",
+        "category": "downloads",
+        "description": "Usenet indexer meta-search aggregator",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "downloads",
+          "icon": "nzbhydra2",
+          "subtitle": "Meta indexer"
+        }
+      },
+      {
+        "name": "plex",
+        "category": "media",
+        "description": "Media server for streaming movies, TV, and music",
+        "kind": "core",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "service-managed",
+        "launcher": {
+          "group": "media",
+          "icon": "plex",
+          "subtitle": "Media server"
+        }
+      },
+      {
+        "name": "profilarr",
+        "category": "utility",
+        "description": "Quality profile and custom format management for Sonarr and Radarr",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "utilities",
+          "icon": "profilarr",
+          "subtitle": "Quality profiles"
+        }
+      },
+      {
+        "name": "prowlarr",
+        "category": "media",
+        "description": "Indexer manager for *arr applications",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-forms",
+        "launcher": {
+          "group": "downloads",
+          "icon": "prowlarr",
+          "subtitle": "Indexers"
+        }
+      },
+      {
+        "name": "pyload",
+        "category": "downloads",
+        "description": "Web-managed HTTP and file-hoster download client",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "upstream-default",
+        "launcher": {
+          "group": "downloads",
+          "icon": "pyload",
+          "subtitle": "Direct downloads"
+        }
+      },
+      {
+        "name": "qbit-manage",
+        "category": "downloads",
+        "description": "Scheduled qBittorrent tagging, cleanup, and data management",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "downloads",
+          "icon": "qbit-manage",
+          "subtitle": "Torrent housekeeping"
+        }
+      },
+      {
+        "name": "qbittorrent",
+        "category": "downloads",
+        "description": "Free and open-source BitTorrent client",
+        "kind": "core",
+        "alwaysEnabled": true,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-password",
+        "launcher": {
+          "group": "downloads",
+          "icon": "qbittorrent",
+          "subtitle": "Torrents"
+        }
+      },
+      {
+        "name": "qui",
+        "category": "downloads",
+        "description": "Modern multi-instance qBittorrent Web UI and workflow engine",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "downloads",
+          "icon": "qui",
+          "subtitle": "Torrent console"
+        }
+      },
+      {
+        "name": "radarr",
+        "category": "media",
+        "description": "Movie collection automation and management",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-forms",
+        "launcher": {
+          "group": "media",
+          "icon": "radarr",
+          "subtitle": "Movies"
+        }
+      },
+      {
+        "name": "recyclarr",
+        "category": "utility",
+        "description": "Scheduled quality-profile synchronization for Sonarr and Radarr",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "sabnzbd",
+        "category": "downloads",
+        "description": "Usenet binary downloader with complete and incomplete queues",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "downloads",
+          "icon": "sabnzbd",
+          "subtitle": "Usenet"
+        }
+      },
+      {
+        "name": "seerr",
+        "category": "media",
+        "description": "Media request and discovery portal for Plex and Jellyfin",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "native-auth",
+        "applicationAuth": "service-managed",
+        "launcher": {
+          "group": "media",
+          "icon": "seerr",
+          "subtitle": "Requests"
+        }
+      },
+      {
+        "name": "sonarr",
+        "category": "media",
+        "description": "TV Shows automation and management",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-forms",
+        "launcher": {
+          "group": "media",
+          "icon": "sonarr",
+          "subtitle": "TV shows"
+        }
+      },
+      {
+        "name": "stash",
+        "category": "media",
+        "description": "Private media organizer with metadata, previews, and transcoding",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "media",
+          "icon": "stash",
+          "subtitle": "Library organizer"
+        }
+      },
+      {
+        "name": "tautulli",
+        "category": "management",
+        "description": "Plex activity monitoring, analytics, and notifications",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "management",
+          "icon": "tautulli",
+          "subtitle": "Plex stats"
+        }
+      },
+      {
+        "name": "tdarr",
+        "category": "media",
+        "description": "Distributed media transcoding with a safe CPU-only internal node",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "media",
+          "icon": "tdarr",
+          "subtitle": "Transcoding"
+        }
+      },
+      {
+        "name": "traefik",
+        "category": "networking",
+        "description": "Modern HTTP reverse proxy and load balancer",
+        "kind": "core",
+        "alwaysEnabled": true,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "unpackerr",
+        "category": "utility",
+        "description": "Background archive extractor for completed downloads and supported Arr services",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "not-routed",
+        "applicationAuth": "none"
+      },
+      {
+        "name": "whisparr",
+        "category": "media",
+        "description": "Whisparr v3 adult-media automation and management",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "sdbx-managed-forms",
+        "launcher": {
+          "group": "media",
+          "icon": "whisparr",
+          "subtitle": "Adult media"
+        }
+      },
+      {
+        "name": "wizarr",
+        "category": "media",
+        "description": "Invitation and onboarding portal for media server users",
+        "kind": "addon",
+        "alwaysEnabled": false,
+        "routeAuth": "admin-only",
+        "applicationAuth": "none",
+        "launcher": {
+          "group": "management",
+          "icon": "wizarr",
+          "subtitle": "Invitations"
+        }
+      }
+    ]
+  },
+  "presets": {
+    "count": 4,
+    "items": [
+      {
+        "name": "media-jellyfin",
+        "title": "TV automation (Jellyfin)",
+        "description": "Curated Jellyfin TV automation with Sonarr, Prowlarr for indexers, and File Browser for direct file access.",
+        "addons": [
+          "filebrowser",
+          "prowlarr",
+          "sonarr"
+        ]
+      },
+      {
+        "name": "media-plex",
+        "title": "TV automation (Plex)",
+        "description": "Curated Plex TV automation with Sonarr, Prowlarr for indexers, and File Browser for direct file access.",
+        "addons": [
+          "filebrowser",
+          "prowlarr",
+          "sonarr"
+        ]
+      },
+      {
+        "name": "minimal",
+        "title": "Minimal seedbox",
+        "description": "Just the essentials: qBittorrent behind a VPN, plus a web file browser to poke at downloads. No automation, no media server, no requests. The smallest sane stack.",
+        "addons": [
+          "filebrowser"
+        ]
+      },
+      {
+        "name": "power-user",
+        "title": "Power user",
+        "description": "Broad movie, TV, music, subtitle and Usenet automation with direct file access and scheduled profile synchronization. Specialist libraries, invitation portals and transcoders stay opt-in.",
+        "addons": [
+          "bazarr",
+          "filebrowser",
+          "lidarr",
+          "nzbhydra2",
+          "prowlarr",
+          "radarr",
+          "recyclarr",
+          "sabnzbd",
+          "sonarr"
+        ]
+      }
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "guided-setup",
+      "title": "Guided, previewable setup",
+      "summary": "LAN-safe defaults, named presets, preflight checks, and a dry-run graph preview."
+    },
+    {
+      "id": "embedded-catalog",
+      "title": "Complete embedded catalog",
+      "summary": "Official service definitions and presets ship in the binary; external sources are optional."
+    },
+    {
+      "id": "digest-lock",
+      "title": "Digest-locked runtime",
+      "summary": "Official first-run locks use release-reviewed embedded OCI pins; explicit updates create new platform-specific locks."
+    },
+    {
+      "id": "encrypted-recovery",
+      "title": "Encrypted recovery",
+      "summary": "Backups use authenticated age encryption and restore through bounded transactional validation."
+    },
+    {
+      "id": "vpn-enforcement",
+      "title": "VPN-enforced downloads",
+      "summary": "qBittorrent shares Gluetun's network namespace and exposes no independent Web UI port."
+    },
+    {
+      "id": "remote-console",
+      "title": "Authenticated management console",
+      "summary": "The full Dashboard is remote-accessible through Authelia admins and a private Traefik mTLS transport, while the Web process stays unprivileged behind a typed project broker."
+    }
+  ],
+  "securityBoundaries": [
+    {
+      "id": "linux-host-only",
+      "summary": "v1 first-class host support is Linux amd64; Linux arm64 is a compatibility build, and macOS is development-only."
+    },
+    {
+      "id": "docker-root-equivalent",
+      "summary": "Docker access and the root broker are host-privileged trust boundaries."
+    },
+    {
+      "id": "authenticated-console",
+      "summary": "The management console is public only through the generated Authelia admins route and private Traefik mTLS backend transport; direct proxy-port access fails closed."
+    },
+    {
+      "id": "optional-vpn",
+      "summary": "VPN enforcement applies only when enabled; unprotected download traffic requires explicit confirmation."
+    },
+    {
+      "id": "remote-managed-tunnel",
+      "summary": "A Cloudflare connector token cannot manage Published application routes; SDBX lists and probes the required remote mappings."
+    },
+    {
+      "id": "no-controller-image",
+      "summary": "v1 publishes native binaries only; there is no supported SDBX controller container image."
+    }
+  ]
+}

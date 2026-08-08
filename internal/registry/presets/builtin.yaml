@@ -1,0 +1,60 @@
+apiVersion: sdbx.one/v1
+kind: PresetCollection
+
+# Recommended addon stacks. Like Debian's tasksel — pick a profile, get a
+# coherent batch of addons enabled together. Each preset is just a list of
+# addon names; SDBX handles dependencies + integrations automatically.
+#
+# Media-server selection is intentionally separate from automation presets.
+# Presets never silently enable Plex or Jellyfin.
+
+presets:
+  - name: minimal
+    title: Minimal seedbox
+    icon: "🏃"
+    description: |
+      Just the essentials: qBittorrent behind a VPN, plus a web file
+      browser to poke at downloads. No automation, no media server,
+      no requests. The smallest sane stack.
+    addons:
+      - filebrowser
+
+  - name: media-plex
+    title: TV automation (Plex)
+    icon: "🎬"
+    description: |
+      Curated Plex TV automation with Sonarr, Prowlarr for indexers,
+      and File Browser for direct file access.
+    addons:
+      - sonarr
+      - prowlarr
+      - filebrowser
+
+  - name: media-jellyfin
+    title: TV automation (Jellyfin)
+    icon: "🎬"
+    description: |
+      Curated Jellyfin TV automation with Sonarr, Prowlarr for indexers,
+      and File Browser for direct file access.
+    addons:
+      - sonarr
+      - prowlarr
+      - filebrowser
+
+  - name: power-user
+    title: Power user
+    icon: "🔥"
+    description: |
+      Broad movie, TV, music, subtitle and Usenet automation with direct file
+      access and scheduled profile synchronization.
+      Specialist libraries, invitation portals and transcoders stay opt-in.
+    addons:
+      - sonarr
+      - radarr
+      - lidarr
+      - bazarr
+      - prowlarr
+      - nzbhydra2
+      - sabnzbd
+      - filebrowser
+      - recyclarr

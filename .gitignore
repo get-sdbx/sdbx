@@ -1,0 +1,47 @@
+# SDBX repository-local artifacts
+
+# Local generated SDBX project state (the repository root is not a fixture)
+/.sdbx.yaml
+/.sdbx.lock
+/compose.yaml
+/.test/
+
+# Secrets and runtime state
+/.env
+!.env.example
+/secrets/
+/data/
+/config/
+/configs/
+/.docker/
+*.secret
+*.key
+*.pem
+*.log
+
+# Build, release, test, browser, and audit artifacts
+/sdbx
+/sdbxd
+/bin/
+/dist/
+/output/
+/coverage.out
+/coverage.html
+*_coverage.out
+*.test
+
+# Editors and operating systems
+.DS_Store
+/.playwright-cli/
+Thumbs.db
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+*.orig

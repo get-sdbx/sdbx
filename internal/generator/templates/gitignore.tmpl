@@ -1,0 +1,30 @@
+# SDBX Generated .gitignore
+
+# Managed secrets and runtime state - NEVER commit these
+{{- range .ProjectIgnores }}
+{{ . }}
+{{- end }}
+*.secret
+*.key
+*.pem
+
+# Environment with secrets
+.env
+
+# Runtime logs
+*.log
+
+# Docker
+.docker/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Backups
+*.bak
+*.backup
+backups/

@@ -1,0 +1,80 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: qbit-manage
+  version: 1.0.0
+  category: downloads
+  description: "Scheduled qBittorrent tagging, cleanup, and data management"
+  homepage: https://github.com/StuffAnThings/qbit_manage
+  documentation: https://github.com/StuffAnThings/qbit_manage/wiki
+  maintainer: sdbx-official
+  tags:
+    - torrent
+    - qbittorrent
+    - automation
+    - cleanup
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: qbit-manage
+    subtitle: "Torrent housekeeping"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - downloads-path
+  - host-chown
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/stuffanthings/qbit_manage
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: QBT_CONFIG_DIR
+        value: /config
+      - name: QBT_WEB_SERVER
+        value: "true"
+      - name: QBT_PORT
+        value: "8181"
+      - name: QBT_SCHEDULE
+        value: "1440"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/qbit-manage"
+      containerPath: /config
+      chown: true
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /data/downloads
+  networking:
+    networks:
+      - name: download
+routing:
+  enabled: true
+  port: 8181
+  subdomain: qbit-manage
+  path: /qbit-manage
+  pathRouting:
+    strategy: stripPrefix
+  auth:
+    mode: admin-only
+  traefik:
+    network: download
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

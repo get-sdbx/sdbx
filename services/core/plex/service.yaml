@@ -1,0 +1,103 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: plex
+  version: 1.1.0
+  category: media
+  description: "Media server for streaming movies, TV, and music"
+  homepage: https://www.plex.tv
+  documentation: https://support.plex.tv
+  maintainer: sdbx-official
+  tags:
+    - linuxserver
+    - media
+    - streaming
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: plex
+    subtitle: "Media server"
+applicationAuth:
+  mode: service-managed
+permissions:
+  - config-path
+  - media-path
+  - network:app
+  - route:native-auth
+  - secret:plex_claim_token
+spec:
+  image:
+    repository: linuxserver/plex
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    shm_size: "2g"
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: VERSION
+        value: docker
+    conditional:
+      - name: ADVERTISE_IP
+        value: "https://plex.{{ .Config.Domain }}:443/"
+        when: '{{ ne .Config.Expose.Mode "lan" }}'
+      - name: FILE__PLEX_CLAIM
+        value: /run/secrets/plex_claim_token
+        when: '{{ ne .Config.Expose.Mode "lan" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/plex"
+      containerPath: /config
+    - name: movies
+      hostPath: "{{ .Config.MediaPath }}/movies"
+      containerPath: /media/movies
+      readOnly: true
+    - name: tv
+      hostPath: "{{ .Config.MediaPath }}/tv"
+      containerPath: /media/tv
+      readOnly: true
+    - name: music
+      hostPath: "{{ .Config.MediaPath }}/music"
+      containerPath: /media/music
+      readOnly: true
+    - name: concerts
+      hostPath: "{{ .Config.MediaPath }}/concerts"
+      containerPath: /media/concerts
+      readOnly: true
+  healthCheck:
+    test: ["CMD", "curl", "-f", "http://localhost:32400/web/index.html"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 60s
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 32400
+  subdomain: plex
+  path: /plex
+  forceSubdomain: true
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+secrets:
+  - name: plex_claim_token
+    type: manual
+    optional: true
+    description: "Plex claim token from https://www.plex.tv/claim/"
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireConfig: plex_enabled

@@ -1,0 +1,77 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: cobalt
+  version: 1.0.0
+  category: downloads
+  description: "Self-hosted cobalt API backend for media-download requests"
+  homepage: https://cobalt.tools
+  documentation: https://github.com/imputnet/cobalt/blob/main/docs/run-an-instance.md
+  maintainer: sdbx-official
+  tags:
+    - api
+    - direct-download
+    - media
+    - native-auth
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: cobalt
+    subtitle: "API endpoint"
+applicationAuth:
+  mode: sdbx-managed-api-key
+permissions:
+  - network:app
+  - route:native-auth
+  - secret:cobalt_keys
+spec:
+  image:
+    repository: ghcr.io/imputnet/cobalt
+    tag: "11"
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    init: true
+    readOnlyRootFilesystem: true
+    pidsLimit: 256
+    capabilities:
+      drop:
+        - ALL
+  environment:
+    static:
+      - name: API_URL
+        value: "https://{{ .Config.Routing.Hostname }}/"
+      - name: API_PORT
+        value: "9000"
+      - name: API_KEY_URL
+        value: "file:///run/secrets/cobalt_keys"
+      - name: API_AUTH_REQUIRED
+        value: "1"
+      - name: CORS_WILDCARD
+        value: "0"
+      - name: CORS_URL
+        value: "https://cobalt.tools"
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 9000
+  subdomain: cobalt
+  path: /cobalt
+  forceSubdomain: true
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+secrets:
+  - name: cobalt_keys
+    type: manual
+    description: "Generated Cobalt API key map"
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

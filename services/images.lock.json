@@ -1,0 +1,685 @@
+{
+  "schemaVersion": 1,
+  "images": [
+    {
+      "service": "audiobookshelf",
+      "kind": "addon",
+      "repository": "ghcr.io/advplyr/audiobookshelf",
+      "tag": "latest",
+      "indexDigest": "sha256:180acad33d69c99ed208676465d8edcb268fa46967735579a7810859885b1a8e",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:e388e90e381ae3fa8660346612b2955f2c555ede81c9c286e2218bdf966b4de8"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:14a6492c743f2acfa00bcd96ec2a5c0c95e311f567718d29cb3c7f3772dc773f"
+        }
+      ]
+    },
+    {
+      "service": "authelia",
+      "kind": "core",
+      "repository": "authelia/authelia",
+      "tag": "latest",
+      "indexDigest": "sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:b5f415d5f14b154c2aa2b186d9f329d879e223da36e115cd871db4c261d5af54"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:68277b28658a69bb3f512c2c23c41c7df7d9311d0e506e64e26c96dcd75d0539"
+        }
+      ]
+    },
+    {
+      "service": "autobrr",
+      "kind": "addon",
+      "repository": "ghcr.io/autobrr/autobrr",
+      "tag": "latest",
+      "indexDigest": "sha256:7e8ce4ec9397685762dc7d8426c976cb15bd36522fac91dfd3648a4c57c6d358",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:e67d3c40528d532c09c582bbeb3ed932ec8a1a97c1c91b96fec27382437a883f"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:7c5a8806d5485500c24e034eb37634a85f9832e001026b90de42239179a0b967"
+        }
+      ]
+    },
+    {
+      "service": "bazarr",
+      "kind": "addon",
+      "repository": "linuxserver/bazarr",
+      "tag": "latest",
+      "indexDigest": "sha256:ab401a0f361cfad328e444838b13d5b334b189d0f556fc91a3623eb581df36df",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:d3f17fc44deac69dc5b4ea96d8218ba50945788e4d2008908bd403b74025eea2"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:78d5c294616952b89ed0a22082ebfdf47a1351894841df8c74ea43fa6dfedb6f"
+        }
+      ]
+    },
+    {
+      "service": "calibre-web",
+      "kind": "addon",
+      "repository": "lscr.io/linuxserver/calibre-web",
+      "tag": "latest",
+      "indexDigest": "sha256:a7277fd8884b3d77e8659a2d82b0974af9812d4c1f4040c98b910da21e764a36",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:4076fd451b44f9f1fdb244b2bff23f1a3142633192c52572349f2940b09c3123"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:4f454dae539f2b21754fac93e34a1a9476ff81d6cf9feeaaa9b9e10ea6420566"
+        }
+      ]
+    },
+    {
+      "service": "cloudflared",
+      "kind": "core",
+      "repository": "cloudflare/cloudflared",
+      "tag": "2026.7.3",
+      "indexDigest": "sha256:e39ee8da81ad5e05d77f38d2f51c60ca51bf2a8450ac3abab50c17fdb91d91bf",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:b392761b711c0e5649d9b64e1fc9a10ba0563fa3e712ed7c26bde5cc1fbe9059"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:00f96f93af72339696087594e9cc78a93518ce90e72248781e69d8c72235a7ae"
+        }
+      ]
+    },
+    {
+      "service": "cobalt",
+      "kind": "addon",
+      "repository": "ghcr.io/imputnet/cobalt",
+      "tag": "11",
+      "indexDigest": "sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:df14a3b3fe4390d4e1c2d4761ed58981d34aa5fc82d0df2091bab890e7dfaa8b"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:6215aed30feb01bca9fe894d7fc642d845d3550042c6412cbb894ca095fe5398"
+        }
+      ]
+    },
+    {
+      "service": "cross-seed",
+      "kind": "addon",
+      "repository": "ghcr.io/cross-seed/cross-seed",
+      "tag": "latest",
+      "indexDigest": "sha256:a1fed512261fd968c55cb03c51cff9c6620aa76a34b3b591afca95c890aa8225",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:93418ffe42ccda770706b10294b46f8642bd1f6da4ca57b4c11b1b220f54e3d3"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:9555dc70f6753fef32d54bfc1ff504899377a6a0b73687f95d58fa27dfa0a7c7"
+        }
+      ]
+    },
+    {
+      "service": "decluttarr",
+      "kind": "addon",
+      "repository": "ghcr.io/manimatter/decluttarr",
+      "tag": "latest",
+      "indexDigest": "sha256:c06d48426b612b845f2406c2d045f266468a6390faf87aea796d497a2935ec95",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:65e8ac53362f30d123188a7b2321749c59c93486c541a49260f278d42982bb22"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:aa81a4a6d0b9f7c48f267da0c2a71e015fd1218549289fd6914ac7603aaa0981"
+        }
+      ]
+    },
+    {
+      "service": "filebrowser",
+      "kind": "addon",
+      "repository": "filebrowser/filebrowser",
+      "tag": "latest",
+      "indexDigest": "sha256:a469ea076d4a1b4b1d86a41d130f2f536cd9da996a2b1fb39c0d7635f9d89b9a",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:1bc61f3b452ae458c0f5be7867fcc0c78476bbd48c5546b41d7d66a6df04db71"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:6ab3014ea7bae5a383be090c9812b2afadc522645b5969fcc4a7dbad3478c759"
+        }
+      ]
+    },
+    {
+      "service": "flaresolverr",
+      "kind": "addon",
+      "repository": "ghcr.io/flaresolverr/flaresolverr",
+      "tag": "latest",
+      "indexDigest": "sha256:139dfee1c6f89249c8d665d1333a42e8ec74ec0a86bc6bb1c8461e10d3a66a47",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:258523d25e4e07028c3a206f0e03ae807b26a50a201dd320f09a18464ecf86fa"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:96ea0bb7b589785f802bf586b00440ca96bfa12b27c3a6a69f0077ef5300fa31"
+        }
+      ]
+    },
+    {
+      "service": "gluetun",
+      "kind": "core",
+      "repository": "qmcgaw/gluetun",
+      "tag": "latest",
+      "indexDigest": "sha256:988d9cb1982f688ce51f3511057b90c5c8d01889db60a4d56e5230aebf1d3339",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:4fabcc11bc0c43e56de00d6705e1e60005877e0bee00d6e4dbf5d22dd0bf891c"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:b6c9ec4195d76b39839735cd83ab7fe9d1e2fc21ffb977f0bfb8ec12ea61e109"
+        }
+      ]
+    },
+    {
+      "service": "janitorr",
+      "kind": "addon",
+      "repository": "ghcr.io/schaka/janitorr",
+      "tag": "jvm-stable",
+      "indexDigest": "sha256:270e9113c71182d30929f253ff6ff49c63078f4556487a668602c4114c7d665a",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:159349b47e6fb4ae211c799369bd8ffa2657b8865e4fc037b5d32a4acec47b3f"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:3332fd69ac5120c1973e80c83e703c2c521895d3928c5f832d62d85d01ee273d"
+        }
+      ]
+    },
+    {
+      "service": "jellyfin",
+      "kind": "core",
+      "repository": "linuxserver/jellyfin",
+      "tag": "latest",
+      "indexDigest": "sha256:b8dcc7b71d0ea872b74314da4b995c0cf282b1778438c295996e7be88c70fdda",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:bb455a7a3073d7977323e04f3bd2012a7798aa0e0e66f2ba144b48df9dac9a88"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:1637ae7afa27b76602221347f8eb4beee50517325ec6fd0f8148bc79d0a3dd88"
+        }
+      ]
+    },
+    {
+      "service": "kometa",
+      "kind": "addon",
+      "repository": "kometateam/kometa",
+      "tag": "latest",
+      "indexDigest": "sha256:a3d5637a58ea1a826824d996738430c76cd16db1d5677665901a80ad3b82b35c",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:39a84f8c18b0ae1521bbf370aa503a0671bdda1295d7b9d6b3ec040b64156f33"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:57cdf6ff7092edf440c2d775cb7eaf2d34dda739151e665f3ebedd4a73c2ba1c"
+        }
+      ]
+    },
+    {
+      "service": "komga",
+      "kind": "addon",
+      "repository": "gotson/komga",
+      "tag": "latest",
+      "indexDigest": "sha256:c4f9885fc077e2e9cd684dc95e8f6cfa5e33b100b46712b2de7f5cc2ff59e6fb",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:dcea6d911ba902b66b61a6970ab3640ac4aa258ea6e60821ff26e3a7bc400d03"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:f233ff7bd29b84f2d030da3e4344b5dba41e7f000bce82701834e26e6486eff9"
+        }
+      ]
+    },
+    {
+      "service": "lidarr",
+      "kind": "addon",
+      "repository": "linuxserver/lidarr",
+      "tag": "latest",
+      "indexDigest": "sha256:60be9a1faad3dfba5a711163fc18526845e2ce7b50b463dd9effae7f766c9beb",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:baeaf799787200711ccf64c68b6951193b000e6bb1b2d703e864f7b97e2ed9ce"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:629e594a37de9d718bd388518ef7f5ea710f8c35b57fa10dda6c27d8f5f17cfd"
+        }
+      ]
+    },
+    {
+      "service": "maintainerr",
+      "kind": "addon",
+      "repository": "ghcr.io/maintainerr/maintainerr",
+      "tag": "latest",
+      "indexDigest": "sha256:ce7ff52afa146dfc05c2c2304df8141e0086f14a803bdbef0d870e5b914f0dee",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:821211cf5f359ecbe5234c2d8a5ce8d02e335b9ab0a56d6bc80db6518229c8db"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:9ab844d1a78049eac2b7de1fcf53f24e65d1af9868943928f742055830fd55f1"
+        }
+      ]
+    },
+    {
+      "service": "navidrome",
+      "kind": "addon",
+      "repository": "deluan/navidrome",
+      "tag": "latest",
+      "indexDigest": "sha256:9012939114fbb1bb641b81cf96dec5ded15f0aafefe8d47a511d7cb919658e40",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:38246ebb80d6f7e2724eecab4acafa7b14ec66ae800b2454aa6da4c19f80a9ce"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:83813e88d8b5dec7d559135ae7707c84ee3f913066c822d212f258706e565ece"
+        }
+      ]
+    },
+    {
+      "service": "notifiarr",
+      "kind": "addon",
+      "repository": "ghcr.io/notifiarr/notifiarr",
+      "tag": "latest",
+      "indexDigest": "sha256:a9a1f37f924d740107874675df6b6a5edd87e5f66ca72ad27481a4bdfd42d162",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:32aeeebb2bfeac4bf6252cecb40adc3d0100e838cc8f15e7e018e297f5cede03"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:80a8e794b59c4ec9339e7b1a0dd6fde562dbeed7b863dab436211ce72555d083"
+        }
+      ]
+    },
+    {
+      "service": "nzbhydra2",
+      "kind": "addon",
+      "repository": "linuxserver/nzbhydra2",
+      "tag": "latest",
+      "indexDigest": "sha256:75a0d411cfc4d27fa0dfcd0c723f2fa08ad97a3c4d2d71b704c9f4bcfc492cfe",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:582f0b4854d7806adfd9f454b4a98717c420c3b12f4075058cc503e2448074fb"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:e92314e139fbbedb540b6aa2fab61163753cc3766867e4af864e5d71630c8cac"
+        }
+      ]
+    },
+    {
+      "service": "plex",
+      "kind": "core",
+      "repository": "linuxserver/plex",
+      "tag": "latest",
+      "indexDigest": "sha256:507713a14f9586f827d00c81381ecdcd438009172342b322b62a0e2b65081fdf",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:e2de8b6305fd59fcb4a2fe38c84d7b6089a74afbe1f80e495d9ad6d1f6b407c7"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:e6deac9660447bd6f8d2aa707a85d1a6c05b04327e79743e7739a7b4d91699a3"
+        }
+      ]
+    },
+    {
+      "service": "profilarr",
+      "kind": "addon",
+      "repository": "ghcr.io/dictionarry-hub/profilarr",
+      "tag": "latest",
+      "indexDigest": "sha256:7a9b5112ff227320d17c65ab643a5d875713e6235991ef04a8e482ec51427902",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:26816532c8351c9029c97ebcb7c97e3f6efb76d426b48e8e5ca92093b7fbd1a8"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:37589d7f1475ae50ef3a82b382a018ecd9d184816ff0d839fc106060cc0239f7"
+        }
+      ]
+    },
+    {
+      "service": "prowlarr",
+      "kind": "addon",
+      "repository": "linuxserver/prowlarr",
+      "tag": "latest",
+      "indexDigest": "sha256:2f3d31307beba3ba2dd226d191f5f5c14ee3b4d8b49277c64683f5ed97083179",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:6380cfdb5f42c5faf36898973220c39b34143879becc37dc3ce6fee0662725d9"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:800f7bfec82017a53b36bf5a618f075fcc4e324ef1ec31ffcfc71b18c1601475"
+        }
+      ]
+    },
+    {
+      "service": "pyload",
+      "kind": "addon",
+      "repository": "lscr.io/linuxserver/pyload-ng",
+      "tag": "latest",
+      "indexDigest": "sha256:1027d179918098b4b870b7886c44139a6dd40f8aa3f99f8e6c382d47c1ccc261",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:586bd6058de924eaf255a7852a9948cca5c5cec0a3046e3f5f11cd558f4fe4b5"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:043a752b461be7c7eabd67acbf72a0f276df84aa1bc8489c0512b35da1820012"
+        }
+      ]
+    },
+    {
+      "service": "qbit-manage",
+      "kind": "addon",
+      "repository": "ghcr.io/stuffanthings/qbit_manage",
+      "tag": "latest",
+      "indexDigest": "sha256:d888d415075dc6fb6843f77465c6eb5688e6d78f15d7bd6a00da1cdd99a92120",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:1fa4ff13712077049ab987b602ea93596328c8e3c8ad1a45924c012c8858e42c"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:9796ed6581f5812365fb81c8f6b63550c6f591a07788569b80af22ae4580c940"
+        }
+      ]
+    },
+    {
+      "service": "qbittorrent",
+      "kind": "core",
+      "repository": "linuxserver/qbittorrent",
+      "tag": "latest",
+      "indexDigest": "sha256:b024436f8ca665d16d9a997d26fd27fdf867ee5566ba09f32764e7b2976d3e02",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:1a4641fa759dee784708ed277ece10adbbc5810ebb8bb9fdfe1cf00031f5ab2b"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:fe3cb06fa08f7906028dc274687285fd99032ad25aca3b2871900cd37f62e2b7"
+        }
+      ]
+    },
+    {
+      "service": "qui",
+      "kind": "addon",
+      "repository": "ghcr.io/autobrr/qui",
+      "tag": "latest",
+      "indexDigest": "sha256:c1531b69a116b2572f69c76e6e02990b20ca04ef6550c883009df9ebcade1aba",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:5db2755cc9e5a8af53746ab54104bfd1421f3ab4e6f73d263655237bb11a85b3"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:26f1e77b762c42ed587ee1bc07fb532a06ebecbe86a778463654baab589b51e9"
+        }
+      ]
+    },
+    {
+      "service": "radarr",
+      "kind": "addon",
+      "repository": "linuxserver/radarr",
+      "tag": "latest",
+      "indexDigest": "sha256:e35056574cdc695a9ee745aa1ecda9eab3842450bf4b7b8471b023790fa3861d",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:3ded1c07339bdb99607a9e16b9bc2b135ef5359ea129a01d61fa744f3d9032d7"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:4bdcd773543ebef7147c17a870db02c406c83ab546d33b0a448ef3d6784f3ef4"
+        }
+      ]
+    },
+    {
+      "service": "recyclarr",
+      "kind": "addon",
+      "repository": "ghcr.io/recyclarr/recyclarr",
+      "tag": "latest",
+      "indexDigest": "sha256:55afe316d3e4e4e3b9120cef7c79436b1b5311f6a18d4ef4b7653e720499c90a",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:bd0254f1bcc7c08947c5297b012c832bda58ebd39a366a6078ede7ef1969e3da"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:fcdf5f689f8a8db895106dfe97a8842646f2a7113d7dbf0fe7bbec484d12a7ea"
+        }
+      ]
+    },
+    {
+      "service": "sabnzbd",
+      "kind": "addon",
+      "repository": "linuxserver/sabnzbd",
+      "tag": "latest",
+      "indexDigest": "sha256:302be8972d4627222a0701634f2f9025826d760d856414aa6e67c0a66833e5be",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:f9e35bb39bcaaf51295a90453eb58f90f8416b511d178db0bd2b1720fe40cb27"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:a3a91b72d939de028f3658b3162c27a65f78b2b3c2327d8746231edb9f33d7b7"
+        }
+      ]
+    },
+    {
+      "service": "seerr",
+      "kind": "addon",
+      "repository": "ghcr.io/seerr-team/seerr",
+      "tag": "latest",
+      "indexDigest": "sha256:f4768de5f616248d723e05891f3345a1402123775d03bf0890dbfedc0831bda1",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:b21cf91bb7a10d70446e104e7b7b9c9c386aa22beeac535a3271cbfc5843d142"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:d62cf12dadc38f11095dbe13762ab2b908874d7ff51f080bd6f0f697867d22bf"
+        }
+      ]
+    },
+    {
+      "service": "sonarr",
+      "kind": "addon",
+      "repository": "linuxserver/sonarr",
+      "tag": "latest",
+      "indexDigest": "sha256:24acea2956a0ccb11f103877d9f4f8576600fb34bff34820ed749c2256dab89f",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:f6bf16c4c5a0c6c99833eab891671ded0f06f553f30c7b0702e98f455c5642cc"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:644dc9f66266431457d6c78d39604b97dccc05ab41f41f0c60d4b1a4c8519708"
+        }
+      ]
+    },
+    {
+      "service": "stash",
+      "kind": "addon",
+      "repository": "stashapp/stash",
+      "tag": "latest",
+      "indexDigest": "sha256:df744af5a0c976e2ec671052ecc1f8a9aa757fa12b8f9930b59910b7295f0da6",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:736e7cd8f61c815c08fd3048792982a61e619735bb1808cd279f0f2fa857c4b0"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:cb368067ac6fcf895979adb7b4f96f45ab0048679ff1d6f0a31011b1a2750bac"
+        }
+      ]
+    },
+    {
+      "service": "tautulli",
+      "kind": "addon",
+      "repository": "linuxserver/tautulli",
+      "tag": "latest",
+      "indexDigest": "sha256:f0c3e7228c84ad0539f9d5aa9f56c79ef19f6c8d0ad61199d803d32a7b0e080b",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:f9f7126b2b29f7376179cbfe6468f9e5a046d47e4ab24d02f02db4ebdbbfaf2f"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:d0253a4ffddb9bac77aa954353224bfe102240ad088165489b627d41a42f4d50"
+        }
+      ]
+    },
+    {
+      "service": "tdarr",
+      "kind": "addon",
+      "repository": "ghcr.io/haveagitgat/tdarr",
+      "tag": "latest",
+      "indexDigest": "sha256:eaeb1b39242685915b50f299a89f15e8ec4ef47f54d4b5b5ceee7e9d2a81c412",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:fd46b1419a99978d58edd0c955f899fd8a7d3dbaa678c2da30f6cd80e6d57ad9"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:7a2f1a343ba8dd0dd43cbd69592a8e7fadf63cd2355f10a660ea77ef195e3b02"
+        }
+      ]
+    },
+    {
+      "service": "traefik",
+      "kind": "core",
+      "repository": "traefik",
+      "tag": "v3.7.10",
+      "indexDigest": "sha256:9c3b91d5fb7770853ca5c1124a23c34bf2d9b47ffaebeab2614cbaf410dcb2ac",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:0ae6898c4a6ad568e8eabad0839b1660eb54a72aa43089ead05c6f624f866b23"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:8f34ac785161ddfe26f4e291982967e92962c126120526a519c4cff521179436"
+        }
+      ]
+    },
+    {
+      "service": "unpackerr",
+      "kind": "addon",
+      "repository": "ghcr.io/unpackerr/unpackerr",
+      "tag": "latest",
+      "indexDigest": "sha256:89e13608521ece21dd300c39229fd595a55fbf4b8152771af5670a7455b5c747",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:bf54c00dd0579a00bd0023839259f6db121b997544ffa7755f244bdf5ec338bf"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:5f0339c80a257ab69e7c249983efc957d03ddc7c0623a009c0c66707a3effe24"
+        }
+      ]
+    },
+    {
+      "service": "whisparr",
+      "kind": "addon",
+      "repository": "ghcr.io/hotio/whisparr",
+      "tag": "v3",
+      "indexDigest": "sha256:93db4f70e19bb8f8dfa8860f8ef6b3bc3102e21089764d1e3cdbc04b6c901714",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:6e2e7072a718fc850686ead3695971c1afc3e43fd7d46d95fd653d12e86e5584"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:652e3d28afe342bf5e87631302052bcce7b624251b13ad12401d93edbd009650"
+        }
+      ]
+    },
+    {
+      "service": "wizarr",
+      "kind": "addon",
+      "repository": "ghcr.io/wizarrrr/wizarr",
+      "tag": "latest",
+      "indexDigest": "sha256:606f9b88b0303daae11f595e424756b588d9365021c53dcb4d1369f2efc0543c",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:be7087954f92badb16248073a347aadc771577a98c9c0c16b4cc010b143bbf50"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:bc0ffc9e4cabd6081db26733281e606001290d55f7fcfb33abf66a07f6399d58"
+        }
+      ]
+    }
+  ]
+}

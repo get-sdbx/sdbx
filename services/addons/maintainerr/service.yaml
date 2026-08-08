@@ -1,0 +1,75 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: maintainerr
+  version: 1.1.0
+  category: utility
+  description: "Rule-based media-library lifecycle management"
+  homepage: https://maintainerr.info
+  documentation: https://docs.maintainerr.info
+  maintainer: sdbx-official
+  tags:
+    - plex
+    - jellyfin
+    - lifecycle
+    - cleanup
+presentation:
+  launcher:
+    enabled: true
+    group: utilities
+    icon: maintainerr
+    subtitle: "Library lifecycle"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - host-chown
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: ghcr.io/maintainerr/maintainerr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: UI_HOSTNAME
+        value: "0.0.0.0"
+      - name: UI_PORT
+        value: "6246"
+    conditional:
+      - name: BASE_PATH
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: data
+      hostPath: "{{ .Config.ConfigPath }}/maintainerr"
+      containerPath: /opt/data
+      chown: true
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 6246
+  subdomain: maintainerr
+  path: /maintainerr
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: BASE_PATH
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

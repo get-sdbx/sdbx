@@ -1,0 +1,74 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: prowlarr
+  version: 1.0.0
+  category: media
+  description: "Indexer manager for *arr applications"
+  homepage: https://prowlarr.com
+  documentation: https://wiki.servarr.com/prowlarr
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - linuxserver
+    - indexers
+presentation:
+  launcher:
+    enabled: true
+    group: downloads
+    icon: prowlarr
+    subtitle: "Indexers"
+applicationAuth:
+  mode: sdbx-managed-forms
+permissions:
+  - config-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/prowlarr
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: PROWLARR__AUTH__METHOD
+        value: Forms
+      - name: PROWLARR__AUTH__REQUIRED
+        value: Enabled
+    conditional:
+      - name: PROWLARR__SERVER__URLBASE
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/prowlarr"
+      containerPath: /config
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 9696
+  subdomain: prowlarr
+  path: /prowlarr
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: PROWLARR__SERVER__URLBASE
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

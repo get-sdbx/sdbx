@@ -1,0 +1,16 @@
+# Release artifact license policy. Grant 0.6.8 treats the CoreOS attribution
+# NOTICE bundled with github.com/coreos/go-oidc/v3 as an unresolvable
+# LicenseRef. scripts/check-release-licenses.sh pins that exact module version
+# and expression before this narrowly scoped package exception is accepted.
+allow:
+  - Apache-2.0
+  - BSD-3-Clause
+  - MIT
+
+ignore-packages:
+  - github.com/get-sdbx/sdbx
+  - github.com/coreos/go-oidc/v3
+
+require-license: true
+require-known-license: false
+disable-file-search: true

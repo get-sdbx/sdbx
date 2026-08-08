@@ -1,0 +1,76 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: komga
+  version: 1.0.0
+  category: media
+  description: "Comic, manga, and ebook library server with OPDS support"
+  homepage: https://komga.org
+  documentation: https://komga.org/docs/installation/docker
+  maintainer: sdbx-official
+  tags:
+    - comics
+    - manga
+    - ebooks
+    - opds
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: komga
+    subtitle: "Comics and manga"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - host-chown
+  - media-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: gotson/komga
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: JAVA_TOOL_OPTIONS
+        value: "-Xmx1g"
+    conditional:
+      - name: SERVER_SERVLET_CONTEXT_PATH
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/komga"
+      containerPath: /config
+      chown: true
+    - name: media
+      hostPath: "{{ .Config.MediaPath }}"
+      containerPath: /data/media
+      readOnly: true
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 25600
+  subdomain: komga
+  path: /komga
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: SERVER_SERVLET_CONTEXT_PATH
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

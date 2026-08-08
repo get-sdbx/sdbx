@@ -1,0 +1,72 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: janitorr
+  version: 1.1.0
+  category: utility
+  description: "Scheduled media lifecycle automation for *arr and media servers"
+  homepage: https://github.com/Schaka/janitorr
+  documentation: https://github.com/Schaka/janitorr/wiki
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - media
+    - lifecycle
+    - internal-only
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - host-chown
+  - media-path
+  - network:app
+spec:
+  image:
+    repository: ghcr.io/schaka/janitorr
+    tag: jvm-stable
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: JAVA_TOOL_OPTIONS
+        value: "-Xmx256M"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/janitorr"
+      containerPath: /config
+      chown: true
+      chownUID: 1002
+      chownGID: 1001
+    - name: logs
+      hostPath: "{{ .Config.ConfigPath }}/janitorr"
+      containerPath: /logs
+      chown: true
+      chownUID: 1002
+      chownGID: 1001
+    - name: movies
+      hostPath: "{{ .Config.MediaPath }}/movies"
+      containerPath: /data/media/movies
+      readOnly: true
+    - name: tv
+      hostPath: "{{ .Config.MediaPath }}/tv"
+      containerPath: /data/media/tv
+      readOnly: true
+    - name: music
+      hostPath: "{{ .Config.MediaPath }}/music"
+      containerPath: /data/media/music
+      readOnly: true
+    - name: concerts
+      hostPath: "{{ .Config.MediaPath }}/concerts"
+      containerPath: /data/media/concerts
+      readOnly: true
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: false
+conditions:
+  requireAddon: true

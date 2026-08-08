@@ -1,0 +1,49 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: decluttarr
+  version: 2.0.0
+  category: utility
+  description: "Queue cleanup automation for supported *arr applications"
+  homepage: https://github.com/ManiMatter/decluttarr
+  documentation: https://github.com/ManiMatter/decluttarr/blob/latest/README.md
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - automation
+    - cleanup
+    - internal-only
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - network:app
+  - network:download
+spec:
+  image:
+    repository: ghcr.io/manimatter/decluttarr
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/decluttarr"
+      containerPath: /app/config
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: false
+conditions:
+  requireAddon: true

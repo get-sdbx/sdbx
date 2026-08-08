@@ -1,0 +1,71 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: gluetun
+  version: 1.1.0
+  category: networking
+  description: "VPN client with kill switch for Docker containers"
+  homepage: https://github.com/qdm12/gluetun
+  documentation: https://github.com/qdm12/gluetun-wiki
+  maintainer: sdbx-official
+  tags:
+    - vpn
+    - networking
+    - security
+applicationAuth:
+  mode: none
+permissions:
+  - capability:NET_ADMIN
+  - config-path
+  - data-path
+  - device
+  - host-port
+  - network:download
+spec:
+  image:
+    repository: qmcgaw/gluetun
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    capabilities:
+      add:
+        - NET_ADMIN
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: VPN_SERVICE_PROVIDER
+        value: "{{ .Config.VPNProvider }}"
+      - name: SERVER_COUNTRIES
+        value: "{{ .Config.VPNCountry }}"
+    envFile:
+      - "{{ .Config.ConfigPath }}/gluetun/gluetun.env"
+  volumes:
+    - name: data
+      hostPath: "{{ .Config.DataPath }}/gluetun"
+      containerPath: /gluetun
+  ports:
+    static:
+      - "127.0.0.1:8080:8080"
+      - "{{ .Config.TorrentPort }}:{{ .Config.TorrentPort }}"
+      - "{{ .Config.TorrentPort }}:{{ .Config.TorrentPort }}/udp"
+  networking:
+    networks:
+      - name: download
+  healthcheck:
+    test: ["CMD", "/gluetun-entrypoint", "healthcheck"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 120s
+routing:
+  enabled: false
+integrations:
+  cloudflared:
+    enabled: false
+conditions:
+  requireConfig: vpn_enabled

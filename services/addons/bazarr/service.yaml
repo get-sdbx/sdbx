@@ -1,0 +1,77 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: bazarr
+  version: 1.0.0
+  category: media
+  description: "Subtitle management for movies and TV shows"
+  homepage: https://www.bazarr.media
+  documentation: https://wiki.bazarr.media
+  maintainer: sdbx-official
+  tags:
+    - linuxserver
+    - subtitles
+    - media
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: bazarr
+    subtitle: "Subtitles"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - media-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/bazarr
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+    conditional:
+      - name: BAZARR__SERVER__URLBASE
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/bazarr"
+      containerPath: /config
+    - name: movies
+      hostPath: "{{ .Config.MediaPath }}/movies"
+      containerPath: /movies
+    - name: tv
+      hostPath: "{{ .Config.MediaPath }}/tv"
+      containerPath: /tv
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 6767
+  subdomain: bazarr
+  path: /bazarr
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: BAZARR__SERVER__URLBASE
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

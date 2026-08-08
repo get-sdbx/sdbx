@@ -1,0 +1,70 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: tautulli
+  version: 1.0.0
+  category: management
+  description: "Plex activity monitoring, analytics, and notifications"
+  homepage: https://tautulli.com
+  documentation: https://github.com/Tautulli/Tautulli/wiki
+  maintainer: sdbx-official
+  tags:
+    - linuxserver
+    - plex
+    - analytics
+presentation:
+  launcher:
+    enabled: true
+    group: management
+    icon: tautulli
+    subtitle: "Plex stats"
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/tautulli
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+    conditional:
+      - name: TAUTULLI_URLBASE
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/tautulli"
+      containerPath: /config
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 8181
+  subdomain: tautulli
+  path: /tautulli
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: TAUTULLI_URLBASE
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

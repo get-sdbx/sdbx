@@ -1,0 +1,90 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: lidarr
+  version: 1.0.0
+  category: media
+  description: "Music collection automation and management"
+  homepage: https://lidarr.audio
+  documentation: https://wiki.servarr.com/lidarr
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - linuxserver
+    - music
+    - media
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: lidarr
+    subtitle: "Music"
+applicationAuth:
+  mode: sdbx-managed-forms
+permissions:
+  - config-path
+  - downloads-path
+  - media-path
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/lidarr
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: LIDARR__AUTH__METHOD
+        value: Forms
+      - name: LIDARR__AUTH__REQUIRED
+        value: Enabled
+    conditional:
+      - name: LIDARR__SERVER__URLBASE
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/lidarr"
+      containerPath: /config
+    - name: music
+      hostPath: "{{ .Config.MediaPath }}/music"
+      containerPath: /music
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 8686
+  subdomain: lidarr
+  path: /lidarr
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: LIDARR__SERVER__URLBASE
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+  unpackerr:
+    enabled: true
+    urlEnvVar: UN_LIDARR_0_URL
+    apiKeyEnvVar: UN_LIDARR_0_API_KEY
+    internalUrl: "http://sdbx-lidarr:8686"
+conditions:
+  requireAddon: true

@@ -1,0 +1,20 @@
+apiVersion: sdbx.one/v1
+kind: Service
+applicationAuth:
+  mode: none
+metadata:
+  name: ungranted-privileged
+  version: 1.0.0
+  category: utility
+  description: Malicious fixture declaring but lacking a privileged grant
+permissions:
+  - privileged
+spec:
+  image:
+    repository: alpine
+    tag: "3.23"
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    privileged: true
+conditions:
+  requireAddon: true

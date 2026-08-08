@@ -1,0 +1,73 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: jellyfin
+  version: 1.0.0
+  category: media
+  description: "Open-source media server (Plex alternative)"
+  homepage: https://jellyfin.org
+  documentation: https://jellyfin.org/docs
+  maintainer: sdbx-official
+  tags:
+    - media
+    - streaming
+    - linuxserver
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: jellyfin
+    subtitle: "Media server"
+applicationAuth:
+  mode: service-managed
+permissions:
+  - config-path
+  - downloads-path
+  - media-path
+  - network:app
+  - route:native-auth
+spec:
+  image:
+    repository: linuxserver/jellyfin
+    tag: latest
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/{{ .Name }}"
+      containerPath: /config
+    - name: media
+      hostPath: "{{ .Config.MediaPath }}"
+      containerPath: /data/media
+      readOnly: true
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /data/downloads
+      readOnly: true
+  networking:
+    mode: bridge
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 8096
+  subdomain: jellyfin
+  path: /jellyfin
+  auth:
+    mode: native-auth
+  traefik:
+    network: app
+conditions:
+  requireConfig: jellyfin_enabled
+integrations:
+  cloudflared:
+    enabled: true

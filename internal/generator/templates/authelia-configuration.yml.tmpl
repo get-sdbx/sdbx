@@ -1,0 +1,81 @@
+# Authelia Configuration
+# Generated from the resolved SDBX service graph.
+
+theme: dark
+
+server:
+  address: {{ yamlQuote .AutheliaAddress }}
+  # SDBX supplies its own HTTP health probe. Disable Authelia's container
+  # helper because it rewrites /app/.healthcheck.env, which is incompatible
+  # with the intentionally read-only root filesystem.
+  disable_healthcheck: true
+
+log:
+  level: info
+  format: json
+
+totp:
+  issuer: {{ yamlQuote .Config.Domain }}
+  period: 30
+  skew: 1
+
+webauthn:
+  metadata:
+    enabled: false
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+    password:
+      algorithm: argon2id
+      iterations: 3
+      memory: 65536
+      parallelism: 4
+      key_length: 32
+      salt_length: 16
+
+access_control:
+  default_policy: deny
+  rules:
+{{- range .AutheliaRules }}
+    - domain: {{ yamlQuote .Domain }}
+{{- if .Resources }}
+      resources:
+{{- range .Resources }}
+        - {{ yamlQuote . }}
+{{- end }}
+{{- end }}
+{{- if .Subject }}
+      subject:
+{{- range .Subject }}
+        - {{ yamlQuote . }}
+{{- end }}
+{{- end }}
+      policy: {{ yamlQuote .Policy }}
+{{- end }}
+
+session:
+  name: authelia_session
+  same_site: lax
+  expiration: 1h
+  inactivity: 10m
+  remember_me: 7d
+  cookies:
+    - domain: {{ yamlQuote .Config.Domain }}
+      authelia_url: {{ yamlQuote .AutheliaURL }}
+
+regulation:
+  modes:
+    - user
+    - ip
+  max_retries: 3
+  find_time: 2m
+  ban_time: 15m
+
+storage:
+  local:
+    path: /data/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /data/notification.txt

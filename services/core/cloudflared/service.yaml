@@ -1,0 +1,67 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: cloudflared
+  version: 1.3.0
+  category: networking
+  description: "Remote-managed Cloudflare Tunnel connector"
+  homepage: https://www.cloudflare.com/products/tunnel/
+  documentation: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
+  maintainer: sdbx-official
+  tags:
+    - cloudflare
+    - tunnel
+    - networking
+    - security
+applicationAuth:
+  mode: none
+permissions:
+  - network:edge
+  - secret:cloudflared_tunnel_token
+spec:
+  image:
+    repository: cloudflare/cloudflared
+    tag: "2026.7.3"
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    command: tunnel run
+    readOnlyRootFilesystem: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m
+    pidsLimit: 64
+    capabilities:
+      drop:
+        - ALL
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: TUNNEL_TOKEN_FILE
+        value: /run/secrets/cloudflared_tunnel_token
+      - name: TUNNEL_METRICS
+        value: 127.0.0.1:2000
+  healthCheck:
+    test: ["CMD", "/usr/local/bin/cloudflared", "tunnel", "--metrics", "127.0.0.1:2000", "ready"]
+    interval: 15s
+    timeout: 5s
+    retries: 4
+    start_period: 20s
+  networking:
+    networks:
+      - name: edge
+  dependencies:
+    required:
+      - traefik
+secrets:
+  - name: cloudflared_tunnel_token
+    type: manual
+    description: "Cloudflare Tunnel token from dashboard"
+routing:
+  enabled: false
+integrations:
+  cloudflared:
+    enabled: false
+conditions:
+  requireConfig: cloudflared

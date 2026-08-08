@@ -1,0 +1,55 @@
+[Unit]
+Description=SDBX privileged management broker
+Documentation=https://github.com/get-sdbx/sdbx/blob/main/docs/installation.md
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+UMask=0077
+EnvironmentFile=/etc/sdbx/sdbxd.env
+ExecStart=/usr/local/bin/sdbxd \
+  --project-dir=${SDBX_PROJECT_DIR} \
+  --sources=${SDBX_SOURCES_FILE} \
+  --socket=/run/sdbx/sdbxd.sock \
+  --token-file=/run/sdbx/client.token \
+  --console-token-file=/run/sdbx/console.token \
+  --socket-group=sdbx \
+  --audit-log=/var/log/sdbx/audit.jsonl \
+  --oidc-issuer=${SDBX_OIDC_ISSUER} \
+  --oidc-client-id=${SDBX_OIDC_CLIENT_ID}
+RuntimeDirectory=sdbx
+RuntimeDirectoryMode=0750
+LogsDirectory=sdbx
+LogsDirectoryMode=0750
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=15s
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_FOWNER
+MemoryDenyWriteExecute=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=full
+ProcSubset=pid
+RemoveIPC=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallFilter=~@clock @cpu-emulation @debug @module @mount @obsolete @raw-io @reboot @swap
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

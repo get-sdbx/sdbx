@@ -1,0 +1,111 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: authelia
+  version: 1.0.0
+  category: auth
+  description: "Single Sign-On Multi-Factor portal"
+  homepage: https://www.authelia.com
+  documentation: https://www.authelia.com/docs/
+  maintainer: sdbx-official
+  tags:
+    - authentication
+    - sso
+    - security
+    - core
+applicationAuth:
+  mode: identity-provider
+permissions:
+  - config-path
+  - data-path
+  - host-chown
+  - secret:authelia_jwt_secret
+  - secret:authelia_session_secret
+  - secret:authelia_storage_encryption_key
+  - capability:CHOWN
+  - capability:SETGID
+  - capability:SETUID
+  - network:app
+  - route:public
+spec:
+  image:
+    repository: authelia/authelia
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    readOnlyRootFilesystem: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m
+    pidsLimit: 128
+    capabilities:
+      add:
+        - CHOWN
+        - SETGID
+        - SETUID
+      drop:
+        - ALL
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: UMASK
+        value: "{{ .Config.Umask }}"
+      - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
+        value: /run/secrets/authelia_jwt_secret
+      - name: AUTHELIA_SESSION_SECRET_FILE
+        value: /run/secrets/authelia_session_secret
+      - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
+        value: /run/secrets/authelia_storage_encryption_key
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/authelia"
+      containerPath: /config
+      chown: true
+    - name: data
+      hostPath: "{{ .Config.DataPath }}/authelia"
+      containerPath: /data
+      chown: true
+  healthCheck:
+    test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9091/api/health"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 30s
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 9091
+  subdomain: auth
+  path: /auth
+  pathRouting:
+    strategy: urlBase
+  auth:
+    mode: public
+  traefik:
+    network: app
+secrets:
+  - name: authelia_jwt_secret
+    type: auto
+    length: 64
+    description: "JWT token signing secret"
+  - name: authelia_session_secret
+    type: auto
+    length: 64
+    description: "Session encryption secret"
+  - name: authelia_storage_encryption_key
+    type: auto
+    length: 64
+    description: "Database encryption key"
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  always: true

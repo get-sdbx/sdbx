@@ -1,0 +1,55 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: cross-seed
+  version: 1.0.0
+  category: downloads
+  description: "Internal cross-seeding daemon for compatible torrent trackers"
+  homepage: https://cross-seed.org
+  documentation: https://www.cross-seed.org/docs/basics/getting-started
+  maintainer: sdbx-official
+  tags:
+    - torrents
+    - automation
+    - internal-only
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - downloads-path
+  - host-chown
+  - media-path
+  - network:app
+  - network:download
+spec:
+  image:
+    repository: ghcr.io/cross-seed/cross-seed
+    tag: latest
+    registry: ghcr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    user: "{{ .Config.PUID }}:{{ .Config.PGID }}"
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/cross-seed"
+      containerPath: /config
+      chown: true
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+    - name: media
+      hostPath: "{{ .Config.MediaPath }}"
+      containerPath: /media
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: false
+conditions:
+  requireAddon: true

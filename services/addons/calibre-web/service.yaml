@@ -1,0 +1,70 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: calibre-web
+  version: 1.0.0
+  category: media
+  description: "Web interface for browsing, reading, and downloading a Calibre library"
+  homepage: https://github.com/janeczku/calibre-web
+  documentation: https://docs.linuxserver.io/images/docker-calibre-web/
+  maintainer: sdbx-official
+  tags:
+    - books
+    - calibre
+    - linuxserver
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: calibre-web
+    subtitle: "Books"
+applicationAuth:
+  mode: upstream-default
+permissions:
+  - config-path
+  - media-path
+  - network:app
+  - route:admin-only
+spec:
+  image:
+    repository: lscr.io/linuxserver/calibre-web
+    tag: latest
+    registry: lscr.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: UMASK
+        value: "{{ .Config.Umask }}"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/calibre-web"
+      containerPath: /config
+    - name: books
+      hostPath: "{{ .Config.MediaPath }}/books"
+      containerPath: /books
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: true
+  port: 8083
+  subdomain: calibre
+  path: /calibre
+  forceSubdomain: true
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

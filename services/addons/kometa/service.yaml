@@ -1,0 +1,48 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: kometa
+  version: 1.0.0
+  category: media
+  description: "Scheduled Plex metadata, collection, playlist, and overlay manager"
+  homepage: https://kometa.wiki
+  documentation: https://kometa.wiki/en/latest/kometa/install/docker/
+  maintainer: sdbx-official
+  tags:
+    - plex
+    - metadata
+    - internal-only
+applicationAuth:
+  mode: none
+permissions:
+  - config-path
+  - network:app
+spec:
+  image:
+    repository: kometateam/kometa
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: KOMETA_TIME
+        value: "03:00"
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/kometa"
+      containerPath: /config
+  networking:
+    networks:
+      - name: app
+routing:
+  enabled: false
+conditions:
+  requireAddon: true

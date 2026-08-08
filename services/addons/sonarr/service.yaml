@@ -1,0 +1,90 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: sonarr
+  version: 1.0.0
+  category: media
+  description: "TV Shows automation and management"
+  homepage: https://sonarr.tv
+  documentation: https://wiki.servarr.com/sonarr
+  maintainer: sdbx-official
+  tags:
+    - arr-stack
+    - linuxserver
+    - tv
+    - media
+presentation:
+  launcher:
+    enabled: true
+    group: media
+    icon: sonarr
+    subtitle: "TV shows"
+applicationAuth:
+  mode: sdbx-managed-forms
+permissions:
+  - config-path
+  - downloads-path
+  - media-path
+  - network:app
+  - network:download
+  - route:admin-only
+spec:
+  image:
+    repository: linuxserver/sonarr
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: PUID
+        value: "{{ .Config.PUID }}"
+      - name: PGID
+        value: "{{ .Config.PGID }}"
+      - name: SONARR__AUTH__METHOD
+        value: Forms
+      - name: SONARR__AUTH__REQUIRED
+        value: Enabled
+    conditional:
+      - name: SONARR__SERVER__URLBASE
+        value: "{{ .Config.Routing.Path }}"
+        when: '{{ eq .Config.Routing.Strategy "path" }}'
+  volumes:
+    - name: config
+      hostPath: "{{ .Config.ConfigPath }}/sonarr"
+      containerPath: /config
+    - name: tv
+      hostPath: "{{ .Config.MediaPath }}/tv"
+      containerPath: /tv
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /downloads
+  networking:
+    networks:
+      - name: app
+      - name: download
+routing:
+  enabled: true
+  port: 8989
+  subdomain: sonarr
+  path: /sonarr
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: SONARR__SERVER__URLBASE
+  auth:
+    mode: admin-only
+  traefik:
+    network: app
+integrations:
+  cloudflared:
+    enabled: true
+  unpackerr:
+    enabled: true
+    urlEnvVar: UN_SONARR_0_URL
+    apiKeyEnvVar: UN_SONARR_0_API_KEY
+    internalUrl: "http://sdbx-sonarr:8989"
+conditions:
+  requireAddon: true

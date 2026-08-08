@@ -1,0 +1,161 @@
+# Update and rollback
+
+`v1.0.0-RC1` is the first public SDBX release. There is no supported migration
+from an earlier public version and no legacy configuration compatibility
+contract. Initialize a new RC1 project and attach only the persistent paths you
+have explicitly reviewed.
+
+SDBX separates changes that have different rollback boundaries:
+
+- replacing `sdbx` and `sdbxd` changes the controller version;
+- `sdbx update` changes pinned container image digests;
+- changing project intent or addons changes the resolved lock and generated
+  runtime;
+- third-party applications may migrate their own databases when a new image
+  starts.
+
+No SDBX command can guarantee rollback of an upstream application's database
+schema. Preserve application-consistent state separately.
+
+## Before any change
+
+Record and verify the baseline:
+
+```bash
+sdbx version
+sdbxd -version
+sdbx lock verify
+sdbx status
+sdbx doctor
+sdbx backup --recipient age1...
+```
+
+For VPN-enabled projects, also run `sdbx vpn status`. Copy the encrypted archive
+off-host, keep its age identity separately, and capture snapshots for state that
+the native backup excludes, including the configured `data_path`, media,
+downloads, and external Docker volumes.
+
+Preserve the matching binary pair, lock, generated runtime, exact release
+checksums, image digests, and application-specific rollback instructions.
+
+## Refresh container images
+
+The default command is a non-mutating preview:
+
+```bash
+sdbx update
+```
+
+Review every repository and digest change plus the upstream release notes. To
+apply the reviewed set:
+
+```bash
+sdbx update --apply --confirm apply-upstream-images
+sdbx lock verify
+sdbx status
+sdbx doctor
+```
+
+SDBX verifies the current project, resolves platform-specific digests, writes
+the candidate lock and runtime, pulls exact digests, converges services in
+dependency order, and checks their health. If that sequence fails, it restores
+the previous lock and runtime and reconverges the previous digests.
+
+An error ending in `previous locked stack restored` means the automated
+software-state rollback completed; verify it. If automatic rollback also
+failed, stop changing the host and preserve the evidence.
+
+## Change intent or addons
+
+Prefer typed commands such as `sdbx addon enable`, `sdbx addon disable`, and
+`sdbx config set`. For a reviewed manual `.sdbx.yaml` change:
+
+```bash
+sdbx lock diff
+sdbx lock
+sdbx lock verify
+sdbx up
+```
+
+Review every source, definition, service, permission, route, image, platform,
+and generated-file effect. Do not use `sdbx generate` to hide a stale lock; it
+only reconstructs derived files when intent and lock already agree.
+
+## Upgrade from RC1 to a later release
+
+Use only the exact signed artifacts and version-specific release notes for the
+target release. Replace `sdbx` and `sdbxd` as one pair; never mix versions.
+Before accepting a new lock:
+
+```bash
+sdbx version
+sdbxd -version
+sdbx lock diff
+```
+
+A controller version change may change the locked deployment identity. Accept
+the diff only when every change is documented by the target release. Then run:
+
+```bash
+sdbx lock
+sdbx lock verify
+sdbx up
+sdbx status
+sdbx doctor
+```
+
+When host services are installed:
+
+```bash
+sudo systemctl restart sdbxd.service sdbx-web.service
+sudo systemctl status sdbxd.service sdbx-web.service
+```
+
+If the diff contains an unexpected registry, image, service, permission,
+route, mount, or generated file, do not accept it. Restore the matching binary
+pair and project snapshot.
+
+## Roll back the controller
+
+Rollback is valid only when the target release notes say the older controller
+supports the current project schema and lock.
+
+1. Stop `sdbx-web` and `sdbxd` if installed.
+2. Preserve the failed state for diagnosis.
+3. Restore the matching binary pair.
+4. Restore the corresponding project snapshot if the newer release changed
+   incompatible state.
+5. Verify the lock, status, doctor, and VPN boundary before restarting host
+   services.
+
+Do not downgrade over an unexplained newer lock and regenerate it.
+
+## Roll back application state
+
+Automatic image rollback is not application-data rollback. If an upstream
+container migrated its database incompatibly:
+
+1. stop the affected stack;
+2. preserve the failed state;
+3. restore the application-consistent data snapshot;
+4. restore the matching SDBX project, lock, and previous image digests;
+5. follow the upstream application's supported rollback procedure;
+6. start only after verifying compatibility.
+
+Never delete a database, volume, download tree, or media tree merely to make an
+older image start.
+
+## Acceptance criteria
+
+A change is complete only when:
+
+- both binaries identify the intended release and commit;
+- `sdbx lock verify`, `sdbx status`, and `sdbx doctor` pass;
+- expected services and routes are healthy in fresh sessions;
+- Sonarr, Radarr, Lidarr, Prowlarr, and Whisparr retain both Authelia and their
+  SDBX-managed Forms credentials;
+- native-auth applications retain their own administrators;
+- VPN protection is proven where configured;
+- the Dashboard retains its broker, mTLS, Authelia admin, Host, Origin, token,
+  and loopback recovery boundaries;
+- an off-host encrypted backup and its separate recovery credential exist.

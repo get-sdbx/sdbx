@@ -1,0 +1,90 @@
+apiVersion: sdbx.one/v1
+kind: Service
+metadata:
+  name: filebrowser
+  version: 1.2.0
+  category: utility
+  description: "Web file manager for browsing, uploading, and organising seedbox files"
+  homepage: https://filebrowser.org/
+  documentation: https://filebrowser.org/installation
+  maintainer: sdbx-official
+  tags:
+    - files
+    - management
+    - utility
+presentation:
+  launcher:
+    enabled: true
+    group: utilities
+    icon: filebrowser
+    subtitle: "Files"
+applicationAuth:
+  mode: sdbx-managed-password
+permissions:
+  - config-path
+  - downloads-path
+  - host-chown
+  - media-path
+  - network:management
+  - route:admin-only
+spec:
+  image:
+    repository: filebrowser/filebrowser
+    tag: latest
+    registry: docker.io
+  container:
+    name_template: "sdbx-{{ .Name }}"
+    restart: unless-stopped
+    # The image bundles /config/settings.json with `"baseURL": ""` which
+    # overrides FB_BASEURL at startup. We pass --baseurl as a CLI flag
+    # because flags win over the settings file, only when path routing is
+    # active (subdomain routing wants empty baseurl).
+    command: '{{ if eq .Config.Routing.Strategy "path" }}--baseurl {{ .Config.Routing.Path }}{{ end }}'
+  environment:
+    static:
+      - name: TZ
+        value: "{{ .Config.Timezone }}"
+      - name: FB_ADDRESS
+        value: "0.0.0.0"
+      - name: FB_PORT
+        value: "80"
+      - name: FB_DATABASE
+        value: /database/filebrowser.db
+      - name: FB_ROOT
+        value: /srv
+      - name: FB_LOG
+        value: stdout
+  volumes:
+    - name: downloads
+      hostPath: "{{ .Config.DownloadsPath }}"
+      containerPath: /srv/downloads
+    - name: media
+      hostPath: "{{ .Config.MediaPath }}"
+      containerPath: /srv/media
+    - name: database
+      hostPath: "{{ .Config.ConfigPath }}/filebrowser"
+      containerPath: /database
+      # filebrowser runs as UID 1000 and needs write access to /database
+      # for filebrowser.db. sdbx creates the dir as root, so chown to
+      # PUID:PGID after mkdir.
+      chown: true
+  networking:
+    networks:
+      - name: management
+routing:
+  enabled: true
+  port: 80
+  subdomain: filebrowser
+  path: /filebrowser
+  pathRouting:
+    strategy: none
+    urlBaseEnvVar: FB_BASEURL
+  auth:
+    mode: admin-only
+  traefik:
+    network: management
+integrations:
+  cloudflared:
+    enabled: true
+conditions:
+  requireAddon: true

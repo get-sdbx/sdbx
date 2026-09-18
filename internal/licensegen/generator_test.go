@@ -44,6 +44,27 @@ func TestFindLicenseFilesRejectsEscapingPackage(t *testing.T) {
 	}
 }
 
+func TestFindLicenseFilesIncludesPatentGrant(t *testing.T) {
+	root := t.TempDir()
+	for _, name := range []string{"LICENSE", "NOTICE", "PATENTS", "PATENTS.txt"} {
+		if err := os.WriteFile(filepath.Join(root, name), []byte(name), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	paths, err := findLicenseFiles(root, root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(paths) != 4 {
+		t.Fatalf("expected license, notice and patent grants, got %v", paths)
+	}
+	for index, name := range []string{"LICENSE", "NOTICE", "PATENTS", "PATENTS.txt"} {
+		if filepath.Base(paths[index]) != name {
+			t.Fatalf("missing %s in %v", name, paths)
+		}
+	}
+}
+
 func TestRenderIsDeterministic(t *testing.T) {
 	files := map[string]noticeFile{
 		"b": {Component: "second v1", Path: "LICENSE", Content: []byte("B")},

@@ -4,6 +4,20 @@ This repository begins with the first public SDBX release candidate. Private
 development builds and internal dogfood revisions are intentionally absent
 from the public history.
 
+## [Unreleased]
+
+### Security
+
+- Build with Go 1.26.8 to include the standard-library security fixes missing
+  from Go 1.26.5.
+- Update age to 1.3.2, go-oidc to 3.21.0, and the Go cryptography, system,
+  terminal, and text modules to their reviewed maintenance releases.
+
+### Fixed
+
+- Include dependency patent grants in generated third-party notices and accept
+  the Go patent grant's explicit license identifier in dependency review.
+
 ## [1.0.0-RC1]
 
 ### Added

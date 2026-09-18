@@ -48,7 +48,7 @@ for sbom in "$dist_dir"/*.spdx.json; do
         | ($coreos | length) > 0
         and all(
             $coreos[];
-            .versionInfo == "v3.20.0"
+            .versionInfo == "v3.21.0"
             and .licenseConcluded == $expression
         )
     ' "$sbom" >/dev/null ||

@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: "1.26.5"
+  GO_VERSION: "1.26.8"
 
 jobs:
   quality:
@@ -215,8 +215,9 @@ jobs:
         with:
           fail-on-severity: moderate
           license-check: true
+          # Go's unchanged PATENTS grant is reported separately from its BSD license.
           allow-licenses: >-
-            0BSD,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC,MIT,MPL-2.0
+            0BSD,Apache-2.0,BSD-2-Clause,BSD-3-Clause,ISC,MIT,MPL-2.0,LicenseRef-scancode-google-patent-license-golang
 
   catalog:
     name: Compose ${{ matrix.expose }} / ${{ matrix.routing }}

@@ -66,8 +66,8 @@ allows review and keeps an exact incident artifact if verification fails.
 
 ## Install from a trusted checkout
 
-For an independent release rebuild, use Go 1.26.5 or newer and pin the exact tag plus
-the commit recorded in the signed release provenance:
+For an independent release rebuild, use the Go version pinned by the selected
+tag and pin the exact tag plus the commit recorded in the signed release provenance:
 
 ```bash
 version=v1.0.0-RC1

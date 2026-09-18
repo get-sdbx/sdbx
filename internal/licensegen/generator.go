@@ -175,7 +175,8 @@ func findLicenseFiles(packageDir string, moduleDir string) ([]string, error) {
 			case name == "LICENSE" || strings.HasPrefix(name, "LICENSE.") ||
 				name == "COPYING" || strings.HasPrefix(name, "COPYING."):
 				licenses = append(licenses, filepath.Join(current, entry.Name()))
-			case name == "NOTICE" || strings.HasPrefix(name, "NOTICE."):
+			case name == "NOTICE" || strings.HasPrefix(name, "NOTICE.") ||
+				name == "PATENTS" || strings.HasPrefix(name, "PATENTS."):
 				notices = append(notices, filepath.Join(current, entry.Name()))
 			}
 		}

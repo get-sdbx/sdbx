@@ -404,6 +404,19 @@ func TestRunInitDryRunExercisesCompletePlanWithoutWritingOrLeakingCredential(t *
 	initAdminPasswordFile = passwordPath
 	initDryRun = true
 
+	// This orchestration test uses synthetic Docker state. Probe ephemeral
+	// listeners so unrelated host services cannot occupy its planned ports.
+	originalTCPListen, originalUDPListen := initTCPListen, initUDPListen
+	initTCPListen = func(network, _ string) (net.Listener, error) {
+		return net.Listen(network, "127.0.0.1:0")
+	}
+	initUDPListen = func(network, _ string) (net.PacketConn, error) {
+		return net.ListenPacket(network, "127.0.0.1:0")
+	}
+	t.Cleanup(func() {
+		initTCPListen, initUDPListen = originalTCPListen, originalUDPListen
+	})
+
 	originalResolverFactory := imageDigestResolverFactory
 	imageDigestResolverFactory = func() registry.ImageDigestResolver {
 		return commandTestImageResolver{}

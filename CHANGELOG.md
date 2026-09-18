@@ -6,6 +6,11 @@ from the public history.
 
 ## [Unreleased]
 
+### Added
+
+- Update selected services with `sdbx update --service NAME` while preserving
+  all other verified image pins.
+
 ### Security
 
 - Build with Go 1.26.8 to include the standard-library security fixes missing
@@ -14,6 +19,11 @@ from the public history.
   terminal, and text modules to their reviewed maintenance releases.
 
 ### Fixed
+
+- Escape terminal controls in human-readable lock differences and registry
+  warnings while preserving structured JSON diagnostics.
+- Reject empty service selections and require services sharing an image to be
+  selected together, so scoped updates cannot change unselected services.
 
 - Include dependency patent grants in generated third-party notices and accept
   the Go patent grant's explicit license identifier in dependency review.

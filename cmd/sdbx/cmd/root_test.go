@@ -49,6 +49,25 @@ func TestWriteCLIErrorPlainText(t *testing.T) {
 	}
 }
 
+func TestWriteCLIErrorEscapesHumanControlsAndPreservesJSON(t *testing.T) {
+	message := "external\x1b[2J\nFORGED\r\u202e password=synthetic-secret"
+	var human, structured bytes.Buffer
+	writeCLIError(&human, errors.New(message), false)
+	writeCLIError(&structured, errors.New(message), true)
+	for _, unsafe := range []string{"\x1b[2J", "\nFORGED", "\r", "\u202e", "synthetic-secret"} {
+		if strings.Contains(human.String(), unsafe) {
+			t.Errorf("human error contains %q", unsafe)
+		}
+	}
+	var result cliErrorEnvelope
+	if err := json.Unmarshal(structured.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.Error.Message != redactCLIError(message) {
+		t.Fatalf("structured error changed: %q", result.Error.Message)
+	}
+}
+
 func TestReportedCLIErrorSuppressesDuplicateRendererAndPreservesCause(t *testing.T) {
 	cause := errors.New("operation failed")
 	reported := markCLIErrorReported(cause)

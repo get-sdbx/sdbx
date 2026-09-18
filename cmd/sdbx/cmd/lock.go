@@ -165,7 +165,11 @@ func generateProjectLock(
 func formatResolutionWarnings(warnings []registry.ResolutionWarning) string {
 	var builder strings.Builder
 	for _, warning := range warnings {
-		builder.WriteString(fmt.Sprintf("  - %s %s: %s\n", warning.Service, warning.Field, warning.Message))
+		builder.WriteString(fmt.Sprintf("  - %s %s: %s\n",
+			tui.EscapeText(warning.Service),
+			tui.EscapeText(warning.Field),
+			tui.EscapeText(warning.Message),
+		))
 	}
 	return builder.String()
 }
@@ -240,13 +244,13 @@ func runLockVerify(command *cobra.Command, _ []string) error {
 	fmt.Println(tui.WarningStyle.Render("Lock file has differences:"))
 	fmt.Println()
 	for _, diff := range diffs {
-		fmt.Printf("  %s: %s\n", tui.InfoStyle.Render(diff.Type), diff.Description)
+		fmt.Printf("  %s: %s\n", tui.InfoStyle.Render(diff.Type), tui.EscapeText(diff.Description))
 	}
 	if generatedFilesErr != nil {
 		fmt.Printf(
 			"  %s: %s\n",
 			tui.InfoStyle.Render("changed"),
-			redactCLIError(generatedFilesErr.Error()),
+			tui.EscapeText(redactCLIError(generatedFilesErr.Error())),
 		)
 	}
 	fmt.Println()
@@ -320,7 +324,7 @@ func runLockDiff(command *cobra.Command, _ []string) error {
 		default:
 			icon = " "
 		}
-		fmt.Printf("  %s %s\n", icon, diff.Description)
+		fmt.Printf("  %s %s\n", icon, tui.EscapeText(diff.Description))
 	}
 
 	return nil

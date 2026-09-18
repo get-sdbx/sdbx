@@ -13,6 +13,7 @@ import (
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/generator"
 	"github.com/get-sdbx/sdbx/internal/redact"
+	"github.com/get-sdbx/sdbx/internal/tui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -240,7 +241,7 @@ func writeCLIError(writer io.Writer, err error, asJSON bool) {
 		})
 		return
 	}
-	_, _ = fmt.Fprintf(writer, "Error: %s\n", message)
+	_, _ = fmt.Fprintf(writer, "Error: %s\n", tui.EscapeText(message))
 }
 
 func redactCLIError(message string) string {

@@ -755,6 +755,7 @@ sdbx update [flags]
 | --- | --- | --- | --- | --- |
 | `--apply` | `bool` | `false` | Current | apply the previewed upstream image digest changes |
 | `--confirm` | `string` | `""` | Current | required exact acknowledgement when applying: apply-upstream-images |
+| `--service` | `stringSlice` | `[]` | Current | refresh only the named active service (repeatable or comma-separated) |
 
 ## sdbx version
 

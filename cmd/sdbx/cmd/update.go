@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/get-sdbx/sdbx/internal/docker"
@@ -33,8 +34,9 @@ var updateComposeFactory = func(projectDir string) updateCompose {
 var updateRuntimeWriter = writeLockedRuntime
 
 var (
-	updateApply   bool
-	updateConfirm string
+	updateApply    bool
+	updateConfirm  string
+	updateServices []string
 )
 
 var updateCmd = &cobra.Command{
@@ -50,7 +52,10 @@ stack. It verifies services in dependency order and restores the previous
 digest-pinned stack if pulling, deployment, or health verification fails.
 
 Resolved upstream images have not passed the release catalog security review.
-Review the displayed digest changes and upstream advisories before applying.`,
+Review the displayed digest changes and upstream advisories before applying.
+
+With --service, all other image pins are preserved. Services using the same
+image must be selected together. An explicitly empty selection is rejected.`,
 	Args: cobra.NoArgs,
 	RunE: runUpdate,
 }
@@ -68,18 +73,28 @@ func init() {
 		"",
 		"required exact acknowledgement when applying: apply-upstream-images",
 	)
+	updateCmd.Flags().StringSliceVar(
+		&updateServices,
+		"service",
+		nil,
+		"refresh only the named active service (repeatable or comma-separated)",
+	)
 	rootCmd.AddCommand(updateCmd)
 }
 
 type updateResult struct {
-	Changed      bool                    `json:"changed"`
-	Differences  []registry.LockFileDiff `json:"differences,omitempty"`
-	ServiceOrder []string                `json:"serviceOrder,omitempty"`
-	Applied      bool                    `json:"applied"`
-	RolledBack   bool                    `json:"rolledBack"`
+	Changed          bool                    `json:"changed"`
+	Differences      []registry.LockFileDiff `json:"differences,omitempty"`
+	SelectedServices []string                `json:"selectedServices,omitempty"`
+	ServiceOrder     []string                `json:"serviceOrder,omitempty"`
+	Applied          bool                    `json:"applied"`
+	RolledBack       bool                    `json:"rolledBack"`
 }
 
 func runUpdate(command *cobra.Command, _ []string) error {
+	if command.Flags().Changed("service") && len(updateServices) == 0 {
+		return fmt.Errorf("--service requires a non-empty service name")
+	}
 	ctx := command.Context()
 	project, err := newProjectContext()
 	if err != nil {
@@ -91,13 +106,25 @@ func runUpdate(command *cobra.Command, _ []string) error {
 	}
 
 	allowLocalSources := lockContainsLocalSource(previous)
+	selectedServices, err := normalizeUpdateServices(updateServices)
+	if err != nil {
+		return err
+	}
+	imageResolver, err := updateImageResolver(
+		previous,
+		selectedServices,
+		imageRefreshResolverFactory(),
+	)
+	if err != nil {
+		return err
+	}
 	next, warnings, err := project.Registry.GenerateLockFileWithOptions(
 		ctx,
 		project.Config,
 		registry.LockOptions{
 			CLIVersion:        Version,
 			AllowLocalSources: allowLocalSources,
-			ImageResolver:     imageRefreshResolverFactory(),
+			ImageResolver:     imageResolver,
 		},
 	)
 	if err != nil {
@@ -105,9 +132,10 @@ func runUpdate(command *cobra.Command, _ []string) error {
 	}
 	differences := project.Registry.DiffLockFiles(previous, next)
 	result := updateResult{
-		Changed:      len(differences) > 0,
-		Differences:  differences,
-		ServiceOrder: append([]string(nil), next.InstallOrder...),
+		Changed:          len(differences) > 0,
+		Differences:      differences,
+		SelectedServices: append([]string(nil), selectedServices...),
+		ServiceOrder:     append([]string(nil), next.InstallOrder...),
 	}
 	if len(differences) == 0 {
 		return printUpdateResult(result, warnings)
@@ -186,6 +214,87 @@ func runUpdate(command *cobra.Command, _ []string) error {
 
 	result.Applied = true
 	return printUpdateResult(result, warnings)
+}
+
+type scopedUpdateImageResolver struct {
+	locked  registry.ImageDigestResolver
+	refresh registry.ImageDigestResolver
+	targets map[string]struct{}
+}
+
+func normalizeUpdateServices(services []string) ([]string, error) {
+	normalized := make([]string, 0, len(services))
+	seen := make(map[string]struct{}, len(services))
+	for _, requested := range services {
+		name := strings.TrimSpace(requested)
+		if name == "" {
+			return nil, fmt.Errorf("--service requires a non-empty service name")
+		}
+		if _, duplicate := seen[name]; duplicate {
+			continue
+		}
+		seen[name] = struct{}{}
+		normalized = append(normalized, name)
+	}
+	return normalized, nil
+}
+
+func updateImageResolver(
+	lock *registry.LockFile,
+	services []string,
+	refresh registry.ImageDigestResolver,
+) (registry.ImageDigestResolver, error) {
+	if refresh == nil {
+		return nil, fmt.Errorf("upstream image resolver is required")
+	}
+	if len(services) == 0 {
+		return refresh, nil
+	}
+	locked, err := registry.NewLockedImageResolver(lock)
+	if err != nil {
+		return nil, fmt.Errorf("load existing image pins: %w", err)
+	}
+	targets := make(map[string]struct{}, len(services))
+	selected := make(map[string]bool, len(services))
+	for _, name := range services {
+		service, ok := lock.Services[name]
+		if !ok {
+			return nil, fmt.Errorf("service %q is not active in the verified lock", name)
+		}
+		targets[updateImageReference(service.Image.Repository, service.Image.Tag)] = struct{}{}
+		selected[name] = true
+	}
+	// Locks pin one digest per image reference. Reject partial selection of a
+	// shared image rather than silently updating an unselected service.
+	for _, name := range lock.InstallOrder {
+		service := lock.Services[name]
+		_, targeted := targets[updateImageReference(service.Image.Repository, service.Image.Tag)]
+		if targeted && !selected[name] {
+			return nil, fmt.Errorf(
+				"selected image is also used by service %q; select all services sharing that image with --service",
+				name,
+			)
+		}
+	}
+	return &scopedUpdateImageResolver{
+		locked:  locked,
+		refresh: refresh,
+		targets: targets,
+	}, nil
+}
+
+func (r *scopedUpdateImageResolver) Resolve(
+	ctx context.Context,
+	repository, tag string,
+) (registry.ResolvedImage, error) {
+	if _, targeted := r.targets[updateImageReference(repository, tag)]; targeted {
+		return r.refresh.Resolve(ctx, repository, tag)
+	}
+	return r.locked.Resolve(ctx, repository, tag)
+}
+
+func updateImageReference(repository, tag string) string {
+	return repository + "\x00" + tag
 }
 
 func validateUpdateApplyConfirmation(confirmation string) error {
@@ -406,7 +515,11 @@ func printUpdateResult(
 			"  Candidate images have not passed the SDBX release catalog security review.",
 		))
 		fmt.Println("  Review upstream releases and exact digest changes, then apply with:")
-		fmt.Println("  sdbx update --apply --confirm apply-upstream-images")
+		applyCommand := "  sdbx update"
+		for _, service := range result.SelectedServices {
+			applyCommand += " --service " + service
+		}
+		fmt.Println(applyCommand + " --apply --confirm apply-upstream-images")
 		if len(warnings) > 0 {
 			fmt.Println()
 			fmt.Print(tui.WarningStyle.Render("Validation warnings:"))

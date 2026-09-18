@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +12,7 @@ import (
 
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/registry"
+	"gopkg.in/yaml.v3"
 )
 
 func TestFormatResolutionWarnings(t *testing.T) {
@@ -28,6 +32,138 @@ func TestFormatResolutionWarnings(t *testing.T) {
 	}
 	if !strings.Contains(output, "docker socket") {
 		t.Fatalf("warning output missing message: %s", output)
+	}
+}
+
+func TestLockDiagnosticsEscapeUntrustedLockNames(t *testing.T) {
+	for _, mode := range []string{"verify", "diff"} {
+		t.Run(mode, func(t *testing.T) {
+			projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+			loader := registry.NewLoader()
+			path := filepath.Join(projectDir, ".sdbx.lock")
+			lock, err := loader.LoadLockFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			name := "injected\x1b[2J\nFORGED\r\u202e"
+			lock.Services[name] = lock.Services["traefik"]
+			lock.InstallOrder = append(lock.InstallOrder, name)
+			if err := loader.SaveLockFile(path, lock); err != nil {
+				t.Fatal(err)
+			}
+			output := captureAddonOutput(t, func() error {
+				if mode == "verify" {
+					if err := runLockVerify(lockVerifyCmd, nil); err == nil {
+						t.Error("tampered lock was accepted")
+					}
+					return nil
+				}
+				return runLockDiff(lockDiffCmd, nil)
+			})
+			for _, control := range []string{"\x1b[2J", "\nFORGED", "\r", "\u202e"} {
+				if strings.Contains(output, control) {
+					t.Errorf("lock diagnostic contains terminal control %q", control)
+				}
+			}
+			if !strings.Contains(output, `injected\x1B[2J\nFORGED\r\u202E`) {
+				t.Errorf("lock diagnostic did not preserve the escaped service name: %q", output)
+			}
+		})
+	}
+}
+
+func TestResolutionWarningsEscapeTerminalControls(t *testing.T) {
+	output := formatResolutionWarnings([]registry.ResolutionWarning{{
+		Service: "service\x1b[2J", Field: "field\r", Message: "message\nFORGED\u202e",
+	}})
+	if strings.Contains(output, "\x1b") || strings.Contains(output, "\r") ||
+		strings.Contains(output, "\nFORGED") || strings.Contains(output, "\u202e") {
+		t.Fatalf("warning contains terminal controls: %q", output)
+	}
+	if !strings.Contains(output, `message\nFORGED\u202E`) {
+		t.Fatalf("warning did not preserve escaped content: %q", output)
+	}
+}
+
+func TestLockVerifyJSONPreservesStructuredDiagnostics(t *testing.T) {
+	projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+	jsonOut = true
+	loader := registry.NewLoader()
+	path := filepath.Join(projectDir, ".sdbx.lock")
+	lock, err := loader.LoadLockFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	name := "injected\x1b[2J\nFORGED"
+	lock.Services[name] = lock.Services["traefik"]
+	lock.InstallOrder = append(lock.InstallOrder, name)
+	if err := loader.SaveLockFile(path, lock); err != nil {
+		t.Fatal(err)
+	}
+	output := captureAddonOutput(t, func() error {
+		if err := runLockVerify(lockVerifyCmd, nil); err == nil {
+			t.Error("tampered lock was accepted")
+		}
+		return nil
+	})
+	var result struct {
+		Valid       bool
+		Differences []registry.LockFileDiff
+	}
+	if err := json.Unmarshal([]byte(output), &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.Valid || len(result.Differences) == 0 ||
+		!strings.Contains(result.Differences[0].Description, name) {
+		t.Fatalf("structured diagnostic changed: %+v", result)
+	}
+}
+
+func TestLockErrorsEscapeUntrustedMetadata(t *testing.T) {
+	for _, malformed := range []bool{false, true} {
+		t.Run(fmt.Sprint(malformed), func(t *testing.T) {
+			projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+			captureAddonOutput(t, func() error { return runGenerate(generateCmd, nil) })
+			loader := registry.NewLoader()
+			path := filepath.Join(projectDir, ".sdbx.lock")
+			lock, err := loader.LoadLockFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			name := "missing\x1b[2J\nFORGED\r\u202e"
+			if malformed {
+				lock.Services[name] = lock.Services["traefik"]
+				lock.InstallOrder = append(lock.InstallOrder, name, name)
+			} else {
+				lock.GeneratedFiles[name] = "sha256:" + strings.Repeat("a", 64)
+			}
+			data, err := yaml.Marshal(lock)
+			if err != nil {
+				t.Fatal(err)
+			}
+			// Imported locks need not have been written by the validating loader.
+			if err := os.WriteFile(path, data, 0o600); err != nil {
+				t.Fatal(err)
+			}
+			var returned error
+			output := captureAddonOutput(t, func() error {
+				returned = runLockVerify(lockVerifyCmd, nil)
+				return nil
+			})
+			if returned == nil {
+				t.Fatal("invalid runtime metadata was accepted")
+			}
+			if shouldRenderCLIError(returned) {
+				var rendered bytes.Buffer
+				writeCLIError(&rendered, returned, false)
+				output += rendered.String()
+			}
+			for _, control := range []string{"\x1b[2J", "\nFORGED", "\r", "\u202e"} {
+				if strings.Contains(output, control) {
+					t.Errorf("lock error contains terminal control %q", control)
+				}
+			}
+		})
 	}
 }
 

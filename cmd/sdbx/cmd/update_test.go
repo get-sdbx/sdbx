@@ -43,6 +43,206 @@ func (changedUpdateImageResolver) Resolve(
 	}, nil
 }
 
+type recordingUpdateImageResolver struct {
+	calls []string
+}
+
+func (r *recordingUpdateImageResolver) Resolve(
+	_ context.Context,
+	repository, tag string,
+) (registry.ResolvedImage, error) {
+	r.calls = append(r.calls, updateImageReference(repository, tag))
+	return changedUpdateImageResolver{}.Resolve(context.Background(), repository, tag)
+}
+
+func TestUpdateImageResolverRefreshesOnlySelectedService(t *testing.T) {
+	projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+	lock, err := registry.NewLoader().LoadLockFile(filepath.Join(projectDir, ".sdbx.lock"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	target := "traefik"
+	targetService, ok := lock.Services[target]
+	if !ok {
+		t.Fatalf("test lock does not contain %s", target)
+	}
+	refresh := &recordingUpdateImageResolver{}
+	resolver, err := updateImageResolver(lock, []string{target}, refresh)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for name, service := range lock.Services {
+		resolved, resolveErr := resolver.Resolve(
+			context.Background(),
+			service.Image.Repository,
+			service.Image.Tag,
+		)
+		if resolveErr != nil {
+			t.Fatalf("resolve %s: %v", name, resolveErr)
+		}
+		if name == target {
+			if resolved.Digest == service.Image.Digest {
+				t.Fatalf("selected service %s retained its old digest", name)
+			}
+			continue
+		}
+		if resolved.Digest != service.Image.Digest {
+			t.Fatalf("unselected service %s changed digest", name)
+		}
+	}
+	wantReference := updateImageReference(
+		targetService.Image.Repository,
+		targetService.Image.Tag,
+	)
+	if len(refresh.calls) != 1 || refresh.calls[0] != wantReference {
+		t.Fatalf("upstream resolver calls = %#v, want only %q", refresh.calls, wantReference)
+	}
+}
+
+func TestUpdateImageResolverRejectsInactiveService(t *testing.T) {
+	projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+	lock, err := registry.NewLoader().LoadLockFile(filepath.Join(projectDir, ".sdbx.lock"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = updateImageResolver(
+		lock,
+		[]string{"not-active"},
+		&recordingUpdateImageResolver{},
+	)
+	if err == nil || !strings.Contains(err.Error(), "not active in the verified lock") {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestRunUpdateRejectsExplicitEmptyServiceFlag(t *testing.T) {
+	for _, apply := range []bool{false, true} {
+		t.Run(fmt.Sprint(apply), func(t *testing.T) {
+			setupAddonCommandProject(t, config.DefaultConfig())
+			refresh := &recordingUpdateImageResolver{}
+			oldRefresh, oldCompose := imageRefreshResolverFactory, updateComposeFactory
+			oldServices, oldApply, oldConfirm := updateServices, updateApply, updateConfirm
+			t.Cleanup(func() {
+				imageRefreshResolverFactory, updateComposeFactory = oldRefresh, oldCompose
+				updateServices, updateApply, updateConfirm = oldServices, oldApply, oldConfirm
+			})
+			imageRefreshResolverFactory = func() registry.ImageDigestResolver { return refresh }
+			updateComposeFactory = func(string) updateCompose {
+				t.Fatal("empty service selection reached a runtime mutation")
+				return nil
+			}
+			command := &cobra.Command{Use: "update", RunE: runUpdate, SilenceErrors: true, SilenceUsage: true}
+			command.Flags().StringSliceVar(&updateServices, "service", nil, "")
+			command.Flags().BoolVar(&updateApply, "apply", false, "")
+			command.Flags().StringVar(&updateConfirm, "confirm", "", "")
+			args := []string{"--service="}
+			if apply {
+				args = append(args, "--apply", "--confirm=apply-upstream-images")
+			}
+			command.SetArgs(args)
+			if err := command.Execute(); err == nil || !strings.Contains(err.Error(), "non-empty service") {
+				t.Fatalf("empty explicit scope was not rejected: %v", err)
+			}
+			if len(refresh.calls) != 0 {
+				t.Fatalf("empty explicit scope refreshed images: %v", refresh.calls)
+			}
+		})
+	}
+}
+
+func TestUpdateImageResolverRejectsUnselectedSharedImage(t *testing.T) {
+	projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+	lock, err := registry.NewLoader().LoadLockFile(filepath.Join(projectDir, ".sdbx.lock"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lock.Services["shared-image-service"] = lock.Services["traefik"]
+	lock.InstallOrder = append(lock.InstallOrder, "shared-image-service")
+	if err := registry.ValidateLockFile(lock, true); err != nil {
+		t.Fatal(err)
+	}
+	refresh := &recordingUpdateImageResolver{}
+	if _, err := updateImageResolver(lock, []string{"traefik"}, refresh); err == nil ||
+		!strings.Contains(err.Error(), "shared-image-service") {
+		t.Fatalf("unselected service sharing the image was not rejected: %v", err)
+	}
+	if len(refresh.calls) != 0 {
+		t.Fatalf("ambiguous scope reached upstream: %v", refresh.calls)
+	}
+	resolver, err := updateImageResolver(lock, []string{"traefik", "shared-image-service"}, refresh)
+	if err != nil {
+		t.Fatal(err)
+	}
+	image := lock.Services["traefik"].Image
+	if _, err := resolver.Resolve(context.Background(), image.Repository, image.Tag); err != nil {
+		t.Fatal(err)
+	}
+	if len(refresh.calls) != 1 {
+		t.Fatalf("explicit shared-image scope did not refresh: %v", refresh.calls)
+	}
+}
+
+func TestRunUpdatePreviewScopesUpstreamResolution(t *testing.T) {
+	projectDir := setupAddonCommandProject(t, config.DefaultConfig())
+	configPath := filepath.Join(projectDir, ".sdbx.yaml")
+	lockPath := filepath.Join(projectDir, ".sdbx.lock")
+	beforeConfig, err := os.ReadFile(configPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeLock, err := os.ReadFile(lockPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeEntries := commandTestEntryNames(t, projectDir)
+
+	refresh := &recordingUpdateImageResolver{}
+	originalResolverFactory := imageRefreshResolverFactory
+	oldServices := updateServices
+	oldApply := updateApply
+	oldConfirm := updateConfirm
+	oldJSON := jsonOut
+	imageRefreshResolverFactory = func() registry.ImageDigestResolver { return refresh }
+	updateServices = []string{"traefik"}
+	updateApply = false
+	updateConfirm = ""
+	jsonOut = false
+	t.Cleanup(func() {
+		imageRefreshResolverFactory = originalResolverFactory
+		updateServices = oldServices
+		updateApply = oldApply
+		updateConfirm = oldConfirm
+		jsonOut = oldJSON
+	})
+
+	command := &cobra.Command{}
+	command.SetContext(context.Background())
+	output := captureAddonOutput(t, func() error {
+		return runUpdate(command, nil)
+	})
+	if !strings.Contains(output, "Update Preview") {
+		t.Fatalf("scoped update did not produce a preview:\n%s", output)
+	}
+	if !strings.Contains(
+		output,
+		"sdbx update --service traefik --apply --confirm apply-upstream-images",
+	) {
+		t.Fatalf("scoped update preview lost its service selection:\n%s", output)
+	}
+	if len(refresh.calls) != 1 {
+		t.Fatalf("upstream resolver calls = %#v, want one selected image", refresh.calls)
+	}
+	assertUpdateCommandFilesUnchanged(
+		t,
+		projectDir,
+		configPath,
+		lockPath,
+		beforeEntries,
+		beforeConfig,
+		beforeLock,
+	)
+}
+
 func TestRunUpdatePreviewIsCompleteAndNonMutating(t *testing.T) {
 	projectDir := setupChangedUpdateCommandProject(t)
 	configPath := filepath.Join(projectDir, ".sdbx.yaml")

@@ -8,6 +8,8 @@ from the public history.
 
 ### Added
 
+- Configure Cloudflare Tunnel transport with `expose.tunnel_protocol` in the
+  CLI and Dashboard: `http2`, `quic`, or `auto`.
 - Update selected services with `sdbx update --service NAME` while preserving
   all other verified image pins.
 
@@ -20,6 +22,9 @@ from the public history.
 
 ### Fixed
 
+- Default generated Cloudflare Tunnel connectors to HTTP/2 over TCP so degraded
+  QUIC/UDP paths do not leave otherwise responsive HTTP services transferring
+  pages slowly. Existing projects adopt the default when regenerated.
 - Escape terminal controls in human-readable lock differences and registry
   warnings while preserving structured JSON diagnostics.
 - Reject empty service selections and require services sharing an image to be

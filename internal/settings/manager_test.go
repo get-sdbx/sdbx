@@ -39,6 +39,42 @@ func TestManagerSetDomainRegeneratesRuntimeFiles(t *testing.T) {
 	}
 }
 
+func TestManagerSetTunnelProtocolRegeneratesAndRollsBackInvalidValues(t *testing.T) {
+	dir := t.TempDir()
+	cfg := config.DefaultConfig()
+	cfg.Expose.Mode = config.ExposeModeCloudflared
+	manager := testManager(t, dir, cfg)
+	initialImage := manager.Lock.Services["cloudflared"].Image
+	for _, protocol := range []string{"quic", "auto", "http2"} {
+		if _, err := manager.Set(context.Background(), "expose.tunnel_protocol", protocol); err != nil {
+			t.Fatal(err)
+		}
+		loaded, err := config.LoadFile(filepath.Join(dir, ".sdbx.yaml"))
+		if err != nil || loaded.EffectiveTunnelProtocol() != protocol {
+			t.Fatalf("persisted protocol = %#v, error = %v", loaded, err)
+		}
+		if !strings.Contains(readFile(t, filepath.Join(dir, "compose.yaml")), "TUNNEL_TRANSPORT_PROTOCOL="+protocol) {
+			t.Fatalf("runtime protocol was not regenerated as %s", protocol)
+		}
+		if err := registry.ValidateGeneratedFiles(dir, cfg.ConfigPath, manager.Lock); err != nil {
+			t.Fatalf("generated files are not bound to the updated lock: %v", err)
+		}
+		if !reflect.DeepEqual(manager.Lock.Services["cloudflared"].Image, initialImage) {
+			t.Fatal("protocol change refreshed the connector image")
+		}
+	}
+	beforeConfig := readFile(t, filepath.Join(dir, ".sdbx.yaml"))
+	beforeCompose := readFile(t, filepath.Join(dir, "compose.yaml"))
+	for _, protocol := range []string{"udp", "HTTP2", "http2\nquic"} {
+		if _, err := manager.Set(context.Background(), "expose.tunnel_protocol", protocol); err == nil {
+			t.Fatalf("accepted invalid tunnel protocol %q", protocol)
+		}
+		if cfg.EffectiveTunnelProtocol() != "http2" || readFile(t, filepath.Join(dir, ".sdbx.yaml")) != beforeConfig || readFile(t, filepath.Join(dir, "compose.yaml")) != beforeCompose {
+			t.Fatal("invalid protocol changed memory or runtime files")
+		}
+	}
+}
+
 func TestManagerSetParsesTypedValues(t *testing.T) {
 	projectDir := t.TempDir()
 	cfg := config.DefaultConfig()
@@ -323,6 +359,10 @@ func TestValuesReturnsCanonicalReadableSettings(t *testing.T) {
 
 func TestFieldsDescribeEditableSettings(t *testing.T) {
 	fields := Fields()
+	protocol := findField(fields, "expose.tunnel_protocol")
+	if protocol == nil || !protocol.Editable || protocol.Type != "select" || !reflect.DeepEqual(protocol.Options, []string{"http2", "quic", "auto"}) {
+		t.Fatalf("tunnel protocol metadata = %#v", protocol)
+	}
 
 	exposure := findField(fields, "expose.mode")
 	if exposure == nil {

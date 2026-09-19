@@ -36,6 +36,43 @@ names, local paths, usernames, and other deployment identifiers. Never share
 `.sdbx.yaml`, `.env`, `.sdbx.lock`, provider configuration, token files,
 passwords, private keys, or the contents of `secrets/`.
 
+## Cloudflare pages respond quickly but download slowly
+
+A healthy connector and fast first response do not prove usable throughput.
+Compare a complete static-file download through the public URL with the same
+file from the application and Traefik on the host. Check Cloudflared's QUIC
+packet-loss counter deltas and congestion windows while reproducing the issue.
+Repeated UDP loss can leave a QUIC tunnel connected but extremely slow.
+
+SDBX defaults `expose.tunnel_protocol` to `http2` (TLS over TCP). To restore
+that choice after selecting another protocol:
+
+```bash
+sdbx config set expose.tunnel_protocol http2
+sdbx lock verify
+docker compose -f compose.yaml up -d --no-deps --pull never cloudflared
+```
+
+The setting regenerates the locked runtime but does not restart containers.
+The last command recreates only the connector when its configuration changes;
+public connections may briefly disconnect. It does not restart Gluetun or
+qBittorrent. Use `sdbx up` instead when intentionally converging the full stack.
+
+The alternatives are `quic` (UDP) and `auto` (prefer QUIC, fall back to HTTP/2
+when a UDP connection cannot be established). `auto` is not a throughput-based
+fallback. QUIC supports Cloudflare's post-quantum key agreements; HTTP/2 does
+not. This setting controls the connector-to-Cloudflare connection, independently
+of browser HTTP versions and the download VPN. LAN and direct exposure do not
+run Cloudflared.
+
+After upgrading a binary whose embedded catalog changed, review `sdbx lock
+diff`, run `sdbx lock` to regenerate with the existing image pins, and verify the
+lock before applying the connector configuration. Older configuration files
+without this setting use HTTP/2 on regeneration; existing running containers
+are not changed merely by installing a binary.
+
+See [Cloudflare's transport parameters](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/#protocol).
+
 ## Project not found
 
 Symptom:

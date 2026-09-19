@@ -65,6 +65,15 @@ func Fields() []Field {
 			Editable:    true,
 		},
 		{
+			Key:         "expose.tunnel_protocol",
+			Label:       "Cloudflare Tunnel protocol",
+			Description: "Cloudflare exposure only: http2 uses TCP for reliable HTTP delivery; quic uses UDP; auto prefers QUIC with connection-failure fallback.",
+			Group:       "Core",
+			Type:        "select",
+			Options:     []string{config.TunnelProtocolHTTP2, config.TunnelProtocolQUIC, config.TunnelProtocolAuto},
+			Editable:    true,
+		},
+		{
 			Key:         "expose.tls.email",
 			Label:       "ACME contact email",
 			Description: "Plain contact address required before direct-mode ACME certificates can be issued.",
@@ -237,6 +246,7 @@ func ValidKeys() []string {
 		"jellyfin_enabled",
 		"expose_mode",
 		"expose.mode",
+		"expose.tunnel_protocol",
 		"expose.tls.email",
 		"routing_strategy",
 		"routing.strategy",
@@ -260,7 +270,7 @@ func ValidKeys() []string {
 
 func ReadGroups() []Group {
 	return []Group{
-		{Name: "Core", Keys: []string{"domain", "expose.mode", "expose.tls.email", "timezone"}},
+		{Name: "Core", Keys: []string{"domain", "expose.mode", "expose.tunnel_protocol", "expose.tls.email", "timezone"}},
 		{Name: "Media servers", Keys: []string{"plex_enabled", "jellyfin_enabled"}},
 		{Name: "Routing", Keys: []string{"routing.strategy", "routing.base_domain"}},
 		{Name: "Authentication", Keys: []string{"auth.factor"}},
@@ -277,28 +287,29 @@ func Values(cfg *config.Config) map[string]interface{} {
 	}
 	addons := append([]string(nil), cfg.Addons...)
 	return map[string]interface{}{
-		"domain":              cfg.Domain,
-		"timezone":            cfg.Timezone,
-		"plex_enabled":        cfg.PlexEnabled,
-		"jellyfin_enabled":    cfg.JellyfinEnabled,
-		"expose.mode":         cfg.Expose.Mode,
-		"expose.tls.email":    cfg.Expose.TLS.Email,
-		"routing.strategy":    cfg.Routing.Strategy,
-		"routing.base_domain": cfg.Routing.BaseDomain,
-		"auth.factor":         cfg.Auth.Factor,
-		"config_path":         cfg.ConfigPath,
-		"data_path":           cfg.DataPath,
-		"downloads_path":      cfg.DownloadsPath,
-		"media_path":          cfg.MediaPath,
-		"secrets_path":        cfg.SecretsPath,
-		"puid":                cfg.PUID,
-		"pgid":                cfg.PGID,
-		"umask":               cfg.Umask,
-		"vpn_enabled":         cfg.VPNEnabled,
-		"vpn_provider":        cfg.VPNProvider,
-		"vpn_country":         cfg.VPNCountry,
-		"torrent_peer_port":   cfg.TorrentPort,
-		"addons":              addons,
+		"domain":                 cfg.Domain,
+		"timezone":               cfg.Timezone,
+		"plex_enabled":           cfg.PlexEnabled,
+		"jellyfin_enabled":       cfg.JellyfinEnabled,
+		"expose.mode":            cfg.Expose.Mode,
+		"expose.tunnel_protocol": cfg.EffectiveTunnelProtocol(),
+		"expose.tls.email":       cfg.Expose.TLS.Email,
+		"routing.strategy":       cfg.Routing.Strategy,
+		"routing.base_domain":    cfg.Routing.BaseDomain,
+		"auth.factor":            cfg.Auth.Factor,
+		"config_path":            cfg.ConfigPath,
+		"data_path":              cfg.DataPath,
+		"downloads_path":         cfg.DownloadsPath,
+		"media_path":             cfg.MediaPath,
+		"secrets_path":           cfg.SecretsPath,
+		"puid":                   cfg.PUID,
+		"pgid":                   cfg.PGID,
+		"umask":                  cfg.Umask,
+		"vpn_enabled":            cfg.VPNEnabled,
+		"vpn_provider":           cfg.VPNProvider,
+		"vpn_country":            cfg.VPNCountry,
+		"torrent_peer_port":      cfg.TorrentPort,
+		"addons":                 addons,
 	}
 }
 
@@ -392,6 +403,8 @@ func apply(cfg *config.Config, key, value string) error {
 		cfg.SetExposureMode(value)
 	case "expose.tls.email":
 		cfg.Expose.TLS.Email = strings.TrimSpace(value)
+	case "expose.tunnel_protocol":
+		cfg.Expose.TunnelProtocol = value
 	case "routing_strategy", "routing.strategy":
 		cfg.Routing.Strategy = value
 	case "routing_base_domain", "routing.base_domain":

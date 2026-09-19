@@ -166,7 +166,8 @@ type CatalogTemplateConfig struct {
 }
 
 type CatalogExposeConfig struct {
-	Mode string
+	Mode           string
+	TunnelProtocol string
 }
 
 type CatalogRoutingConfig struct {
@@ -198,7 +199,8 @@ func catalogTemplateConfig(
 		VPNCountry:    cfg.VPNCountry,
 		TorrentPort:   cfg.TorrentPort,
 		Expose: CatalogExposeConfig{
-			Mode: cfg.Expose.Mode,
+			Mode:           cfg.Expose.Mode,
+			TunnelProtocol: cfg.EffectiveTunnelProtocol(),
 		},
 		Routing: CatalogRoutingConfig{
 			Strategy:   sdbxrouting.Strategy(cfg, definition),

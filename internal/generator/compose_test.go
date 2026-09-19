@@ -96,6 +96,9 @@ func TestMergedCatalogGeneratesUsableCoreCompose(t *testing.T) {
 			cloudflared.Environment,
 		)
 	}
+	if !contains(cloudflared.Environment, "TUNNEL_TRANSPORT_PROTOCOL=http2") {
+		t.Fatal("Cloudflared must default to HTTP/2")
+	}
 	for _, mount := range cloudflared.Volumes {
 		if strings.Contains(mount, "/etc/cloudflared") {
 			t.Fatalf(

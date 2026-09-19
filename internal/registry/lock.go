@@ -803,6 +803,7 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 		Domain          string                            `json:"domain"`
 		Timezone        string                            `json:"timezone"`
 		ExposeMode      string                            `json:"exposeMode"`
+		TunnelProtocol  string                            `json:"tunnelProtocol,omitempty"`
 		TLS             lockTLSConfig                     `json:"tls"`
 		Routing         config.RoutingConfig              `json:"routing"`
 		ConfigPath      string                            `json:"configPath"`
@@ -852,6 +853,9 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 		TorrentPort:     cfg.TorrentPort,
 		Addons:          addons,
 		Services:        cfg.Services,
+	}
+	if cfg.IsCloudflared() {
+		view.TunnelProtocol = cfg.EffectiveTunnelProtocol()
 	}
 	data, err := json.Marshal(view)
 	if err != nil {

@@ -12,6 +12,7 @@ Use `sdbx config get` to inspect values and `sdbx config set KEY VALUE` for one 
 | --- | --- | --- | --- | --- | --- |
 | `domain` | `text` | `sdbx.example.com` | — | yes | Base DNS domain used to derive routed service URLs. |
 | `expose.mode` | `select` | `lan` | lan, direct, cloudflared | yes | Ingress boundary: trusted LAN, direct public HTTPS, or a remote-managed Cloudflare Tunnel. |
+| `expose.tunnel_protocol` | `select` | `http2` | http2, quic, auto | yes | Cloudflare exposure only: http2 uses TCP for reliable HTTP delivery; quic uses UDP; auto prefers QUIC with connection-failure fallback. |
 | `expose.tls.email` | `text` | `""` | — | yes | Plain contact address required before direct-mode ACME certificates can be issued. |
 | `timezone` | `text` | `Europe/Paris` | — | yes | IANA timezone propagated to supported containers. |
 
@@ -78,6 +79,7 @@ timezone: Europe/Paris
 expose:
     mode: lan
     tls: {}
+    tunnel_protocol: http2
 routing:
     strategy: subdomain
     base_domain: sdbx

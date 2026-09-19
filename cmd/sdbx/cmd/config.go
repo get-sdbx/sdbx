@@ -40,6 +40,7 @@ var configSetCmd = &cobra.Command{
 Example:
   sdbx config set domain sdbx.example.com
   sdbx config set expose_mode cloudflared
+  sdbx config set expose.tunnel_protocol http2
   sdbx config set routing.strategy path
   sdbx config set auth.factor two_factor
   sdbx config set timezone America/New_York`,

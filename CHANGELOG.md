@@ -26,6 +26,13 @@ from the public history.
 
 ### Fixed
 
+- Require Docker Compose 5.0 or newer. Staged initialization validates with
+  `docker compose config --no-env-resolution` so a project whose `config_path`
+  is absolute is checked before its env files are promoted. Older releases
+  either reject that flag (2.34.0 and earlier) or still open the not-yet-staged
+  absolute env file (2.35.0 through 2.40.3), so `sdbx init` preflight,
+  `sdbx doctor`, the README and the documentation now report the real minimum
+  instead of claiming 2.20 support and failing at generation time.
 - Default generated Cloudflare Tunnel connectors to HTTP/2 over TCP so degraded
   QUIC/UDP paths do not leave otherwise responsive HTTP services transferring
   pages slowly. Existing projects adopt the default when regenerated.

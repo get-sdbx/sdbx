@@ -250,6 +250,23 @@ jobs:
       - name: Build both binaries
         run: make build
 
+      - name: Install pinned Docker Compose
+        env:
+          COMPOSE_VERSION: v5.5.1
+        run: |
+          set -Eeuo pipefail
+          base="https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}"
+          tmp="$(mktemp -d)"
+          curl -fsSL -o "$tmp/docker-compose-linux-x86_64" \
+            "${base}/docker-compose-linux-x86_64"
+          curl -fsSL -o "$tmp/docker-compose-linux-x86_64.sha256" \
+            "${base}/docker-compose-linux-x86_64.sha256"
+          (cd "$tmp" && sha256sum -c docker-compose-linux-x86_64.sha256)
+          sudo install -d -m 0755 /usr/local/lib/docker/cli-plugins
+          sudo install -m 0755 "$tmp/docker-compose-linux-x86_64" \
+            /usr/local/lib/docker/cli-plugins/docker-compose
+          docker compose version
+
       - name: Generate and validate locked Compose profile
         env:
           EXPOSURE_MODE: ${{ matrix.expose }}

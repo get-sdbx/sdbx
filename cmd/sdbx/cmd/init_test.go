@@ -439,7 +439,7 @@ func TestRunInitDryRunExercisesCompletePlanWithoutWritingOrLeakingCredential(t *
 		case "version":
 			return []byte("28.3.3\n"), nil
 		case "compose":
-			return []byte("2.39.1\n"), nil
+			return []byte("5.5.1\n"), nil
 		case "buildx":
 			return []byte("github.com/docker/buildx v0.29.1 synthetic\n"), nil
 		default:
@@ -709,9 +709,11 @@ func TestValidateStagedComposeUsesHermeticResolutionFlags(t *testing.T) {
 	joined := strings.Join(args, " ")
 	// compose.yaml keeps final absolute env-file paths while the transaction
 	// writes those files under stage/external-config, so staged validation must
-	// not resolve service env files. Docker Compose 2.35.0 is the first release
-	// that accepts both flags; the documented minimum, the init preflight and
-	// this call must stay in step.
+	// not resolve service env files. Docker Compose 5.0.0 is the first release
+	// whose --no-env-resolution also skips that resolution: 2.35.0 accepts the
+	// flag but still opens the staged absolute path, while 2.34.0 and earlier
+	// reject it outright. The documented minimum, the init preflight and this
+	// call must stay in step.
 	for _, required := range []string{
 		"compose",
 		"config",

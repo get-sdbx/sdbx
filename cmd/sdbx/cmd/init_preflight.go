@@ -104,8 +104,8 @@ func runInitPreflight(
 	if err := checkCommandVersion(
 		"Docker Compose",
 		[]string{"compose", "version", "--short"},
-		2,
-		35,
+		5,
+		0,
 	); err != nil {
 		return nil, err
 	}

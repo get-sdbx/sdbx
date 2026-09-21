@@ -240,7 +240,7 @@ func doctorRemediation(name string, status doctor.CheckStatus) string {
 	case "Docker version":
 		return "Install or upgrade Docker Engine to version 24 or newer."
 	case "Docker Compose version":
-		return "Install or upgrade the Docker Compose plugin to version 2.35 or newer."
+		return "Install or upgrade the Docker Compose plugin to version 5.0 or newer."
 	case "Disk space":
 		return "Free disk space on the project filesystem before deploying or updating."
 	case "File permissions":

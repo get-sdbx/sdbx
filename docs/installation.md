@@ -8,7 +8,7 @@ clean-host runtime guarantee. Each archive contains two native binaries:
 - `sdbxd` is the root-owned, project-scoped management broker used by the
   console.
 
-Docker Engine 24 or newer and Docker Compose 2.35 or newer are required.
+Docker Engine 24 or newer and Docker Compose 5.0 or newer are required.
 Docker access is root-equivalent; use a dedicated host or VM and keep the
 Docker and SDBX management groups small.
 

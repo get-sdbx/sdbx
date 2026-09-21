@@ -454,13 +454,12 @@ func (d *Doctor) checkComposeVersion(ctx context.Context) (bool, string) {
 	}
 
 	major, _ := strconv.Atoi(parts[0])
-	minor, _ := strconv.Atoi(parts[1])
 
-	if major < 2 || (major == 2 && minor < 35) {
-		return false, fmt.Sprintf("Compose %s < 2.35 (minimum required)", version)
+	if major < 5 {
+		return false, fmt.Sprintf("Compose %s < 5.0 (minimum required)", version)
 	}
 
-	return true, fmt.Sprintf("%s ≥ 2.35", version)
+	return true, fmt.Sprintf("%s ≥ 5.0", version)
 }
 
 // checkDiskSpace verifies sufficient disk space

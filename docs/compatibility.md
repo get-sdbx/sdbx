@@ -24,12 +24,12 @@ audit boundaries.
 | Component | Enforced minimum | Purpose |
 | --- | --- | --- |
 | Docker Engine | 24.0 | Container runtime and Compose backend |
-| Docker Compose plugin | 2.20 | Locked project convergence and structured status |
+| Docker Compose plugin | 2.35 | Locked project convergence and structured status |
 | Docker Buildx | 0.10 | Initialization preflight and platform tooling |
 | Go | 1.26.8 | Source builds only |
 
 Initialization refuses older or unrecognized Docker, Compose, and Buildx
-versions. `sdbx doctor` verifies Docker 24 and Compose 2.20 during day-two
+versions. `sdbx doctor` verifies Docker 24 and Compose 2.35 during day-two
 operation.
 
 Docker-compatible replacements are not part of the v1 contract. Rootless

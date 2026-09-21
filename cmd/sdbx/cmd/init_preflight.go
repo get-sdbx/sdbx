@@ -105,7 +105,7 @@ func runInitPreflight(
 		"Docker Compose",
 		[]string{"compose", "version", "--short"},
 		2,
-		20,
+		35,
 	); err != nil {
 		return nil, err
 	}
@@ -422,6 +422,8 @@ func validateStagedCompose(
 		stageProject+"/compose.yaml",
 		"config",
 		"--quiet",
+		"--no-env-resolution",
+		"--no-path-resolution",
 	)
 	if err != nil {
 		return fmt.Errorf(

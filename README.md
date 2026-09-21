@@ -53,7 +53,7 @@ acceptance guarantee. macOS is supported only for development and CLI tests.
 
 - Linux amd64 for the supported RC2 host contract
 - Docker Engine 24.0 or newer
-- Docker Compose plugin 2.20 or newer
+- Docker Compose plugin 2.35 or newer
 - Docker Buildx 0.10 or newer
 - a user with Docker access
 - a domain name for generated routes

@@ -26,9 +26,12 @@ from the public history.
 
 ### Fixed
 
-- Validate staged projects with `docker compose config --quiet` alone so
-  initialization works on the documented Docker Compose 2.20 minimum instead of
-  requiring newer resolution flags that only recent Compose releases accept.
+- Require Docker Compose 2.35 or newer. Staged initialization validates with
+  `docker compose config --no-env-resolution` so a project whose `config_path`
+  is absolute is checked before its env files are promoted; Docker Compose
+  2.34.0 and earlier reject that flag. `sdbx init` preflight, `sdbx doctor`, the
+  README and the documentation now report the real minimum instead of claiming
+  2.20 support and failing at generation time.
 - Default generated Cloudflare Tunnel connectors to HTTP/2 over TCP so degraded
   QUIC/UDP paths do not leave otherwise responsive HTTP services transferring
   pages slowly. Existing projects adopt the default when regenerated.

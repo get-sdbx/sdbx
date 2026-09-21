@@ -14,7 +14,7 @@ useful development clients, not supported deployment hosts.
 You need:
 
 - Docker Engine 24.0 or newer;
-- Docker Compose plugin 2.20 or newer;
+- Docker Compose plugin 2.35 or newer;
 - Docker Buildx 0.10 or newer;
 - a user that can reach the Docker daemon;
 - a domain you control, including local DNS for LAN-only deployments;

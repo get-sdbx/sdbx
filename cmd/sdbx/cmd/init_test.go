@@ -689,7 +689,7 @@ func TestValidateStagedComposePropagatesParentCancellation(t *testing.T) {
 	}
 }
 
-func TestValidateStagedComposeUsesOnlyDocumentedComposeFlags(t *testing.T) {
+func TestValidateStagedComposeUsesHermeticResolutionFlags(t *testing.T) {
 	original := initDockerCommandOutput
 	t.Cleanup(func() {
 		initDockerCommandOutput = original
@@ -707,18 +707,21 @@ func TestValidateStagedComposeUsesOnlyDocumentedComposeFlags(t *testing.T) {
 	}
 
 	joined := strings.Join(args, " ")
-	for _, required := range []string{"compose", "config", "--quiet", stage} {
+	// compose.yaml keeps final absolute env-file paths while the transaction
+	// writes those files under stage/external-config, so staged validation must
+	// not resolve service env files. Docker Compose 2.35.0 is the first release
+	// that accepts both flags; the documented minimum, the init preflight and
+	// this call must stay in step.
+	for _, required := range []string{
+		"compose",
+		"config",
+		"--quiet",
+		"--no-env-resolution",
+		"--no-path-resolution",
+		stage,
+	} {
 		if !strings.Contains(joined, required) {
 			t.Fatalf("compose validation args = %v, want %q", args, required)
-		}
-	}
-	for _, unsupported := range []string{"--no-env-resolution", "--no-path-resolution"} {
-		if strings.Contains(joined, unsupported) {
-			t.Fatalf(
-				"compose validation args contain %s, which Docker Compose 2.20 does not support: %v",
-				unsupported,
-				args,
-			)
 		}
 	}
 }

@@ -28,7 +28,7 @@ Required for the full local gate:
 - Go 1.26.8 or newer;
 - Git and Make;
 - Docker Engine 24.0 or newer;
-- Docker Compose plugin 2.20 or newer.
+- Docker Compose plugin 2.35 or newer.
 
 The Makefile downloads and executes pinned `goimports`, `golangci-lint`, and
 other Go-based quality tools with `go run`; do not install arbitrary global

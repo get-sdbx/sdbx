@@ -803,6 +803,7 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 		Domain          string                            `json:"domain"`
 		Timezone        string                            `json:"timezone"`
 		ExposeMode      string                            `json:"exposeMode"`
+		TunnelProtocol  string                            `json:"tunnelProtocol,omitempty"`
 		TLS             lockTLSConfig                     `json:"tls"`
 		Routing         config.RoutingConfig              `json:"routing"`
 		ConfigPath      string                            `json:"configPath"`
@@ -812,6 +813,7 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 		SecretsPath     string                            `json:"secretsPath"`
 		PlexEnabled     bool                              `json:"plexEnabled"`
 		JellyfinEnabled bool                              `json:"jellyfinEnabled"`
+		Plex            *config.PlexConfig                `json:"plex,omitempty"`
 		PUID            int                               `json:"puid"`
 		PGID            int                               `json:"pgid"`
 		Umask           string                            `json:"umask"`
@@ -852,6 +854,17 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 		TorrentPort:     cfg.TorrentPort,
 		Addons:          addons,
 		Services:        cfg.Services,
+	}
+	if cfg.IsCloudflared() {
+		view.TunnelProtocol = cfg.EffectiveTunnelProtocol()
+	}
+	if cfg.PlexEnabled && (cfg.Plex.HardwareDevice != "" || cfg.Plex.LANAddress != "") {
+		plex := cfg.Plex
+		plex.LANPort = 0
+		if plex.LANAddress != "" {
+			plex.LANPort = cfg.Plex.EffectiveLANPort()
+		}
+		view.Plex = &plex
 	}
 	data, err := json.Marshal(view)
 	if err != nil {

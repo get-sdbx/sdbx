@@ -12,6 +12,7 @@ Use `sdbx config get` to inspect values and `sdbx config set KEY VALUE` for one 
 | --- | --- | --- | --- | --- | --- |
 | `domain` | `text` | `sdbx.example.com` | — | yes | Base DNS domain used to derive routed service URLs. |
 | `expose.mode` | `select` | `lan` | lan, direct, cloudflared | yes | Ingress boundary: trusted LAN, direct public HTTPS, or a remote-managed Cloudflare Tunnel. |
+| `expose.tunnel_protocol` | `select` | `http2` | http2, quic, auto | yes | Cloudflare exposure only: http2 uses TCP for reliable HTTP delivery; quic uses UDP; auto prefers QUIC with connection-failure fallback. |
 | `expose.tls.email` | `text` | `""` | — | yes | Plain contact address required before direct-mode ACME certificates can be issued. |
 | `timezone` | `text` | `Europe/Paris` | — | yes | IANA timezone propagated to supported containers. |
 
@@ -21,6 +22,15 @@ Use `sdbx config get` to inspect values and `sdbx config set KEY VALUE` for one 
 | --- | --- | --- | --- | --- | --- |
 | `plex_enabled` | `boolean` | `false` | — | yes | Include Plex in the active service graph. |
 | `jellyfin_enabled` | `boolean` | `false` | — | yes | Include Jellyfin in the active service graph. |
+
+## Plex
+
+| Key | Type | Default | Options | Typed mutation | Meaning |
+| --- | --- | --- | --- | --- | --- |
+| `plex.hardware_device` | `text` | `""` | — | yes | Optional /dev/dri/renderD device for hardware transcoding. The host must already provide the device; empty disables GPU access. |
+| `plex.amd_vaapi` | `boolean` | `false` | — | yes | Opt in to the pinned community AMD VA-API compatibility package on Linux amd64. Requires a GPU render device. |
+| `plex.lan_address` | `text` | `""` | — | yes | Bind Plex's native authenticated HTTP port to a private or loopback IP. Empty disables the listener; routed HTTPS remains available. |
+| `plex.lan_port` | `number` | `32400` | — | yes | Host TCP port for the private Plex listener; defaults to 32400. Requires a private listen address. |
 
 ## Routing
 
@@ -78,6 +88,7 @@ timezone: Europe/Paris
 expose:
     mode: lan
     tls: {}
+    tunnel_protocol: http2
 routing:
     strategy: subdomain
     base_domain: sdbx
@@ -109,6 +120,26 @@ sdbx config set expose.tls.email ops@example.test
 sdbx config set expose.mode direct
 sdbx lock verify
 ```
+
+## Plex GPU and private listener
+
+Plex host access is opt-in. With Plex enabled, configure the DRM render device already available on the Docker host and, optionally, a private listen address:
+
+```bash
+sdbx config set plex.hardware_device /dev/dri/renderD128
+sdbx config set plex.lan_address 192.168.1.20
+sdbx config set plex.lan_port 32400
+sdbx lock verify
+sdbx up
+```
+
+The device must be a canonical `/dev/dri/renderD<number>` path. SDBX does not install host GPU drivers or configure a hypervisor. For Docker inside an unprivileged LXC, expose the render node to the LXC first and verify its ownership. Plex uses the LinuxServer device-permission initializer; verify access as its application user. Hardware transcoding requires Plex Pass and a compatible driver/codec.
+
+The listener binds only the chosen private or loopback IP, on TCP 32400 by default; IPv4 and IPv6 ULA/loopback addresses are supported. Wildcard, hostname and public-IP bindings are rejected. Claim Plex before enabling access: the native port uses Plex authentication, while the existing routed HTTPS endpoint remains available. In Cloudflare Tunnel mode this is a narrow Plex-only exception; other services and the tunnel entrypoint remain unpublished. The address must exist on the host, preferably through a static address or DHCP reservation.
+
+Some newer AMD GPUs require a compatibility package because Plex's bundled VA-API libraries are too old. `sdbx config set plex.amd_vaapi true` opts into the digest-pinned [community AMD package](https://github.com/justinappler/plex-vaapi-amdgpu-mod) declared in the Plex catalog. It wraps Plex's runtime to load compatible libraries, requires `plex.hardware_device`, and is limited to Linux amd64. It is not an official Plex driver or a guarantee of hardware HDR tone mapping. Verify actual hardware decoding/encoding with a bounded playback test. Leave this option off when the bundled driver works.
+
+Settings are available in the CLI and Dashboard and are included in lock verification. Recreate Plex after changing container options. To remove access, disable `plex.amd_vaapi` first, then clear `plex.hardware_device` and/or `plex.lan_address` with an empty string and run `sdbx up`. Disabling the compatibility package restores the image's normal runtime on recreation. If its saved VA-API cache link still points into `/vaapi-amdgpu`, restore the original bundled-driver link before relying on the bundled driver again; preserve the original Plex `Drivers` directory. Background analysis schedules remain Plex-owned settings under Settings > Library.
 
 ## Service route overrides
 

@@ -5,7 +5,7 @@ deployment. It uses the interactive setup because that path shows the complete
 service, route, authentication, network, mount, and secret plan before writing
 anything.
 
-SDBX `v1.0.0-RC1` supports Linux amd64 hosts. Linux arm64 is published as a compatibility
+SDBX `v1.0.0-RC2` supports Linux amd64 hosts. Linux arm64 is published as a compatibility
 build without the full clean-host runtime guarantee. macOS and Windows are
 useful development clients, not supported deployment hosts.
 

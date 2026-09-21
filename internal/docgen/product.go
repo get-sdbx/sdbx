@@ -14,8 +14,8 @@ import (
 
 const (
 	productManifestSchemaVersion = 1
-	releaseVersion               = "1.0.0-RC1"
-	releaseTag                   = "v1.0.0-RC1"
+	releaseVersion               = "1.0.0-RC2"
+	releaseTag                   = "v1.0.0-RC2"
 )
 
 type productManifest struct {
@@ -235,8 +235,8 @@ func generateProductManifest() ([]byte, error) {
 		Artifacts: productArtifacts{
 			ArchiveNameTemplate: "sdbx_{version}_linux_{architecture}.tar.gz",
 			Archives: []string{
-				"sdbx_1.0.0-RC1_linux_amd64.tar.gz",
-				"sdbx_1.0.0-RC1_linux_arm64.tar.gz",
+				"sdbx_1.0.0-RC2_linux_amd64.tar.gz",
+				"sdbx_1.0.0-RC2_linux_arm64.tar.gz",
 			},
 			Checksums:         "checksums.txt",
 			ChecksumSignature: "checksums.txt.sigstore.json",

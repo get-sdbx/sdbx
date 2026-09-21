@@ -586,6 +586,12 @@ func (v *Validator) validateConditions(def *ServiceDefinition) []ValidationError
 			false,
 		)
 	}
+	for i, device := range def.Spec.Container.ConditionalDevices {
+		validateWhen(fmt.Sprintf("spec.container.conditional_devices[%d].when", i), device.When, true, false)
+		if strings.TrimSpace(device.Device) == "" || strings.Contains(device.Device, "/dev/mem") || strings.Contains(device.Device, "/dev/kmem") {
+			errors = append(errors, ValidationError{Field: fmt.Sprintf("spec.container.conditional_devices[%d].device", i), Message: "device mapping is empty or unsafe", Severity: "error"})
+		}
+	}
 	for i, network := range def.Spec.Networking.Networks {
 		validateWhen(
 			fmt.Sprintf("spec.networking.networks[%d].when", i),
@@ -903,7 +909,7 @@ func RequiredCatalogPermissions(def *ServiceDefinition) []string {
 	for _, capability := range def.Spec.Container.Capabilities.Add {
 		add("capability:" + strings.ToUpper(capability))
 	}
-	if len(def.Spec.Container.Devices) > 0 {
+	if len(def.Spec.Container.Devices) > 0 || len(def.Spec.Container.ConditionalDevices) > 0 {
 		add(PermissionDevice)
 	}
 
@@ -1100,25 +1106,28 @@ func (v *Validator) validateCatalogTemplates(def *ServiceDefinition) []Validatio
 		"TorrentPort":   true,
 		"Expose":        true,
 		"Routing":       true,
+		"Plex":          true,
 	}
 	templatableFields := map[string]bool{
-		"spec.container.name_template":       true,
-		"spec.container.command":             true,
-		"spec.container.user":                true,
-		"spec.container.working_dir":         true,
-		"spec.environment.static.value":      true,
-		"spec.environment.conditional.value": true,
-		"spec.environment.conditional.when":  true,
-		"spec.environment.envFile":           true,
-		"spec.volumes.hostPath":              true,
-		"spec.volumes.containerPath":         true,
-		"spec.volumes.when":                  true,
-		"spec.ports.static":                  true,
-		"spec.ports.conditional.port":        true,
-		"spec.ports.conditional.when":        true,
-		"spec.networking.modeTemplate":       true,
-		"spec.networking.networks.when":      true,
-		"spec.dependencies.conditional.when": true,
+		"spec.container.name_template":              true,
+		"spec.container.command":                    true,
+		"spec.container.user":                       true,
+		"spec.container.working_dir":                true,
+		"spec.container.conditional_devices.device": true,
+		"spec.container.conditional_devices.when":   true,
+		"spec.environment.static.value":             true,
+		"spec.environment.conditional.value":        true,
+		"spec.environment.conditional.when":         true,
+		"spec.environment.envFile":                  true,
+		"spec.volumes.hostPath":                     true,
+		"spec.volumes.containerPath":                true,
+		"spec.volumes.when":                         true,
+		"spec.ports.static":                         true,
+		"spec.ports.conditional.port":               true,
+		"spec.ports.conditional.when":               true,
+		"spec.networking.modeTemplate":              true,
+		"spec.networking.networks.when":             true,
+		"spec.dependencies.conditional.when":        true,
 	}
 
 	var errors []ValidationError

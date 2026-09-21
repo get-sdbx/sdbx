@@ -120,21 +120,28 @@ type ContainerSpec struct {
 	User    string `yaml:"user,omitempty"`
 	Command string `yaml:"command,omitempty"`
 	// WorkingDir overrides the container's WORKDIR and supports templates.
-	WorkingDir   string            `yaml:"working_dir,omitempty"`
-	ShmSize      string            `yaml:"shm_size,omitempty"`
-	Sysctls      map[string]string `yaml:"sysctls,omitempty"`
-	CustomLabels map[string]string `yaml:"customLabels,omitempty"`
-	Privileged   bool              `yaml:"privileged,omitempty"`
-	ReadOnlyRoot bool              `yaml:"readOnlyRootFilesystem,omitempty"`
-	Tmpfs        []string          `yaml:"tmpfs,omitempty"`
-	PidsLimit    int               `yaml:"pidsLimit,omitempty"`
-	StopGrace    string            `yaml:"stopGracePeriod,omitempty"`
-	Capabilities CapabilitiesSpec  `yaml:"capabilities,omitempty"`
-	Devices      []string          `yaml:"devices,omitempty"`
+	WorkingDir         string              `yaml:"working_dir,omitempty"`
+	ShmSize            string              `yaml:"shm_size,omitempty"`
+	Sysctls            map[string]string   `yaml:"sysctls,omitempty"`
+	CustomLabels       map[string]string   `yaml:"customLabels,omitempty"`
+	Privileged         bool                `yaml:"privileged,omitempty"`
+	ReadOnlyRoot       bool                `yaml:"readOnlyRootFilesystem,omitempty"`
+	Tmpfs              []string            `yaml:"tmpfs,omitempty"`
+	PidsLimit          int                 `yaml:"pidsLimit,omitempty"`
+	StopGrace          string              `yaml:"stopGracePeriod,omitempty"`
+	Capabilities       CapabilitiesSpec    `yaml:"capabilities,omitempty"`
+	Devices            []string            `yaml:"devices,omitempty"`
+	ConditionalDevices []ConditionalDevice `yaml:"conditional_devices,omitempty"`
 	// Init, when true, runs an init process (PID 1) inside the container that
 	// reaps zombies and forwards signals. Required by some images that don't
 	// ship their own init (e.g. Seerr).
 	Init bool `yaml:"init,omitempty"`
+}
+
+// ConditionalDevice declares bounded device access behind an explicit condition.
+type ConditionalDevice struct {
+	Device string `yaml:"device"`
+	When   string `yaml:"when"`
 }
 
 // CapabilitiesSpec defines Linux capabilities to add or drop

@@ -2,7 +2,7 @@ apiVersion: sdbx.one/v1
 kind: Service
 metadata:
   name: cloudflared
-  version: 1.3.0
+  version: 1.4.0
   category: networking
   description: "Remote-managed Cloudflare Tunnel connector"
   homepage: https://www.cloudflare.com/products/tunnel/
@@ -42,6 +42,8 @@ spec:
         value: /run/secrets/cloudflared_tunnel_token
       - name: TUNNEL_METRICS
         value: 127.0.0.1:2000
+      - name: TUNNEL_TRANSPORT_PROTOCOL
+        value: "{{ .Config.Expose.TunnelProtocol }}"
   healthCheck:
     test: ["CMD", "/usr/local/bin/cloudflared", "tunnel", "--metrics", "127.0.0.1:2000", "ready"]
     interval: 15s

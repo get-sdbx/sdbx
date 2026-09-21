@@ -4,10 +4,16 @@ This repository begins with the first public SDBX release candidate. Private
 development builds and internal dogfood revisions are intentionally absent
 from the public history.
 
-## [Unreleased]
+## [1.0.0-RC2]
 
 ### Added
 
+- Opt-in Plex DRM render-device access and a private native listener through
+  `plex.hardware_device`, `plex.lan_address`, and `plex.lan_port`, with CLI and
+  Dashboard controls, lock verification, and an optional digest-pinned AMD
+  VA-API compatibility package (`plex.amd_vaapi`, Linux amd64 only).
+- Configure Cloudflare Tunnel transport with `expose.tunnel_protocol` in the
+  CLI and Dashboard: `http2`, `quic`, or `auto`.
 - Update selected services with `sdbx update --service NAME` while preserving
   all other verified image pins.
 
@@ -20,6 +26,9 @@ from the public history.
 
 ### Fixed
 
+- Default generated Cloudflare Tunnel connectors to HTTP/2 over TCP so degraded
+  QUIC/UDP paths do not leave otherwise responsive HTTP services transferring
+  pages slowly. Existing projects adopt the default when regenerated.
 - Escape terminal controls in human-readable lock differences and registry
   warnings while preserving structured JSON diagnostics.
 - Reject empty service selections and require services sharing an image to be

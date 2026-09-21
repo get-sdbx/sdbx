@@ -24,6 +24,10 @@ const (
 	ExposeModeDirect      = "direct"
 	ExposeModeLAN         = "lan"
 
+	TunnelProtocolHTTP2 = "http2"
+	TunnelProtocolQUIC  = "quic"
+	TunnelProtocolAuto  = "auto"
+
 	// Routing strategies
 	RoutingStrategyPath      = "path"
 	RoutingStrategySubdomain = "subdomain"
@@ -55,8 +59,9 @@ type Config struct {
 
 	// Media servers are explicit choices. Neither is silently enabled for a
 	// new project; legacy configs without both keys migrate to Plex on load.
-	PlexEnabled     bool `mapstructure:"plex_enabled" yaml:"plex_enabled"`
-	JellyfinEnabled bool `mapstructure:"jellyfin_enabled" yaml:"jellyfin_enabled"`
+	PlexEnabled     bool       `mapstructure:"plex_enabled" yaml:"plex_enabled"`
+	JellyfinEnabled bool       `mapstructure:"jellyfin_enabled" yaml:"jellyfin_enabled"`
+	Plex            PlexConfig `mapstructure:"plex" yaml:"plex,omitempty"`
 
 	// Permissions
 	PUID  int    `mapstructure:"puid" yaml:"puid"`
@@ -99,8 +104,9 @@ type Config struct {
 
 // ExposeConfig defines how services are exposed to the network
 type ExposeConfig struct {
-	Mode string    `mapstructure:"mode" yaml:"mode"` // "lan" | "direct" | "cloudflared"
-	TLS  TLSConfig `mapstructure:"tls" yaml:"tls"`
+	Mode           string    `mapstructure:"mode" yaml:"mode"` // "lan" | "direct" | "cloudflared"
+	TLS            TLSConfig `mapstructure:"tls" yaml:"tls"`
+	TunnelProtocol string    `mapstructure:"tunnel_protocol" yaml:"tunnel_protocol,omitempty"`
 }
 
 // TLSConfig defines TLS/SSL settings for direct mode
@@ -142,8 +148,9 @@ func DefaultConfig() *Config {
 		Domain:   "sdbx.example.com",
 		Timezone: "Europe/Paris",
 		Expose: ExposeConfig{
-			Mode: ExposeModeLAN,
-			TLS:  TLSConfig{},
+			Mode:           ExposeModeLAN,
+			TLS:            TLSConfig{},
+			TunnelProtocol: TunnelProtocolHTTP2,
 		},
 		Routing: RoutingConfig{
 			Strategy:   "subdomain",
@@ -185,6 +192,16 @@ func (c *Config) SetExposureMode(mode string) {
 	c.Expose.TLS.Email = ""
 }
 
+// EffectiveTunnelProtocol keeps omitted protocol settings independent of
+// cloudflared's upstream default. HTTP/2 avoids degraded QUIC/UDP paths that
+// can stay connected while transferring HTTP responses extremely slowly.
+func (c *Config) EffectiveTunnelProtocol() string {
+	if c.Expose.TunnelProtocol == "" {
+		return TunnelProtocolHTTP2
+	}
+	return c.Expose.TunnelProtocol
+}
+
 // Domain validation regex - matches valid domain names
 var domainRegex = regexp.MustCompile(`^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`)
 var identifierRegex = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{0,62}$`)
@@ -194,6 +211,9 @@ var routePathRegex = regexp.MustCompile(`^/(?:[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~-
 
 // Validate checks if the configuration is valid
 func (c *Config) Validate() error {
+	if err := c.Plex.Validate(); err != nil {
+		return err
+	}
 	// Required fields
 	if c.Domain == "" {
 		return NewValidationError("domain", "domain is required")
@@ -217,6 +237,9 @@ func (c *Config) Validate() error {
 	if !contains(validExposeModes, c.Expose.Mode) {
 		return NewValidationError("expose.mode",
 			fmt.Sprintf("must be one of: %s", strings.Join(validExposeModes, ", ")))
+	}
+	if !contains([]string{TunnelProtocolHTTP2, TunnelProtocolQUIC, TunnelProtocolAuto}, c.EffectiveTunnelProtocol()) {
+		return NewValidationError("expose.tunnel_protocol", "must be one of: http2, quic, auto")
 	}
 	if c.Expose.Mode == ExposeModeDirect {
 		if c.Expose.TLS.Provider != "acme" {
@@ -471,6 +494,7 @@ func Load() (*Config, error) {
 	viper.SetDefault("domain", cfg.Domain)
 	viper.SetDefault("timezone", cfg.Timezone)
 	viper.SetDefault("expose.mode", cfg.Expose.Mode)
+	viper.SetDefault("expose.tunnel_protocol", cfg.Expose.TunnelProtocol)
 	viper.SetDefault("expose.tls.provider", cfg.Expose.TLS.Provider)
 	viper.SetDefault("routing.strategy", cfg.Routing.Strategy)
 	viper.SetDefault("routing.base_domain", cfg.Routing.BaseDomain)
@@ -482,6 +506,10 @@ func Load() (*Config, error) {
 	viper.SetDefault("secrets_path", cfg.SecretsPath)
 	viper.SetDefault("plex_enabled", cfg.PlexEnabled)
 	viper.SetDefault("jellyfin_enabled", cfg.JellyfinEnabled)
+	viper.SetDefault("plex.hardware_device", cfg.Plex.HardwareDevice)
+	viper.SetDefault("plex.amd_vaapi", cfg.Plex.AMDVAAPI)
+	viper.SetDefault("plex.lan_address", cfg.Plex.LANAddress)
+	viper.SetDefault("plex.lan_port", cfg.Plex.LANPort)
 	viper.SetDefault("puid", cfg.PUID)
 	viper.SetDefault("pgid", cfg.PGID)
 	viper.SetDefault("umask", cfg.Umask)

@@ -1,6 +1,6 @@
 # SDBX documentation
 
-These documents describe the public `v1.0.0-RC1` product contract. Executable
+These documents describe the public `v1.0.0-RC2` product contract. Executable
 CLI help, the embedded catalog, generated references, and tests remain the
 source of truth when prose disagrees.
 
@@ -11,7 +11,7 @@ source of truth when prose disagrees.
 - [Getting started](getting-started.md) — initialize and verify the first
   project after the binaries are installed.
 - [Compatibility](compatibility.md) — supported hosts, required tooling,
-  routing modes, filesystems, and RC1 evidence boundaries.
+  routing modes, filesystems, and RC2 evidence boundaries.
 
 ## Operate
 

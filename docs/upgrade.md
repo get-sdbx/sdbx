@@ -1,9 +1,11 @@
 # Update and rollback
 
-`v1.0.0-RC1` is the first public SDBX release. There is no supported migration
-from an earlier public version and no legacy configuration compatibility
-contract. Initialize a new RC1 project and attach only the persistent paths you
-have explicitly reviewed.
+`v1.0.0-RC2` is the current public SDBX release candidate. RC1 projects upgrade
+with the signed RC2 binaries; the lock diff records the new Cloudflare Tunnel
+transport binding, and the new Plex GPU and private-listener settings stay
+opt-in. There is no legacy configuration compatibility contract beyond the
+documented RC1 upgrade path. Attach only the persistent paths you have
+explicitly reviewed.
 
 SDBX separates changes that have different rollback boundaries:
 

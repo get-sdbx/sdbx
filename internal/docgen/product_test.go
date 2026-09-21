@@ -19,8 +19,8 @@ func TestProductManifestMatchesReleaseContract(t *testing.T) {
 	if manifest.SchemaVersion != 1 {
 		t.Fatalf("schema version = %d, want 1", manifest.SchemaVersion)
 	}
-	if manifest.Release.Version != "1.0.0-RC1" ||
-		manifest.Release.Tag != "v1.0.0-RC1" ||
+	if manifest.Release.Version != "1.0.0-RC2" ||
+		manifest.Release.Tag != "v1.0.0-RC2" ||
 		manifest.Release.Level != "release-candidate" {
 		t.Fatalf("unexpected release contract: %+v", manifest.Release)
 	}

@@ -59,6 +59,9 @@ func TestConfigGetAll(t *testing.T) {
 	if !strings.Contains(output, "test.example.com") {
 		t.Error("Output should contain domain value")
 	}
+	if !strings.Contains(output, "expose.tunnel_protocol") || !strings.Contains(output, "http2") {
+		t.Error("Output should contain the default Cloudflare Tunnel protocol")
+	}
 
 	// Reset viper
 	viper.Reset()

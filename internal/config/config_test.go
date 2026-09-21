@@ -41,6 +41,68 @@ func TestDefaultConfig(t *testing.T) {
 	}
 }
 
+func TestTunnelProtocolConfiguration(t *testing.T) {
+	for _, protocol := range []string{"", "http2", "quic", "auto", "udp", "HTTP2", "http2\nquic"} {
+		t.Run(fmt.Sprintf("protocol=%q", protocol), func(t *testing.T) {
+			cfg := DefaultConfig()
+			cfg.Expose.TunnelProtocol = protocol
+			err := cfg.Validate()
+			valid := protocol == "" || protocol == "http2" || protocol == "quic" || protocol == "auto"
+			if valid && err != nil {
+				t.Fatal(err)
+			}
+			if !valid {
+				var validationErr *ValidationError
+				if !errors.As(err, &validationErr) || validationErr.Field != "expose.tunnel_protocol" {
+					t.Fatalf("Validate = %v, want tunnel protocol validation", err)
+				}
+				return
+			}
+			want := protocol
+			if want == "" {
+				want = "http2"
+			}
+			if cfg.EffectiveTunnelProtocol() != want {
+				t.Fatalf("effective protocol = %q, want %q", cfg.EffectiveTunnelProtocol(), want)
+			}
+		})
+	}
+}
+
+func TestLoadTunnelProtocolDefaultsAndRoundTrips(t *testing.T) {
+	for _, protocol := range []string{"", "http2", "quic", "auto"} {
+		t.Run("protocol="+protocol, func(t *testing.T) {
+			viper.Reset()
+			t.Cleanup(viper.Reset)
+			dir := t.TempDir()
+			path := filepath.Join(dir, ".sdbx.yaml")
+			data := "domain: media.example.test\nexpose:\n  mode: cloudflared\n"
+			want := protocol
+			if protocol != "" {
+				data += "  tunnel_protocol: " + protocol + "\n"
+			} else {
+				want = "http2"
+			}
+			if err := os.WriteFile(path, []byte(data), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			viper.SetConfigFile(path)
+			for _, load := range []func() (*Config, error){Load, func() (*Config, error) { return LoadFile(path) }} {
+				cfg, err := load()
+				if err != nil {
+					t.Fatal(err)
+				}
+				if cfg.Expose.TunnelProtocol != want {
+					t.Fatalf("loaded protocol = %q, want %q", cfg.Expose.TunnelProtocol, want)
+				}
+				if err := cfg.SaveFile(path); err != nil {
+					t.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
 func TestValidateRejectsUnsupportedAuthenticationFactor(t *testing.T) {
 	cfg := DefaultConfig()
 	cfg.Auth.Factor = "password_and_vibes"

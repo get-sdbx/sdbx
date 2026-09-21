@@ -1,7 +1,7 @@
 # Installation and host services
 
-SDBX `v1.0.0-RC1` first-class host support targets Linux amd64. The release also carries
-Linux arm64 compatibility artifacts, but arm64 does not have the complete RC1
+SDBX `v1.0.0-RC2` first-class host support targets Linux amd64. The release also carries
+Linux arm64 compatibility artifacts, but arm64 does not have the complete RC2
 clean-host runtime guarantee. Each archive contains two native binaries:
 
 - `sdbx` is the operator CLI and host Dashboard;
@@ -19,7 +19,7 @@ Install and verify
 then download the installer from the exact release tag:
 
 ```bash
-version=v1.0.0-RC1
+version=v1.0.0-RC2
 installer="$(mktemp)"
 curl --fail --show-error --location \
   --proto '=https' --proto-redir '=https' --tlsv1.2 \
@@ -70,7 +70,7 @@ For an independent release rebuild, use the Go version pinned by the selected
 tag and pin the exact tag plus the commit recorded in the signed release provenance:
 
 ```bash
-version=v1.0.0-RC1
+version=v1.0.0-RC2
 expected_commit=REPLACE_WITH_COMMIT_FROM_SIGNED_PROVENANCE
 git clone https://github.com/get-sdbx/sdbx.git
 cd SDBX
@@ -151,7 +151,7 @@ whitespace, repeated separators, or dot segments. Review the installer before
 invoking it:
 
 ```bash
-version=v1.0.0-RC1
+version=v1.0.0-RC2
 installer="$(mktemp)"
 curl --fail --show-error --location \
   --proto '=https' --proto-redir '=https' --tlsv1.2 \

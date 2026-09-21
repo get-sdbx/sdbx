@@ -4,7 +4,7 @@ This repository begins with the first public SDBX release candidate. Private
 development builds and internal dogfood revisions are intentionally absent
 from the public history.
 
-## [Unreleased]
+## [1.0.0-RC2]
 
 ### Added
 

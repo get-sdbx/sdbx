@@ -9,8 +9,8 @@
     "websiteUrl": "https://sdbx.one"
   },
   "release": {
-    "version": "1.0.0-RC1",
-    "tag": "v1.0.0-RC1",
+    "version": "1.0.0-RC2",
+    "tag": "v1.0.0-RC2",
     "level": "release-candidate"
   },
   "platforms": [
@@ -28,8 +28,8 @@
   "artifacts": {
     "archiveNameTemplate": "sdbx_{version}_linux_{architecture}.tar.gz",
     "archives": [
-      "sdbx_1.0.0-RC1_linux_amd64.tar.gz",
-      "sdbx_1.0.0-RC1_linux_arm64.tar.gz"
+      "sdbx_1.0.0-RC2_linux_amd64.tar.gz",
+      "sdbx_1.0.0-RC2_linux_arm64.tar.gz"
     ],
     "checksums": "checksums.txt",
     "checksumSignature": "checksums.txt.sigstore.json",

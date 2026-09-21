@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the implemented `v1.0.0-RC1` architecture. It is based on
+This document describes the implemented `v1.0.0-RC2` architecture. It is based on
 the registry, resolver, generator, management broker, and service definitions in
 this repository. It does not describe abandoned containerized-control-plane
 experiments.

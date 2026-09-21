@@ -1,12 +1,12 @@
 # Compatibility
 
-This matrix defines the `v1.0.0-RC1` product contract. Linux amd64 is the
+This matrix defines the `v1.0.0-RC2` product contract. Linux amd64 is the
 supported clean-host runtime target; arm64 remains a build and installer
 compatibility target.
 
 ## Host platform
 
-| Host | Architecture | RC1 status | Notes |
+| Host | Architecture | RC2 status | Notes |
 | --- | --- | --- | --- |
 | Linux | amd64 | Supported, first class | Full native `sdbx`/`sdbxd`, Docker Engine, destructive recovery, and runtime acceptance matrix |
 | Linux | arm64 | Compatibility build | Native archives, installer checks, static validation, and immutable upstream image coverage; no full v1 host-runtime guarantee |
@@ -109,7 +109,7 @@ mobile layout, contrast, and reduced-motion behavior are release gates.
 
 ## Release acceptance matrix
 
-RC1 qualification covers:
+RC2 qualification covers:
 
 - Linux amd64 archive installation plus the complete clean-host runtime matrix;
 - Linux arm64 archive build, installer contract, binary metadata, and selected

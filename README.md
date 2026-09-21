@@ -15,7 +15,7 @@ complete deployment in `.sdbx.lock`.
 
 ## Release status
 
-`v1.0.0-RC1` is the first public SDBX release candidate. It is published for
+`v1.0.0-RC2` is the current public SDBX release candidate. It is published for
 real-world validation before the stable v1 release. Use it on a reviewed host,
 keep independent backups of application state and media, and report defects
 through the public repository.
@@ -51,7 +51,7 @@ acceptance guarantee. macOS is supported only for development and CLI tests.
 
 ## Requirements
 
-- Linux amd64 for the supported RC1 host contract
+- Linux amd64 for the supported RC2 host contract
 - Docker Engine 24.0 or newer
 - Docker Compose plugin 2.20 or newer
 - Docker Buildx 0.10 or newer
@@ -62,13 +62,13 @@ acceptance guarantee. macOS is supported only for development and CLI tests.
 
 Docker access is root-equivalent. Keep Docker and SDBX management groups small.
 
-## Install RC1
+## Install RC2
 
 The installer must be downloaded and reviewed; SDBX does not recommend a
 `curl | sh` pipeline.
 
 ```bash
-version=v1.0.0-RC1
+version=v1.0.0-RC2
 installer="$(mktemp)"
 curl --fail --show-error --location \
   --proto '=https' --proto-redir '=https' --tlsv1.2 \
@@ -88,7 +88,7 @@ both embedded binary versions before replacing an existing binary pair.
 To build the same tag from source:
 
 ```bash
-version=v1.0.0-RC1
+version=v1.0.0-RC2
 git clone --branch "$version" --depth 1 https://github.com/get-sdbx/sdbx.git
 cd sdbx
 test "$(git describe --tags --exact-match)" = "$version"

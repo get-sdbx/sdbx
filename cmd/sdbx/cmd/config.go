@@ -41,6 +41,9 @@ Example:
   sdbx config set domain sdbx.example.com
   sdbx config set expose_mode cloudflared
   sdbx config set expose.tunnel_protocol http2
+  sdbx config set plex.hardware_device /dev/dri/renderD128
+  sdbx config set plex.lan_address 192.168.1.20
+  sdbx config set plex.lan_port 32400
   sdbx config set routing.strategy path
   sdbx config set auth.factor two_factor
   sdbx config set timezone America/New_York`,

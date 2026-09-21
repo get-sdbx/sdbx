@@ -8,6 +8,10 @@ from the public history.
 
 ### Added
 
+- Opt-in Plex DRM render-device access and a private native listener through
+  `plex.hardware_device`, `plex.lan_address`, and `plex.lan_port`, with CLI and
+  Dashboard controls, lock verification, and an optional digest-pinned AMD
+  VA-API compatibility package (`plex.amd_vaapi`, Linux amd64 only).
 - Configure Cloudflare Tunnel transport with `expose.tunnel_protocol` in the
   CLI and Dashboard: `http2`, `quic`, or `auto`.
 - Update selected services with `sdbx update --service NAME` while preserving

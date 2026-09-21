@@ -2,7 +2,7 @@ apiVersion: sdbx.one/v1
 kind: Service
 metadata:
   name: plex
-  version: 1.1.0
+  version: 1.2.0
   category: media
   description: "Media server for streaming movies, TV, and music"
   homepage: https://www.plex.tv
@@ -26,6 +26,8 @@ permissions:
   - network:app
   - route:native-auth
   - secret:plex_claim_token
+  - device
+  - host-port
 spec:
   image:
     repository: linuxserver/plex
@@ -35,6 +37,9 @@ spec:
     name_template: "sdbx-{{ .Name }}"
     restart: unless-stopped
     shm_size: "2g"
+    conditional_devices:
+      - device: "{{ .Config.Plex.HardwareDevice }}:{{ .Config.Plex.HardwareDevice }}"
+        when: '{{ ne .Config.Plex.HardwareDevice "" }}'
   environment:
     static:
       - name: TZ
@@ -46,9 +51,16 @@ spec:
       - name: VERSION
         value: docker
     conditional:
+      - name: ATTACHED_DEVICES_PERMS
+        value: "{{ .Config.Plex.HardwareDevice }}"
+        when: '{{ ne .Config.Plex.HardwareDevice "" }}'
+      # Community compatibility package for newer AMD GPUs; opt-in and immutable.
+      - name: DOCKER_MODS
+        value: ghcr.io/justinappler/plex-vaapi-amdgpu-mod@sha256:7102a1a1a5b4ef26142310f48a625a9b5fd084d0074fbbb6595df5eb4575b2b2
+        when: '{{ .Config.Plex.AMDVAAPI }}'
       - name: ADVERTISE_IP
-        value: "https://plex.{{ .Config.Domain }}:443/"
-        when: '{{ ne .Config.Expose.Mode "lan" }}'
+        value: "{{ .Config.Plex.AdvertiseURLs }}"
+        when: '{{ ne .Config.Plex.AdvertiseURLs "" }}'
       - name: FILE__PLEX_CLAIM
         value: /run/secrets/plex_claim_token
         when: '{{ ne .Config.Expose.Mode "lan" }}'
@@ -81,6 +93,10 @@ spec:
   networking:
     networks:
       - name: app
+  ports:
+    conditional:
+      - port: "{{ .Config.Plex.LANBinding }}:32400/tcp"
+        when: '{{ ne .Config.Plex.LANBinding "" }}'
 routing:
   enabled: true
   port: 32400

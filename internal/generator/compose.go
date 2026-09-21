@@ -163,6 +163,14 @@ type CatalogTemplateConfig struct {
 	TorrentPort   int
 	Expose        CatalogExposeConfig
 	Routing       CatalogRoutingConfig
+	Plex          CatalogPlexConfig
+}
+
+type CatalogPlexConfig struct {
+	HardwareDevice string
+	AMDVAAPI       bool
+	LANBinding     string
+	AdvertiseURLs  string
 }
 
 type CatalogExposeConfig struct {
@@ -198,6 +206,12 @@ func catalogTemplateConfig(
 		VPNProvider:   cfg.VPNProvider,
 		VPNCountry:    cfg.VPNCountry,
 		TorrentPort:   cfg.TorrentPort,
+		Plex: CatalogPlexConfig{
+			HardwareDevice: cfg.Plex.HardwareDevice,
+			AMDVAAPI:       cfg.Plex.AMDVAAPI,
+			LANBinding:     cfg.Plex.LANBinding(),
+			AdvertiseURLs:  sdbxrouting.PlexAdvertiseURLs(cfg, definition),
+		},
 		Expose: CatalogExposeConfig{
 			Mode:           cfg.Expose.Mode,
 			TunnelProtocol: cfg.EffectiveTunnelProtocol(),
@@ -214,6 +228,12 @@ func catalogTemplateConfig(
 
 // Generate generates a Docker Compose file from resolved services
 func (g *ComposeGenerator) Generate(graph *registry.ResolutionGraph) (*ComposeFile, error) {
+	if g.Config == nil {
+		return nil, fmt.Errorf("project configuration is required")
+	}
+	if err := g.Config.Plex.Validate(); err != nil {
+		return nil, err
+	}
 	if len(graph.Errors) > 0 {
 		return nil, fmt.Errorf("resolution graph has errors: %w", graph.Errors[0])
 	}
@@ -242,6 +262,9 @@ func (g *ComposeGenerator) Generate(graph *registry.ResolutionGraph) (*ComposeFi
 		}
 
 		def := resolved.FinalDefinition
+		if serviceName == "plex" && g.Config.Plex.AMDVAAPI && g.Lock != nil && g.Lock.Services[serviceName].Image.Platform != "linux/amd64" {
+			return nil, fmt.Errorf("plex.amd_vaapi supports only linux/amd64; disable it for this target platform")
+		}
 
 		// Check conditions
 		if !registry.MatchesActivationConditions(def.Conditions, g.Config) {
@@ -467,7 +490,10 @@ func (g *ComposeGenerator) generateService(def *registry.ServiceDefinition) (Com
 	svc.CapDrop = def.Spec.Container.Capabilities.Drop
 
 	// Devices
-	svc.Devices = def.Spec.Container.Devices
+	svc.Devices, err = g.buildDevices(def, ctx)
+	if err != nil {
+		return ComposeService{}, err
+	}
 
 	// Secrets
 	for _, secret := range def.Secrets {
@@ -675,6 +701,15 @@ func (g *ComposeGenerator) normalizePortBinding(
 		)
 	}
 	if g.Config == nil || g.Config.Expose.Mode != config.ExposeModeCloudflared {
+		return port, nil
+	}
+	// Plex owns native authentication. A user-selected private listener is the
+	// sole explicit exception to tunnel mode's loopback-only host-port policy.
+	if def.Metadata.Name == "plex" && def.Routing.Auth.Mode == registry.AuthModeNative &&
+		g.Config.Plex.LANAddress != "" && port == g.Config.Plex.LANBinding()+":32400/tcp" {
+		if err := g.Config.Plex.Validate(); err != nil {
+			return "", err
+		}
 		return port, nil
 	}
 	if strings.HasPrefix(port, "127.0.0.1:") || strings.HasPrefix(port, "localhost:") || strings.HasPrefix(port, "[::1]:") {

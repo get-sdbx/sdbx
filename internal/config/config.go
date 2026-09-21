@@ -59,8 +59,9 @@ type Config struct {
 
 	// Media servers are explicit choices. Neither is silently enabled for a
 	// new project; legacy configs without both keys migrate to Plex on load.
-	PlexEnabled     bool `mapstructure:"plex_enabled" yaml:"plex_enabled"`
-	JellyfinEnabled bool `mapstructure:"jellyfin_enabled" yaml:"jellyfin_enabled"`
+	PlexEnabled     bool       `mapstructure:"plex_enabled" yaml:"plex_enabled"`
+	JellyfinEnabled bool       `mapstructure:"jellyfin_enabled" yaml:"jellyfin_enabled"`
+	Plex            PlexConfig `mapstructure:"plex" yaml:"plex,omitempty"`
 
 	// Permissions
 	PUID  int    `mapstructure:"puid" yaml:"puid"`
@@ -210,6 +211,9 @@ var routePathRegex = regexp.MustCompile(`^/(?:[A-Za-z0-9._~-]+(?:/[A-Za-z0-9._~-
 
 // Validate checks if the configuration is valid
 func (c *Config) Validate() error {
+	if err := c.Plex.Validate(); err != nil {
+		return err
+	}
 	// Required fields
 	if c.Domain == "" {
 		return NewValidationError("domain", "domain is required")
@@ -502,6 +506,10 @@ func Load() (*Config, error) {
 	viper.SetDefault("secrets_path", cfg.SecretsPath)
 	viper.SetDefault("plex_enabled", cfg.PlexEnabled)
 	viper.SetDefault("jellyfin_enabled", cfg.JellyfinEnabled)
+	viper.SetDefault("plex.hardware_device", cfg.Plex.HardwareDevice)
+	viper.SetDefault("plex.amd_vaapi", cfg.Plex.AMDVAAPI)
+	viper.SetDefault("plex.lan_address", cfg.Plex.LANAddress)
+	viper.SetDefault("plex.lan_port", cfg.Plex.LANPort)
 	viper.SetDefault("puid", cfg.PUID)
 	viper.SetDefault("pgid", cfg.PGID)
 	viper.SetDefault("umask", cfg.Umask)

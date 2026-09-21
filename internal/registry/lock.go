@@ -813,6 +813,7 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 		SecretsPath     string                            `json:"secretsPath"`
 		PlexEnabled     bool                              `json:"plexEnabled"`
 		JellyfinEnabled bool                              `json:"jellyfinEnabled"`
+		Plex            *config.PlexConfig                `json:"plex,omitempty"`
 		PUID            int                               `json:"puid"`
 		PGID            int                               `json:"pgid"`
 		Umask           string                            `json:"umask"`
@@ -856,6 +857,14 @@ func calculateLockConfigDigest(cfg *config.Config) (string, error) {
 	}
 	if cfg.IsCloudflared() {
 		view.TunnelProtocol = cfg.EffectiveTunnelProtocol()
+	}
+	if cfg.PlexEnabled && (cfg.Plex.HardwareDevice != "" || cfg.Plex.LANAddress != "") {
+		plex := cfg.Plex
+		plex.LANPort = 0
+		if plex.LANAddress != "" {
+			plex.LANPort = cfg.Plex.EffectiveLANPort()
+		}
+		view.Plex = &plex
 	}
 	data, err := json.Marshal(view)
 	if err != nil {

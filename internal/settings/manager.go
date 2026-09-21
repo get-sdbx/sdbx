@@ -106,6 +106,22 @@ func Fields() []Field {
 			Editable:    true,
 		},
 		{
+			Key: "plex.hardware_device", Label: "Plex GPU render device", Group: "Plex", Type: "text", Editable: true,
+			Description: "Optional /dev/dri/renderD device for hardware transcoding. The host must already provide the device; empty disables GPU access.",
+		},
+		{
+			Key: "plex.amd_vaapi", Label: "Plex AMD driver compatibility", Group: "Plex", Type: "boolean", Editable: true,
+			Description: "Opt in to the pinned community AMD VA-API compatibility package on Linux amd64. Requires a GPU render device.",
+		},
+		{
+			Key: "plex.lan_address", Label: "Plex private listen address", Group: "Plex", Type: "text", Editable: true,
+			Description: "Bind Plex's native authenticated HTTP port to a private or loopback IP. Empty disables the listener; routed HTTPS remains available.",
+		},
+		{
+			Key: "plex.lan_port", Label: "Plex private listen port", Group: "Plex", Type: "number", Editable: true,
+			Description: "Host TCP port for the private Plex listener; defaults to 32400. Requires a private listen address.",
+		},
+		{
 			Key:         "routing.strategy",
 			Label:       "Routing",
 			Description: "Default routed-service URL strategy.",
@@ -244,6 +260,10 @@ func ValidKeys() []string {
 		"timezone",
 		"plex_enabled",
 		"jellyfin_enabled",
+		"plex.hardware_device",
+		"plex.amd_vaapi",
+		"plex.lan_address",
+		"plex.lan_port",
 		"expose_mode",
 		"expose.mode",
 		"expose.tunnel_protocol",
@@ -272,6 +292,7 @@ func ReadGroups() []Group {
 	return []Group{
 		{Name: "Core", Keys: []string{"domain", "expose.mode", "expose.tunnel_protocol", "expose.tls.email", "timezone"}},
 		{Name: "Media servers", Keys: []string{"plex_enabled", "jellyfin_enabled"}},
+		{Name: "Plex", Keys: []string{"plex.hardware_device", "plex.amd_vaapi", "plex.lan_address", "plex.lan_port"}},
 		{Name: "Routing", Keys: []string{"routing.strategy", "routing.base_domain"}},
 		{Name: "Authentication", Keys: []string{"auth.factor"}},
 		{Name: "Paths", Keys: []string{"config_path", "data_path", "downloads_path", "media_path", "secrets_path"}},
@@ -291,6 +312,10 @@ func Values(cfg *config.Config) map[string]interface{} {
 		"timezone":               cfg.Timezone,
 		"plex_enabled":           cfg.PlexEnabled,
 		"jellyfin_enabled":       cfg.JellyfinEnabled,
+		"plex.hardware_device":   cfg.Plex.HardwareDevice,
+		"plex.amd_vaapi":         cfg.Plex.AMDVAAPI,
+		"plex.lan_address":       cfg.Plex.LANAddress,
+		"plex.lan_port":          cfg.Plex.EffectiveLANPort(),
 		"expose.mode":            cfg.Expose.Mode,
 		"expose.tunnel_protocol": cfg.EffectiveTunnelProtocol(),
 		"expose.tls.email":       cfg.Expose.TLS.Email,
@@ -399,6 +424,22 @@ func apply(cfg *config.Config, key, value string) error {
 			return fmt.Errorf("jellyfin_enabled must be a boolean")
 		}
 		cfg.JellyfinEnabled = parsed
+	case "plex.hardware_device":
+		cfg.Plex.HardwareDevice = value
+	case "plex.amd_vaapi":
+		parsed, err := strconv.ParseBool(value)
+		if err != nil {
+			return fmt.Errorf("plex.amd_vaapi must be a boolean")
+		}
+		cfg.Plex.AMDVAAPI = parsed
+	case "plex.lan_address":
+		cfg.Plex.LANAddress = value
+	case "plex.lan_port":
+		parsed, err := strconv.Atoi(value)
+		if err != nil {
+			return fmt.Errorf("plex.lan_port must be an integer")
+		}
+		cfg.Plex.LANPort = parsed
 	case "expose_mode", "expose.mode":
 		cfg.SetExposureMode(value)
 	case "expose.tls.email":

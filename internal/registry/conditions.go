@@ -18,6 +18,10 @@ const (
 	conditionExposeHostPorts  = `{{ or (eq .Config.Expose.Mode "lan") (eq .Config.Expose.Mode "direct") }}`
 	conditionRoutingPath      = `{{ eq .Config.Routing.Strategy "path" }}`
 	conditionRoutingSubdomain = `{{ eq .Config.Routing.Strategy "subdomain" }}`
+	conditionPlexHardware     = `{{ ne .Config.Plex.HardwareDevice "" }}`
+	conditionPlexLAN          = `{{ ne .Config.Plex.LANBinding "" }}`
+	conditionPlexAMDVAAPI     = `{{ .Config.Plex.AMDVAAPI }}`
+	conditionPlexAdvertise    = `{{ ne .Config.Plex.AdvertiseURLs "" }}`
 )
 
 var supportedCatalogConditions = map[string]struct{}{
@@ -32,6 +36,10 @@ var supportedCatalogConditions = map[string]struct{}{
 	conditionExposeHostPorts:  {},
 	conditionRoutingPath:      {},
 	conditionRoutingSubdomain: {},
+	conditionPlexHardware:     {},
+	conditionPlexLAN:          {},
+	conditionPlexAMDVAAPI:     {},
+	conditionPlexAdvertise:    {},
 }
 
 var supportedDependencyConditions = map[string]struct{}{

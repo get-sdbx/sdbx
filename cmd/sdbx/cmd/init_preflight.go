@@ -422,8 +422,6 @@ func validateStagedCompose(
 		stageProject+"/compose.yaml",
 		"config",
 		"--quiet",
-		"--no-env-resolution",
-		"--no-path-resolution",
 	)
 	if err != nil {
 		return fmt.Errorf(

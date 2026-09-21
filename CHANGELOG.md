@@ -26,6 +26,9 @@ from the public history.
 
 ### Fixed
 
+- Validate staged projects with `docker compose config --quiet` alone so
+  initialization works on the documented Docker Compose 2.20 minimum instead of
+  requiring newer resolution flags that only recent Compose releases accept.
 - Default generated Cloudflare Tunnel connectors to HTTP/2 over TCP so degraded
   QUIC/UDP paths do not leave otherwise responsive HTTP services transferring
   pages slowly. Existing projects adopt the default when regenerated.

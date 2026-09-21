@@ -689,6 +689,40 @@ func TestValidateStagedComposePropagatesParentCancellation(t *testing.T) {
 	}
 }
 
+func TestValidateStagedComposeUsesOnlyDocumentedComposeFlags(t *testing.T) {
+	original := initDockerCommandOutput
+	t.Cleanup(func() {
+		initDockerCommandOutput = original
+	})
+
+	var args []string
+	initDockerCommandOutput = func(_ context.Context, got ...string) ([]byte, error) {
+		args = append([]string(nil), got...)
+		return nil, nil
+	}
+
+	stage := t.TempDir()
+	if err := validateStagedCompose(context.Background(), stage); err != nil {
+		t.Fatalf("validateStagedCompose() error = %v", err)
+	}
+
+	joined := strings.Join(args, " ")
+	for _, required := range []string{"compose", "config", "--quiet", stage} {
+		if !strings.Contains(joined, required) {
+			t.Fatalf("compose validation args = %v, want %q", args, required)
+		}
+	}
+	for _, unsupported := range []string{"--no-env-resolution", "--no-path-resolution"} {
+		if strings.Contains(joined, unsupported) {
+			t.Fatalf(
+				"compose validation args contain %s, which Docker Compose 2.20 does not support: %v",
+				unsupported,
+				args,
+			)
+		}
+	}
+}
+
 func TestFirstVersionParsesDockerToolOutputs(t *testing.T) {
 	tests := map[string][3]int{
 		"28.3.3": {28, 3, 3},

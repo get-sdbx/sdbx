@@ -179,14 +179,24 @@ upstream provider instructions. Replace the relevant placeholders and keep the
 file mode at `0600`. Do not place VPN credentials in `.sdbx.yaml`.
 
 Write manual secret values through private mode-`0600` input files. On
-`sdbx up`, SDBX keeps the `secrets/` directory mode `0700` and normalizes only
-the Authelia and Cloudflared files mounted into non-root containers to mode
-`0644` inside that untraversable directory. Docker Compose implements
-file-backed secrets as bind mounts, so this constrained exception lets those
-containers read their individual read-only mounts without exposing the files
-to other host users or putting values in container environment metadata. Use
-`sdbx up`, not a raw Compose start, so runtime ownership and secret modes are
-repaired first.
+`sdbx up`, SDBX keeps the `secrets/` directory mode `0700` and normalizes these
+container-mounted files to mode `0644` inside that private directory:
+
+- Authelia's JWT, session, and storage-encryption secret files;
+- the Cloudflared connector token, `cloudflared_tunnel_token.txt`;
+- Cobalt's generated API key map, `cobalt_keys.txt`;
+- Unpackerr's generated `unpackerr_*_api_key.txt` copies;
+- Traefik's console trust files: `console_proxy_ca.txt`,
+  `console_proxy_client_cert.txt`, and `console_proxy_client_key.txt`.
+
+Docker Compose implements file-backed secrets as bind mounts. This exception
+lets non-root containers and capability-restricted Traefik read their individual
+read-only mounts while other host users cannot traverse the private directory.
+`sdbx doctor` also checks matching ownership and a single link for each file.
+Host-only console files `console_proxy_server_cert.txt` and
+`console_proxy_server_key.txt` remain mode `0600`. Do not reset the mounted
+console files to `0600`; Traefik may lose access to them. Use `sdbx up`, not a
+raw Compose start, so runtime ownership and secret modes are repaired first.
 
 Direct mode requires one plain ACME contact email. The interactive wizard
 collects it. Non-interactive setup must pass it explicitly:

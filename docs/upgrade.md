@@ -132,11 +132,14 @@ sdbx doctor
 ```
 
 The restart briefly interrupts those services. Wait for them to become ready
-before integration. The dry-run must authenticate successfully, and the real
-integration pass must repair and verify configured clients before the upgrade
-is complete. Apply the same reload procedure after any `sdbx lock` or
-`sdbx generate` operation that changes managed Arr authentication files. SDBX
-preserves existing API keys; this procedure does not call for rotating them.
+before integration. Use the dry-run to review planned changes; it does not
+verify Arr native authentication. The real `sdbx integrate` pass must succeed:
+it authenticates to each enabled Arr API, verifies or reconciles its managed
+Forms credential, and applies the configured cross-service integrations. This
+real pass is required even when no cross-service integration applies. Apply
+the same reload procedure after any `sdbx lock` or `sdbx generate` operation
+that changes managed Arr authentication files. SDBX preserves existing API
+keys; this procedure does not call for rotating them.
 
 When host services are installed:
 

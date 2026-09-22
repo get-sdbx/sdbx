@@ -30,6 +30,17 @@ func TestEnsureConsoleProxyPKIGeneratesAndPreservesValidSet(t *testing.T) {
 			t.Fatalf("generated PKI file %s is empty", name)
 		}
 		first[name] = data
+		info, err := os.Stat(filepath.Join(dir, name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		wantMode := os.FileMode(0o600)
+		if name == ConsoleProxyCAFile || name == ConsoleProxyClientCertFile || name == ConsoleProxyClientKeyFile {
+			wantMode = 0o644
+		}
+		if info.Mode().Perm() != wantMode {
+			t.Fatalf("console PKI %s mode = %o, want %o", name, info.Mode().Perm(), wantMode)
+		}
 	}
 	if err := validateConsoleProxyPKI(first, time.Now()); err != nil {
 		t.Fatal(err)

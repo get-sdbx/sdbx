@@ -149,7 +149,9 @@ func (g *IntegrationsGenerator) GenerateTraefikDynamic(graph *registry.Resolutio
 			Options: map[string]TraefikTLSOption{
 				"default": {
 					MinVersion: "VersionTLS12",
-					SNIStrict:  true,
+					// LAN relies on Traefik's default certificate. Strict SNI
+					// rejects it before the hostname-based HTTP routes run.
+					SNIStrict: g.Config.Expose.Mode != config.ExposeModeLAN,
 				},
 			},
 		},

@@ -558,8 +558,8 @@ func TestGeneratedAutheliaUsesModernSessionAndLANUsesTLS(t *testing.T) {
 		t.Fatalf("native-auth Jellyfin middlewares = %#v", jellyfinMiddlewares)
 	}
 	tlsDefault := dynamic["tls"].(map[string]any)["options"].(map[string]any)["default"].(map[string]any)
-	if tlsDefault["minVersion"] != "VersionTLS12" || tlsDefault["sniStrict"] != true {
-		t.Fatalf("default TLS policy = %#v", tlsDefault)
+	if tlsDefault["minVersion"] != "VersionTLS12" || tlsDefault["sniStrict"] != false {
+		t.Fatalf("LAN TLS must allow its default certificate with TLS 1.2+: %#v", tlsDefault)
 	}
 }
 
@@ -630,6 +630,13 @@ func TestDirectTraefikRendersConfiguredACMEEmail(t *testing.T) {
 	}
 	if !strings.Contains(string(dynamicBody), "stsSeconds: 31536000") {
 		t.Fatalf("public TLS routes are missing HSTS:\n%s", dynamicBody)
+	}
+	var dynamic TraefikDynamicConfig
+	if err := yaml.Unmarshal(dynamicBody, &dynamic); err != nil {
+		t.Fatal(err)
+	}
+	if policy := dynamic.TLS.Options["default"]; !policy.SNIStrict || policy.MinVersion != "VersionTLS12" {
+		t.Fatalf("direct ACME TLS must retain strict SNI and TLS 1.2+: %#v", policy)
 	}
 }
 

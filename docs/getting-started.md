@@ -5,8 +5,9 @@ deployment. It uses the interactive setup because that path shows the complete
 service, route, authentication, network, mount, and secret plan before writing
 anything.
 
-SDBX `v1.0.0-RC2` supports Linux amd64 hosts. Linux arm64 is published as a compatibility
-build without the full clean-host runtime guarantee. macOS and Windows are
+SDBX targets Linux amd64 hosts. Linux arm64 is a compatibility build without
+the full clean-host runtime guarantee. RC1 is the current published version;
+this guide also describes the upcoming RC2 source. macOS and Windows are
 useful development clients, not supported deployment hosts.
 
 ## 1. Prepare the host
@@ -36,13 +37,17 @@ installation additionally requires Cosign v3.
 
 ## 2. Install SDBX
 
-Use the signed release procedure in [Installation and host
-services](installation.md#install-a-signed-release). For an independent rebuild,
-build both native binaries from a trusted checkout:
+Use the signed RC1 release procedure in [Installation and host
+services](installation.md#install-a-signed-release). RC2 downloads are not yet
+available. For an independent rebuild of the published release, build both
+native binaries from its exact tag:
 
 ```bash
-git clone https://github.com/get-sdbx/sdbx.git
-cd SDBX
+version=v1.0.0-RC1
+git clone --branch "$version" --depth 1 https://github.com/get-sdbx/sdbx.git
+cd sdbx
+test "$(git describe --tags --exact-match)" = "$version"
+go mod verify
 make build
 
 sudo install -m 0755 bin/sdbx /usr/local/bin/sdbx

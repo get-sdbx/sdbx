@@ -15,10 +15,14 @@ complete deployment in `.sdbx.lock`.
 
 ## Release status
 
-`v1.0.0-RC2` is the current public SDBX release candidate. It is published for
-real-world validation before the stable v1 release. Use it on a reviewed host,
-keep independent backups of application state and media, and report defects
-through the public repository.
+`v1.0.0-RC1` is the current published SDBX release candidate.
+This checkout contains the upcoming `v1.0.0-RC2`; its release acceptance is
+still in progress and its signed downloads are not available yet. The feature
+descriptions and generated references here describe this checkout. For the
+published version, use the [RC1 documentation](https://github.com/get-sdbx/sdbx/tree/v1.0.0-RC1/docs).
+
+Use release candidates on a reviewed host, keep independent backups of
+application state and media, and report defects through the public repository.
 
 The supported release-candidate host is Linux amd64. Linux arm64 artifacts are
 published as a compatibility target, without the complete clean-host runtime
@@ -51,7 +55,7 @@ acceptance guarantee. macOS is supported only for development and CLI tests.
 
 ## Requirements
 
-- Linux amd64 for the supported RC2 host contract
+- Linux amd64 for the supported host contract
 - Docker Engine 24.0 or newer
 - Docker Compose plugin 5.0 or newer
 - Docker Buildx 0.10 or newer
@@ -62,13 +66,13 @@ acceptance guarantee. macOS is supported only for development and CLI tests.
 
 Docker access is root-equivalent. Keep Docker and SDBX management groups small.
 
-## Install RC2
+## Install the published release
 
 The installer must be downloaded and reviewed; SDBX does not recommend a
 `curl | sh` pipeline.
 
 ```bash
-version=v1.0.0-RC2
+version=v1.0.0-RC1
 installer="$(mktemp)"
 curl --fail --show-error --location \
   --proto '=https' --proto-redir '=https' --tlsv1.2 \
@@ -88,7 +92,7 @@ both embedded binary versions before replacing an existing binary pair.
 To build the same tag from source:
 
 ```bash
-version=v1.0.0-RC2
+version=v1.0.0-RC1
 git clone --branch "$version" --depth 1 https://github.com/get-sdbx/sdbx.git
 cd sdbx
 test "$(git describe --tags --exact-match)" = "$version"

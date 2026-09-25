@@ -1,8 +1,10 @@
 # Installation and host services
 
-SDBX `v1.0.0-RC2` first-class host support targets Linux amd64. The release also carries
-Linux arm64 compatibility artifacts, but arm64 does not have the complete RC2
-clean-host runtime guarantee. Each archive contains two native binaries:
+SDBX first-class host support targets Linux amd64. Published releases also
+carry Linux arm64 compatibility artifacts, without the full clean-host runtime
+guarantee. `v1.0.0-RC1` is the current published version. RC2 is still undergoing
+acceptance; its signed downloads are not available yet. The installation
+examples below select RC1. Each archive contains two native binaries:
 
 - `sdbx` is the operator CLI and host Dashboard;
 - `sdbxd` is the root-owned, project-scoped management broker used by the
@@ -19,7 +21,7 @@ Install and verify
 then download the installer from the exact release tag:
 
 ```bash
-version=v1.0.0-RC2
+version=v1.0.0-RC1
 installer="$(mktemp)"
 curl --fail --show-error --location \
   --proto '=https' --proto-redir '=https' --tlsv1.2 \
@@ -70,10 +72,10 @@ For an independent release rebuild, use the Go version pinned by the selected
 tag and pin the exact tag plus the commit recorded in the signed release provenance:
 
 ```bash
-version=v1.0.0-RC2
+version=v1.0.0-RC1
 expected_commit=REPLACE_WITH_COMMIT_FROM_SIGNED_PROVENANCE
 git clone https://github.com/get-sdbx/sdbx.git
-cd SDBX
+cd sdbx
 git checkout --detach "$version"
 test "$(git describe --tags --exact-match)" = "$version"
 test "$(git rev-parse HEAD)" = "$expected_commit"
@@ -151,7 +153,7 @@ whitespace, repeated separators, or dot segments. Review the installer before
 invoking it:
 
 ```bash
-version=v1.0.0-RC2
+version=v1.0.0-RC1
 installer="$(mktemp)"
 curl --fail --show-error --location \
   --proto '=https' --proto-redir '=https' --tlsv1.2 \

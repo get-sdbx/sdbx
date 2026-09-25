@@ -231,6 +231,11 @@ func TestRepairExistingPermissionsMakesServiceMountedSecretsContainerReadable(t 
 	cloudflared := filepath.Join(secretsDir, CloudflaredTunnelTokenFile)
 	authelia := filepath.Join(secretsDir, "authelia_jwt_secret.txt")
 	qbittorrent := filepath.Join(secretsDir, "qbittorrent_password.txt")
+	for _, name := range consoleProxyFiles {
+		if err := os.WriteFile(filepath.Join(secretsDir, name), []byte("synthetic-pki"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
 	if err := os.WriteFile(cloudflared, []byte("tunnel-token"), 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -248,6 +253,11 @@ func TestRepairExistingPermissionsMakesServiceMountedSecretsContainerReadable(t 
 		cloudflared: 0o644,
 		authelia:    0o644,
 		qbittorrent: 0o600,
+		filepath.Join(secretsDir, ConsoleProxyCAFile):         0o644,
+		filepath.Join(secretsDir, ConsoleProxyClientCertFile): 0o644,
+		filepath.Join(secretsDir, ConsoleProxyClientKeyFile):  0o644,
+		filepath.Join(secretsDir, ConsoleProxyServerCertFile): 0o600,
+		filepath.Join(secretsDir, ConsoleProxyServerKeyFile):  0o600,
 	} {
 		info, err := os.Stat(path)
 		if err != nil {

@@ -373,52 +373,65 @@ func TestCheckArrAuthRequiresFormsEnabledWithoutAmbiguity(t *testing.T) {
 }
 
 func TestProjectDoctorAcceptsOnlyProtectedContainerReadableSecret(t *testing.T) {
-	project := t.TempDir()
-	cfg := config.DefaultConfig()
-	cfg.SecretsPath = "./secrets"
-	cfg.ActiveServices = map[string]bool{"cloudflared": true}
-	graph := &registry.ResolutionGraph{
-		Order: []string{"cloudflared"},
-		Services: map[string]*registry.ResolvedService{
-			"cloudflared": {
-				Enabled: true,
-				FinalDefinition: &registry.ServiceDefinition{
-					Secrets: []registry.SecretDef{{
-						Name: "cloudflared_tunnel_token", Type: "manual",
-					}},
+	for _, name := range []string{"cloudflared_tunnel_token", "console_proxy_ca", "console_proxy_client_cert", "console_proxy_client_key"} {
+		t.Run(name, func(t *testing.T) {
+			project := t.TempDir()
+			cfg := config.DefaultConfig()
+			cfg.SecretsPath = "./secrets"
+			cfg.ActiveServices = map[string]bool{"cloudflared": true}
+			graph := &registry.ResolutionGraph{
+				Order: []string{"cloudflared"},
+				Services: map[string]*registry.ResolvedService{
+					"cloudflared": {
+						Enabled: true,
+						FinalDefinition: &registry.ServiceDefinition{
+							Secrets: []registry.SecretDef{{
+								Name: name, Type: "manual",
+							}},
+						},
+					},
 				},
-			},
-		},
-	}
-	secretsDir := filepath.Join(project, "secrets")
-	if err := os.Mkdir(secretsDir, 0o700); err != nil {
-		t.Fatal(err)
-	}
-	token := filepath.Join(secretsDir, "cloudflared_tunnel_token.txt")
-	if err := os.WriteFile(token, []byte("configured"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	doc := NewProjectDoctor(project, cfg, graph, &generator.ComposeFile{})
-	if passed, message := doc.checkSecrets(context.Background()); !passed {
-		t.Fatalf("protected container-readable secret failed: %s", message)
-	}
+			}
+			secretsDir := filepath.Join(project, "secrets")
+			if err := os.Mkdir(secretsDir, 0o700); err != nil {
+				t.Fatal(err)
+			}
+			token := filepath.Join(secretsDir, name+".txt")
+			if err := os.WriteFile(token, []byte("configured"), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			doc := NewProjectDoctor(project, cfg, graph, &generator.ComposeFile{})
+			if passed, message := doc.checkSecrets(context.Background()); !passed {
+				t.Fatalf("protected container-readable secret failed: %s", message)
+			}
+			if err := os.Chmod(secretsDir, 0o755); err != nil {
+				t.Fatal(err)
+			}
+			if passed, message := doc.checkSecrets(context.Background()); passed {
+				t.Fatalf("container secret accepted a traversable parent: %q", message)
+			}
+			if err := os.Chmod(secretsDir, 0o700); err != nil {
+				t.Fatal(err)
+			}
 
-	if err := os.Chmod(token, 0o600); err != nil {
-		t.Fatal(err)
-	}
-	if passed, message := doc.checkSecrets(context.Background()); passed ||
-		!strings.Contains(message, "mode 0644") {
-		t.Fatalf("mode-0600 container secret result = %t, %q", passed, message)
-	}
-	if err := os.Chmod(token, 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Link(token, filepath.Join(secretsDir, "token-hardlink")); err != nil {
-		t.Fatal(err)
-	}
-	if passed, message := doc.checkSecrets(context.Background()); passed ||
-		!strings.Contains(message, "single-linked") {
-		t.Fatalf("hard-linked container secret result = %t, %q", passed, message)
+			if err := os.Chmod(token, 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if passed, message := doc.checkSecrets(context.Background()); passed ||
+				!strings.Contains(message, "mode 0644") {
+				t.Fatalf("mode-0600 container secret result = %t, %q", passed, message)
+			}
+			if err := os.Chmod(token, 0o644); err != nil {
+				t.Fatal(err)
+			}
+			if err := os.Link(token, filepath.Join(secretsDir, "token-hardlink")); err != nil {
+				t.Fatal(err)
+			}
+			if passed, message := doc.checkSecrets(context.Background()); passed ||
+				!strings.Contains(message, "single-linked") {
+				t.Fatalf("hard-linked container secret result = %t, %q", passed, message)
+			}
+		})
 	}
 }
 

@@ -19,6 +19,9 @@ const maxSecretFileSize = 1 << 20
 const CloudflaredTunnelTokenFile = "cloudflared_tunnel_token.txt"
 
 var containerReadableSecretFiles = map[string]struct{}{
+	ConsoleProxyCAFile:                    {},
+	ConsoleProxyClientCertFile:            {},
+	ConsoleProxyClientKeyFile:             {},
 	"authelia_jwt_secret.txt":             {},
 	"authelia_session_secret.txt":         {},
 	"authelia_storage_encryption_key.txt": {},
@@ -65,8 +68,9 @@ var SecretFiles = map[string]int{
 // FileMode returns the protected host mode required by one managed secret.
 //
 // Docker Compose implements file-backed secrets as bind mounts, so non-root
-// Authelia and Cloudflared processes cannot read conventional mode-0600
-// sources. Their files are mode 0644 inside a mode-0700 secrets directory:
+// processes and capability-restricted Traefik cannot read mode-0600 sources
+// owned by the project user. Their files are mode 0644 inside a mode-0700
+// secrets directory:
 // other host users still cannot traverse the parent, while the intended
 // containers can read their single-file, read-only mounts. Doctor additionally
 // verifies the private parent, matching ownership, and single-link invariant.
@@ -78,7 +82,7 @@ func FileMode(filename string) os.FileMode {
 }
 
 // ContainerReadable reports whether a managed file must be readable by a
-// non-root container through Docker Compose's file-backed secret bind mount.
+// non-root or capability-restricted container through a file-backed secret mount.
 func ContainerReadable(filename string) bool {
 	_, ok := containerReadableSecretFiles[filename]
 	return ok

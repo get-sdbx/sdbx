@@ -5,8 +5,9 @@ deployment. It uses the interactive setup because that path shows the complete
 service, route, authentication, network, mount, and secret plan before writing
 anything.
 
-SDBX `v1.0.0-RC2` supports Linux amd64 hosts. Linux arm64 is published as a compatibility
-build without the full clean-host runtime guarantee. macOS and Windows are
+SDBX targets Linux amd64 hosts. Linux arm64 is a compatibility build without
+the full clean-host runtime guarantee. RC1 is the current published version;
+this guide also describes the upcoming RC2 source. macOS and Windows are
 useful development clients, not supported deployment hosts.
 
 ## 1. Prepare the host
@@ -36,13 +37,17 @@ installation additionally requires Cosign v3.
 
 ## 2. Install SDBX
 
-Use the signed release procedure in [Installation and host
-services](installation.md#install-a-signed-release). For an independent rebuild,
-build both native binaries from a trusted checkout:
+Use the signed RC1 release procedure in [Installation and host
+services](installation.md#install-a-signed-release). RC2 downloads are not yet
+available. For an independent rebuild of the published release, build both
+native binaries from its exact tag:
 
 ```bash
-git clone https://github.com/get-sdbx/sdbx.git
-cd SDBX
+version=v1.0.0-RC1
+git clone --branch "$version" --depth 1 https://github.com/get-sdbx/sdbx.git
+cd sdbx
+test "$(git describe --tags --exact-match)" = "$version"
+go mod verify
 make build
 
 sudo install -m 0755 bin/sdbx /usr/local/bin/sdbx
@@ -174,14 +179,24 @@ upstream provider instructions. Replace the relevant placeholders and keep the
 file mode at `0600`. Do not place VPN credentials in `.sdbx.yaml`.
 
 Write manual secret values through private mode-`0600` input files. On
-`sdbx up`, SDBX keeps the `secrets/` directory mode `0700` and normalizes only
-the Authelia and Cloudflared files mounted into non-root containers to mode
-`0644` inside that untraversable directory. Docker Compose implements
-file-backed secrets as bind mounts, so this constrained exception lets those
-containers read their individual read-only mounts without exposing the files
-to other host users or putting values in container environment metadata. Use
-`sdbx up`, not a raw Compose start, so runtime ownership and secret modes are
-repaired first.
+`sdbx up`, SDBX keeps the `secrets/` directory mode `0700` and normalizes these
+container-mounted files to mode `0644` inside that private directory:
+
+- Authelia's JWT, session, and storage-encryption secret files;
+- the Cloudflared connector token, `cloudflared_tunnel_token.txt`;
+- Cobalt's generated API key map, `cobalt_keys.txt`;
+- Unpackerr's generated `unpackerr_*_api_key.txt` copies;
+- Traefik's console trust files: `console_proxy_ca.txt`,
+  `console_proxy_client_cert.txt`, and `console_proxy_client_key.txt`.
+
+Docker Compose implements file-backed secrets as bind mounts. This exception
+lets non-root containers and capability-restricted Traefik read their individual
+read-only mounts while other host users cannot traverse the private directory.
+`sdbx doctor` also checks matching ownership and a single link for each file.
+Host-only console files `console_proxy_server_cert.txt` and
+`console_proxy_server_key.txt` remain mode `0600`. Do not reset the mounted
+console files to `0600`; Traefik may lose access to them. Use `sdbx up`, not a
+raw Compose start, so runtime ownership and secret modes are repaired first.
 
 Direct mode requires one plain ACME contact email. The interactive wizard
 collects it. Non-interactive setup must pass it explicitly:

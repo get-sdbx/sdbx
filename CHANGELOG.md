@@ -4,7 +4,7 @@ This repository begins with the first public SDBX release candidate. Private
 development builds and internal dogfood revisions are intentionally absent
 from the public history.
 
-## [1.0.0-RC2]
+## [1.0.0-RC2] — Unreleased
 
 ### Added
 
@@ -26,6 +26,15 @@ from the public history.
 
 ### Fixed
 
+- Allow LAN HTTPS to use Traefik's local/default certificate. Strict SNI
+  previously rejected every LAN TLS handshake before routing; direct ACME
+  mode keeps strict SNI checking.
+- Make the console's Traefik-mounted certificate files readable by the
+  capability-restricted proxy after non-root initialization, using the
+  existing private-directory secret policy. Host-only server keys stay private.
+- Keep installation examples on the published RC1 until RC2 acceptance and
+  publication complete, and document the Arr reload and integration steps
+  required after controller upgrades change managed authentication files.
 - Require Docker Compose 5.0 or newer. Staged initialization validates with
   `docker compose config --no-env-resolution` so a project whose `config_path`
   is absolute is checked before its env files are promoted. Older releases

@@ -236,10 +236,26 @@ through the host public IP is intentional and explicitly acknowledged.
 
 Start the project with `sdbx up`, not raw `docker compose up`. The SDBX
 lifecycle repairs the runtime-readable modes required by Authelia and the
-Cloudflared connector token, and verifies that the containing secrets directory
-remains mode `0700`, each service-mounted file has one link, and the directory
-and files share an owner. `sdbx doctor` fails if any part of that boundary is
-wrong.
+Cloudflared connector token, as well as the generated Cobalt, Unpackerr, and
+Traefik console files listed in the
+[secret permission boundary](getting-started.md#5-add-provider-owned-credentials).
+These files use mode `0644` inside the mode-`0700` secrets directory. Each must
+have one link and share the directory's owner. `sdbx doctor` fails if any part
+of that boundary is wrong.
+
+## Dashboard reports certificate permission errors
+
+Traefik needs its three mounted console files, `console_proxy_ca.txt`,
+`console_proxy_client_cert.txt`, and `console_proxy_client_key.txt`, to use the
+same mode-`0644` exception inside the private secrets directory. Changing them
+to `0600` can prevent capability-restricted Traefik from reading files owned by
+the project user. The host-only `console_proxy_server_cert.txt` and
+`console_proxy_server_key.txt` remain mode `0600`.
+
+Run `sdbx up` to repair permissions, then `sdbx restart traefik` to reload its
+mounted trust files and `sdbx doctor` to verify the boundary. Restarting Traefik
+briefly interrupts routed applications. Do not make the secrets directory
+accessible to other users or regenerate valid certificates to fix permissions.
 
 ## Downloads are stalled
 

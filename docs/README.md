@@ -1,6 +1,9 @@
 # SDBX documentation
 
-These documents describe the public `v1.0.0-RC2` product contract. Executable
+These documents describe the upcoming `v1.0.0-RC2` product contract. RC2 is
+unreleased; signed installation examples select the published RC1. For the
+RC1 feature set, use the [versioned documentation](https://github.com/get-sdbx/sdbx/tree/v1.0.0-RC1/docs).
+Executable
 CLI help, the embedded catalog, generated references, and tests remain the
 source of truth when prose disagrees.
 

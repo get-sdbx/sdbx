@@ -1,6 +1,7 @@
 # Compatibility
 
-This matrix defines the `v1.0.0-RC2` product contract. Linux amd64 is the
+This matrix defines the upcoming `v1.0.0-RC2` product contract; RC2 acceptance
+is still in progress. Linux amd64 is the
 supported clean-host runtime target; arm64 remains a build and installer
 compatibility target.
 
@@ -109,7 +110,7 @@ mobile layout, contrast, and reduced-motion behavior are release gates.
 
 ## Release acceptance matrix
 
-RC2 qualification covers:
+RC2 qualification requires the following evidence before publication:
 
 - Linux amd64 archive installation plus the complete clean-host runtime matrix;
 - Linux arm64 archive build, installer contract, binary metadata, and selected

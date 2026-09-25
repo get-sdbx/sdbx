@@ -111,7 +111,7 @@ func EnsureConsoleProxyPKI(secretsDir string) error {
 			filepath.Join(secretsDir, name),
 			generated[name],
 			0o700,
-			0o600,
+			FileMode(name),
 		); err != nil {
 			return fmt.Errorf("write console proxy PKI %s: %w", name, err)
 		}

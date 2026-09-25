@@ -1,11 +1,12 @@
 # Update and rollback
 
-`v1.0.0-RC2` is the current public SDBX release candidate. RC1 projects upgrade
-with the signed RC2 binaries; the lock diff records the new Cloudflare Tunnel
-transport binding, and the new Plex GPU and private-listener settings stay
-opt-in. There is no legacy configuration compatibility contract beyond the
-documented RC1 upgrade path. Attach only the persistent paths you have
-explicitly reviewed.
+`v1.0.0-RC1` is the current published SDBX release candidate. RC2 acceptance is
+still in progress; wait for its signed release before upgrading a deployed
+RC1 project. The planned RC2 upgrade records the new Cloudflare Tunnel
+transport binding in the lock diff, and its Plex GPU and private-listener
+settings stay opt-in. There is no legacy configuration compatibility contract
+beyond the documented RC1 upgrade path. Attach only the persistent paths you
+have explicitly reviewed.
 
 SDBX separates changes that have different rollback boundaries:
 
@@ -102,9 +103,43 @@ the diff only when every change is documented by the target release. Then run:
 sdbx lock
 sdbx lock verify
 sdbx up
+sdbx restart traefik
+```
+
+Restarting Traefik briefly interrupts routed applications and reloads its
+configuration and mounted console certificates. This also applies RC2's
+certificate-permission repair to a proxy created by an earlier version.
+
+Reload the enabled Arr services before checking health. Generation can update
+their managed `config.xml` authentication settings or insert a missing API key,
+while an already-running process keeps its previous in-memory configuration.
+`sdbx up` does not guarantee a restart when only a bind-mounted file changes.
+This can leave clients receiving `401 Unauthorized` until the services reload.
+
+Use `sdbx status` to identify the enabled Arr services, then restart all of
+them during the maintenance window. For example, a TV automation project may
+enable Sonarr and Prowlarr; include Radarr, Lidarr, and Whisparr in the same
+command when enabled. Skip the Arr restart when no Arr service is enabled:
+
+```bash
+sdbx status
+sdbx restart sonarr prowlarr
+sdbx integrate --dry-run
+sdbx integrate
+sdbx lock verify
 sdbx status
 sdbx doctor
 ```
+
+The restart briefly interrupts those services. Wait for them to become ready
+before integration. Use the dry-run to review planned changes; it does not
+verify Arr native authentication. The real `sdbx integrate` pass must succeed:
+it authenticates to each enabled Arr API, verifies or reconciles its managed
+Forms credential, and applies the configured cross-service integrations. This
+real pass is required even when no cross-service integration applies. Apply
+the same reload procedure after any `sdbx lock` or `sdbx generate` operation
+that changes managed Arr authentication files. SDBX preserves existing API
+keys; this procedure does not call for rotating them.
 
 When host services are installed:
 

@@ -9,14 +9,15 @@ the [threat model](docs/threat-model.md).
 
 ## Supported versions
 
-`v1.0.0-RC2` is the current public release candidate. Release candidates
+`v1.0.0-RC1` is the current published release candidate. RC2 is under
+development and has not superseded RC1. Release candidates
 receive security fixes while they are the current published line, but their
 public interfaces may still change before v1 stable.
 
 | Version | Security support |
 |---|---|
-| `1.0.0-RC2` | Supported during the RC evaluation period |
-| `1.0.0-RC1` | Superseded by `1.0.0-RC2` |
+| `1.0.0-RC1` | Current published RC; supported during its evaluation period |
+| `1.0.0-RC2` | Unreleased candidate; acceptance in progress |
 | Older or private development builds | Unsupported |
 
 Security fixes will target the latest supported release; users may need to

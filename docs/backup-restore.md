@@ -179,8 +179,11 @@ Existing file owners are preserved. Files and directories created by a root
 broker inherit the nearest real destination-parent owner. Secrets and `.env`
 are restored with mode `0600`; secret directories use `0700`.
 Before the next `sdbx up`, SDBX reapplies service-required ownership and
-normalizes the service-mounted Authelia files and Cloudflared connector token
-to their container-readable mode inside that private directory.
+normalizes the service-mounted Authelia, Cloudflared, Cobalt, Unpackerr, and
+Traefik console files to mode `0644` inside that private directory. See the
+[secret permission boundary](getting-started.md#5-add-provider-owned-credentials)
+for the affected files. The host-only console server certificate and key remain
+mode `0600`.
 
 The archive's project intent and lock are compatibility evidence only. SDBX
 compares them with the already verified target before promotion, but never

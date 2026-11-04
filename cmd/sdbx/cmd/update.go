@@ -153,7 +153,7 @@ func runUpdate(command *cobra.Command, _ []string) error {
 
 	compose := updateComposeFactory(project.Dir)
 	if !IsJSONOutput() {
-		fmt.Println(tui.TitleStyle.Render("SDBX Update"))
+		fmt.Println(tui.Render(tui.TitleStyle, "SDBX Update"))
 		fmt.Println()
 		fmt.Printf("  %d locked change(s) resolved\n", len(differences))
 	}
@@ -500,18 +500,18 @@ func printUpdateResult(
 		return nil
 	}
 	if !result.Changed {
-		fmt.Println(tui.SuccessStyle.Render("✓ Locked service images are already current"))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ Locked service images are already current"))
 		return nil
 	}
 	if !result.Applied {
-		fmt.Println(tui.TitleStyle.Render("SDBX Update Preview"))
+		fmt.Println(tui.Render(tui.TitleStyle, "SDBX Update Preview"))
 		fmt.Println()
 		fmt.Printf(
 			"  %d locked change(s) resolved; no project files or containers changed\n",
 			len(result.Differences),
 		)
 		fmt.Println()
-		fmt.Println(tui.WarningStyle.Render(
+		fmt.Println(tui.Render(tui.WarningStyle,
 			"  Candidate images have not passed the SDBX release catalog security review.",
 		))
 		fmt.Println("  Review upstream releases and exact digest changes, then apply with:")
@@ -522,18 +522,18 @@ func printUpdateResult(
 		fmt.Println(applyCommand + " --apply --confirm apply-upstream-images")
 		if len(warnings) > 0 {
 			fmt.Println()
-			fmt.Print(tui.WarningStyle.Render("Validation warnings:"))
+			fmt.Print(tui.Render(tui.WarningStyle, "Validation warnings:"))
 			fmt.Println()
 			fmt.Print(formatResolutionWarnings(warnings))
 		}
 		return nil
 	}
 	fmt.Println()
-	fmt.Println(tui.SuccessStyle.Render("✓ Updated locked stack is healthy"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Updated locked stack is healthy"))
 	fmt.Printf("  Verified %d service(s) in dependency order\n", len(result.ServiceOrder))
 	if len(warnings) > 0 {
 		fmt.Println()
-		fmt.Print(tui.WarningStyle.Render("Validation warnings:"))
+		fmt.Print(tui.Render(tui.WarningStyle, "Validation warnings:"))
 		fmt.Println()
 		fmt.Print(formatResolutionWarnings(warnings))
 	}

@@ -57,12 +57,12 @@ func runTunnelRoutes(command *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Cloudflare Tunnel Routes"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Cloudflare Tunnel Routes"))
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render(
+	fmt.Println(tui.Render(tui.MutedStyle,
 		"Management: remote (Cloudflare dashboard or API)",
 	))
-	fmt.Println(tui.MutedStyle.Render(
+	fmt.Println(tui.Render(tui.MutedStyle,
 		"The tunnel token runs the connector; it cannot configure these routes.",
 	))
 	fmt.Println()
@@ -70,7 +70,7 @@ func runTunnelRoutes(command *cobra.Command, _ []string) error {
 		fmt.Printf("  %-36s → %s\n", route.Hostname, route.Service)
 	}
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render(
+	fmt.Println(tui.Render(tui.MutedStyle,
 		"Create one Published application route per hostname, then run 'sdbx doctor'.",
 	))
 	return nil

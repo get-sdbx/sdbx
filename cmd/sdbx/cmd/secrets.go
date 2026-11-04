@@ -115,7 +115,7 @@ func runSecretsGenerate(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(tui.InfoStyle.Render("Generating secrets..."))
+	fmt.Println(tui.Render(tui.InfoStyle, "Generating secrets..."))
 	fmt.Println()
 
 	if err := secrets.GenerateSecrets(secretsDir); err != nil {
@@ -126,14 +126,14 @@ func runSecretsGenerate(_ *cobra.Command, args []string) error {
 	status, _ := secrets.ListSecrets(secretsDir)
 	for name, configured := range status {
 		if configured {
-			fmt.Printf("  %s %s\n", tui.SuccessStyle.Render(tui.IconSuccess), name)
+			fmt.Printf("  %s %s\n", tui.Render(tui.SuccessStyle, tui.IconSuccess), name)
 		} else {
-			fmt.Printf("  %s %s %s\n", tui.WarningStyle.Render(tui.IconWarning), name, tui.MutedStyle.Render("(needs manual config)"))
+			fmt.Printf("  %s %s %s\n", tui.Render(tui.WarningStyle, tui.IconWarning), name, tui.Render(tui.MutedStyle, "(needs manual config)"))
 		}
 	}
 
 	fmt.Println()
-	fmt.Println(tui.SuccessStyle.Render("✓ Secrets generated"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Secrets generated"))
 
 	return nil
 }
@@ -156,7 +156,7 @@ func runSecretsList(_ *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render("SDBX Secrets"))
+	fmt.Println(tui.Render(tui.TitleStyle, "SDBX Secrets"))
 	fmt.Println()
 
 	configured := 0
@@ -164,19 +164,19 @@ func runSecretsList(_ *cobra.Command, args []string) error {
 
 	for name, isConfigured := range status {
 		if isConfigured {
-			fmt.Printf("  %s %s\n", tui.SuccessStyle.Render(tui.IconSuccess), name)
+			fmt.Printf("  %s %s\n", tui.Render(tui.SuccessStyle, tui.IconSuccess), name)
 			configured++
 		} else {
-			fmt.Printf("  %s %s %s\n", tui.ErrorStyle.Render(tui.IconError), name, tui.MutedStyle.Render("(empty)"))
+			fmt.Printf("  %s %s %s\n", tui.Render(tui.ErrorStyle, tui.IconError), name, tui.Render(tui.MutedStyle, "(empty)"))
 			missing++
 		}
 	}
 
 	fmt.Println()
 	if missing > 0 {
-		fmt.Println(tui.WarningStyle.Render(fmt.Sprintf("%d of %d secrets need configuration", missing, configured+missing)))
+		fmt.Println(tui.Render(tui.WarningStyle, fmt.Sprintf("%d of %d secrets need configuration", missing, configured+missing)))
 	} else {
-		fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ All %d secrets configured", configured)))
+		fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ All %d secrets configured", configured)))
 	}
 
 	return nil
@@ -262,18 +262,18 @@ func showArrAdminPassword(service string) error {
 			service,
 		)
 	}
-	fmt.Println(tui.SuccessStyle.Render("✓ Native admin password is configured (sdbx-managed)"))
-	fmt.Println(tui.MutedStyle.Render("Reconciled by `sdbx integrate`. Persists across restarts."))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Native admin password is configured (sdbx-managed)"))
+	fmt.Println(tui.Render(tui.MutedStyle, "Reconciled by `sdbx integrate`. Persists across restarts."))
 	fmt.Println()
 	username := "sdbx-admin"
 	if service == "qui" || service == "wizarr" {
 		username = "admin"
 	}
-	fmt.Printf("  Username: %s\n", tui.InfoStyle.Render(username))
-	fmt.Printf("  Password: %s\n", tui.InfoStyle.Render(password))
+	fmt.Printf("  Username: %s\n", tui.Render(tui.InfoStyle, username))
+	fmt.Printf("  Password: %s\n", tui.Render(tui.InfoStyle, password))
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render("Authelia remains the outer admin-only boundary."))
-	fmt.Println(tui.MutedStyle.Render("Rotate it transactionally with `sdbx integrate --rotate-managed-credentials --confirm rotate-managed-credentials`."))
+	fmt.Println(tui.Render(tui.MutedStyle, "Authelia remains the outer admin-only boundary."))
+	fmt.Println(tui.Render(tui.MutedStyle, "Rotate it transactionally with `sdbx integrate --rotate-managed-credentials --confirm rotate-managed-credentials`."))
 	return nil
 }
 
@@ -290,12 +290,12 @@ func showCobaltAPIKey() error {
 	if err != nil {
 		return fmt.Errorf("read Cobalt API key map: %w", err)
 	}
-	fmt.Println(tui.SuccessStyle.Render("✓ Cobalt API authentication is configured (sdbx-managed)"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Cobalt API authentication is configured (sdbx-managed)"))
 	fmt.Println()
-	fmt.Printf("  API key: %s\n", tui.InfoStyle.Render(first))
+	fmt.Printf("  API key: %s\n", tui.Render(tui.InfoStyle, first))
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render("Paste this key into https://cobalt.tools/settings/instances"))
-	fmt.Println(tui.MutedStyle.Render("after selecting your SDBX Cobalt API endpoint."))
+	fmt.Println(tui.Render(tui.MutedStyle, "Paste this key into https://cobalt.tools/settings/instances"))
+	fmt.Println(tui.Render(tui.MutedStyle, "after selecting your SDBX Cobalt API endpoint."))
 	return nil
 }
 
@@ -312,24 +312,24 @@ func showQBittorrentTempPassword(parent context.Context) error {
 			if username == "" {
 				username = "admin"
 			}
-			fmt.Println(tui.SuccessStyle.Render("✓ Permanent password is configured (sdbx-managed)"))
-			fmt.Println(tui.MutedStyle.Render("Set by `sdbx integrate`. Persists across restarts."))
+			fmt.Println(tui.Render(tui.SuccessStyle, "✓ Permanent password is configured (sdbx-managed)"))
+			fmt.Println(tui.Render(tui.MutedStyle, "Set by `sdbx integrate`. Persists across restarts."))
 			fmt.Println()
-			fmt.Printf("  Username: %s\n", tui.InfoStyle.Render(username))
-			fmt.Printf("  Password: %s\n", tui.InfoStyle.Render(plaintext))
+			fmt.Printf("  Username: %s\n", tui.Render(tui.InfoStyle, username))
+			fmt.Printf("  Password: %s\n", tui.Render(tui.InfoStyle, plaintext))
 			fmt.Println()
-			fmt.Println(tui.MutedStyle.Render("Do not change it outside SDBX; v1 does not automate safe rotation."))
-			fmt.Println(tui.MutedStyle.Render("See docs/operations.md before any credential change."))
+			fmt.Println(tui.Render(tui.MutedStyle, "Do not change it outside SDBX; v1 does not automate safe rotation."))
+			fmt.Println(tui.Render(tui.MutedStyle, "See docs/operations.md before any credential change."))
 			return nil
 		}
 
 		// The current hash has no matching SDBX-managed plaintext. Never show a
 		// stale recovery value as though it were authoritative.
-		fmt.Println(tui.SuccessStyle.Render("✓ Permanent password is configured"))
-		fmt.Println(tui.MutedStyle.Render("Stored as PBKDF2 hash in qBittorrent.conf. Survives container restarts."))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ Permanent password is configured"))
+		fmt.Println(tui.Render(tui.MutedStyle, "Stored as PBKDF2 hash in qBittorrent.conf. Survives container restarts."))
 		fmt.Println()
 		if username != "" {
-			fmt.Printf("  Username: %s\n", tui.InfoStyle.Render(username))
+			fmt.Printf("  Username: %s\n", tui.Render(tui.InfoStyle, username))
 		}
 		fmt.Println(strings.TrimSpace(`
 The current hash does not match an available SDBX-managed recovery credential.
@@ -366,11 +366,11 @@ command because process arguments and shell history are not private channels.
 	}
 	password := matches[len(matches)-1][1]
 
-	fmt.Println(tui.WarningStyle.Render("⚠ TEMPORARY PASSWORD"))
-	fmt.Println(tui.MutedStyle.Render("Rotates on every qBittorrent container restart."))
+	fmt.Println(tui.Render(tui.WarningStyle, "⚠ TEMPORARY PASSWORD"))
+	fmt.Println(tui.Render(tui.MutedStyle, "Rotates on every qBittorrent container restart."))
 	fmt.Println()
-	fmt.Printf("  Username: %s\n", tui.InfoStyle.Render("admin"))
-	fmt.Printf("  Password: %s\n", tui.InfoStyle.Render(password))
+	fmt.Printf("  Username: %s\n", tui.Render(tui.InfoStyle, "admin"))
+	fmt.Printf("  Password: %s\n", tui.Render(tui.InfoStyle, password))
 	fmt.Println()
 	fmt.Println(strings.TrimSpace(`
 Run sdbx integrate to replace this temporary value with an SDBX-managed
@@ -471,14 +471,14 @@ func showFileBrowserAdminPassword(parent context.Context) error {
 	// Prefer the sdbx-managed plaintext if `sdbx integrate` set it. Same
 	// recovery UX as qBittorrent: the secret file is the source of truth.
 	if plaintext := readSDBXManagedFBPassword(); plaintext != "" {
-		fmt.Println(tui.SuccessStyle.Render("✓ Permanent password is configured (sdbx-managed)"))
-		fmt.Println(tui.MutedStyle.Render("Set by `sdbx integrate`. Persists across restarts."))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ Permanent password is configured (sdbx-managed)"))
+		fmt.Println(tui.Render(tui.MutedStyle, "Set by `sdbx integrate`. Persists across restarts."))
 		fmt.Println()
-		fmt.Printf("  Username: %s\n", tui.InfoStyle.Render("admin"))
-		fmt.Printf("  Password: %s\n", tui.InfoStyle.Render(plaintext))
+		fmt.Printf("  Username: %s\n", tui.Render(tui.InfoStyle, "admin"))
+		fmt.Printf("  Password: %s\n", tui.Render(tui.InfoStyle, plaintext))
 		fmt.Println()
-		fmt.Println(tui.MutedStyle.Render("Do not change it outside SDBX; v1 does not automate safe rotation."))
-		fmt.Println(tui.MutedStyle.Render("See docs/operations.md before any credential change."))
+		fmt.Println(tui.Render(tui.MutedStyle, "Do not change it outside SDBX; v1 does not automate safe rotation."))
+		fmt.Println(tui.Render(tui.MutedStyle, "See docs/operations.md before any credential change."))
 		return nil
 	}
 
@@ -505,12 +505,12 @@ func showFileBrowserAdminPassword(parent context.Context) error {
 	// has changed it since (we can't tell from logs alone — flag that risk).
 	matches := fbAdminPasswordRE.FindAllStringSubmatch(string(out), -1)
 	if len(matches) == 0 {
-		fmt.Println(tui.MutedStyle.Render("No first-launch password line in current log buffer."))
+		fmt.Println(tui.Render(tui.MutedStyle, "No first-launch password line in current log buffer."))
 		fmt.Println()
 		fmt.Println("Either filebrowser was started before the current log retention window,")
 		fmt.Println("or the database was already initialized when this container booted.")
 		fmt.Println()
-		fmt.Println(tui.InfoStyle.Render("Recovery"))
+		fmt.Println(tui.Render(tui.InfoStyle, "Recovery"))
 		fmt.Println("Take an encrypted backup, then follow the reviewed File Browser")
 		fmt.Println("recovery procedure in docs/operations.md. Do not put a password in")
 		fmt.Println("Docker arguments or shell history.")
@@ -519,12 +519,12 @@ func showFileBrowserAdminPassword(parent context.Context) error {
 	username := matches[len(matches)-1][1]
 	password := matches[len(matches)-1][2]
 
-	fmt.Println(tui.WarningStyle.Render("⚠ FIRST-LAUNCH PASSWORD"))
-	fmt.Println(tui.MutedStyle.Render("Auto-generated on filebrowser.db init. Persists across restarts — but if you've"))
-	fmt.Println(tui.MutedStyle.Render("changed it via the WebUI since first launch, this value will no longer work."))
+	fmt.Println(tui.Render(tui.WarningStyle, "⚠ FIRST-LAUNCH PASSWORD"))
+	fmt.Println(tui.Render(tui.MutedStyle, "Auto-generated on filebrowser.db init. Persists across restarts — but if you've"))
+	fmt.Println(tui.Render(tui.MutedStyle, "changed it via the WebUI since first launch, this value will no longer work."))
 	fmt.Println()
-	fmt.Printf("  Username: %s\n", tui.InfoStyle.Render(username))
-	fmt.Printf("  Password: %s\n", tui.InfoStyle.Render(password))
+	fmt.Printf("  Username: %s\n", tui.Render(tui.InfoStyle, username))
+	fmt.Printf("  Password: %s\n", tui.Render(tui.InfoStyle, password))
 	fmt.Println()
 	fmt.Println(strings.TrimSpace(`
 Run sdbx integrate to replace this first-launch value with an SDBX-managed

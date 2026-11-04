@@ -100,15 +100,15 @@ func runConfigGet(_ *cobra.Command, args []string) error {
 	}
 
 	// All keys
-	fmt.Println(tui.TitleStyle.Render("SDBX Configuration"))
+	fmt.Println(tui.Render(tui.TitleStyle, "SDBX Configuration"))
 	fmt.Println()
 
 	for _, group := range settings.ReadGroups() {
-		fmt.Println(tui.InfoStyle.Render(group.Name + ":"))
+		fmt.Println(tui.Render(tui.InfoStyle, group.Name+":"))
 		for _, key := range group.Keys {
 			valueStr := fmt.Sprintf("%v", values[key])
 			if valueStr == "" {
-				valueStr = tui.MutedStyle.Render("(not set)")
+				valueStr = tui.Render(tui.MutedStyle, "(not set)")
 			}
 			fmt.Printf("  %-20s %s\n", key, valueStr)
 		}
@@ -145,7 +145,7 @@ func runConfigSet(command *cobra.Command, args []string) error {
 		return fmt.Errorf("%w\nValid keys: %s", err, strings.Join(settings.ValidKeys(), ", "))
 	}
 
-	fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ Set %s = %s", key, value)))
-	fmt.Println(tui.MutedStyle.Render("Runtime files regenerated."))
+	fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ Set %s = %s", key, value)))
+	fmt.Println(tui.Render(tui.MutedStyle, "Runtime files regenerated."))
 	return nil
 }

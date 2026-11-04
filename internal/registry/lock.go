@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/get-sdbx/sdbx/internal/config"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 const lockSchemaVersion = 2

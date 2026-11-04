@@ -146,7 +146,7 @@ func generateProjectLock(
 		return nil
 	}
 
-	fmt.Println(tui.SuccessStyle.Render("✓ Generated .sdbx.lock"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Generated .sdbx.lock"))
 	fmt.Println()
 	fmt.Printf("Locked %d sources, %d services\n",
 		len(lockFile.Sources),
@@ -154,7 +154,7 @@ func generateProjectLock(
 	)
 	if len(warnings) > 0 {
 		fmt.Println()
-		fmt.Print(tui.WarningStyle.Render("Validation warnings:"))
+		fmt.Print(tui.Render(tui.WarningStyle, "Validation warnings:"))
 		fmt.Println()
 		fmt.Print(formatResolutionWarnings(warnings))
 	}
@@ -237,24 +237,22 @@ func runLockVerify(command *cobra.Command, _ []string) error {
 	}
 
 	if len(diffs) == 0 && generatedFilesErr == nil {
-		fmt.Println(tui.SuccessStyle.Render("✓ Lock file is valid and up-to-date"))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ Lock file is valid and up-to-date"))
 		return nil
 	}
 
-	fmt.Println(tui.WarningStyle.Render("Lock file has differences:"))
+	fmt.Println(tui.Render(tui.WarningStyle, "Lock file has differences:"))
 	fmt.Println()
 	for _, diff := range diffs {
-		fmt.Printf("  %s: %s\n", tui.InfoStyle.Render(diff.Type), tui.EscapeText(diff.Description))
+		fmt.Printf("  %s: %s\n", tui.Render(tui.InfoStyle, diff.Type), tui.EscapeText(diff.Description))
 	}
 	if generatedFilesErr != nil {
 		fmt.Printf(
-			"  %s: %s\n",
-			tui.InfoStyle.Render("changed"),
-			tui.EscapeText(redactCLIError(generatedFilesErr.Error())),
+			"  %s: %s\n", tui.Render(tui.InfoStyle, "changed"), tui.EscapeText(redactCLIError(generatedFilesErr.Error())),
 		)
 	}
 	fmt.Println()
-	fmt.Printf("Run '%s' to update the lock file\n", tui.CommandStyle.Render("sdbx lock"))
+	fmt.Printf("Run '%s' to update the lock file\n", tui.Render(tui.CommandStyle, "sdbx lock"))
 
 	return fmt.Errorf("lock file is stale")
 }
@@ -305,22 +303,22 @@ func runLockDiff(command *cobra.Command, _ []string) error {
 	}
 
 	if len(diffs) == 0 {
-		fmt.Println(tui.MutedStyle.Render("No differences found"))
+		fmt.Println(tui.Render(tui.MutedStyle, "No differences found"))
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Lock File Differences"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Lock File Differences"))
 	fmt.Println()
 
 	for _, diff := range diffs {
 		var icon string
 		switch diff.Type {
 		case "added":
-			icon = tui.SuccessStyle.Render("+")
+			icon = tui.Render(tui.SuccessStyle, "+")
 		case "removed":
-			icon = tui.ErrorStyle.Render("-")
+			icon = tui.Render(tui.ErrorStyle, "-")
 		case "changed":
-			icon = tui.WarningStyle.Render("~")
+			icon = tui.Render(tui.WarningStyle, "~")
 		default:
 			icon = " "
 		}

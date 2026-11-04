@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 	"github.com/get-sdbx/sdbx/internal/docker"
 	"github.com/get-sdbx/sdbx/internal/registry"
 	"github.com/get-sdbx/sdbx/internal/tui"
@@ -89,7 +89,7 @@ func runStatus(command *cobra.Command, _ []string) error {
 		Foreground(tui.ColorPrimary).
 		MarginBottom(1)
 
-	fmt.Println(titleStyle.Render("SDBX STATUS // " + verified.Project.Config.Domain))
+	fmt.Println(tui.Render(titleStyle, "SDBX STATUS // "+verified.Project.Config.Domain))
 	fmt.Println()
 
 	// Calculate column widths
@@ -102,11 +102,7 @@ func runStatus(command *cobra.Command, _ []string) error {
 
 	// Header row
 	headerStyle := lipgloss.NewStyle().Bold(true).Foreground(tui.ColorMuted)
-	fmt.Printf("%s  %s  %s\n",
-		headerStyle.Render(padRight("SERVICE", maxName)),
-		headerStyle.Render(padRight("STATUS", 12)),
-		headerStyle.Render("HEALTH"),
-	)
+	fmt.Printf("%s  %s  %s\n", tui.Render(headerStyle, padRight("SERVICE", maxName)), tui.Render(headerStyle, padRight("STATUS", 12)), tui.Render(headerStyle, "HEALTH"))
 	fmt.Println(strings.Repeat("─", maxName+30))
 
 	// Service rows
@@ -131,24 +127,22 @@ func runStatus(command *cobra.Command, _ []string) error {
 		var healthText string
 		switch service.Health {
 		case "healthy":
-			healthText = tui.SuccessStyle.Render("✓ healthy")
+			healthText = tui.Render(tui.SuccessStyle, "✓ healthy")
 		case "unhealthy":
-			healthText = tui.ErrorStyle.Render("✗ unhealthy")
+			healthText = tui.Render(tui.ErrorStyle, "✗ unhealthy")
 		case "starting":
-			healthText = tui.WarningStyle.Render("◐ starting")
+			healthText = tui.Render(tui.WarningStyle, "◐ starting")
 		default:
-			healthText = tui.MutedStyle.Render("—")
+			healthText = tui.Render(tui.MutedStyle, "—")
 		}
 
-		fmt.Printf("%s  %s  %s\n",
-			statusStyle.Render(statusIcon)+" "+padRight(service.Name, maxName-2),
-			padRight(statusText, 12),
+		fmt.Printf("%s  %s  %s\n", tui.Render(statusStyle, statusIcon)+" "+padRight(service.Name, maxName-2), padRight(statusText, 12),
 			healthText,
 		)
 	}
 
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render(fmt.Sprintf(
+	fmt.Println(tui.Render(tui.MutedStyle, fmt.Sprintf(
 		"Locked: %d services — %d running, %d stopped or missing",
 		report.Total,
 		report.Running,

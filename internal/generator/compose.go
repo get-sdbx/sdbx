@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/registry"

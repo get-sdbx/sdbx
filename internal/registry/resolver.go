@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/get-sdbx/sdbx/internal/config"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // Resolver handles service resolution and dependency ordering

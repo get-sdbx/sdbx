@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/get-sdbx/sdbx/internal/securefs"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // Loader handles loading and parsing of YAML service definitions

@@ -436,7 +436,7 @@ func validateStagedCompose(
 }
 
 func printInitPreflight(report *initPreflightReport) {
-	fmt.Println(tui.TitleStyle.Render("Preflight"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Preflight"))
 	fmt.Println()
 	for _, check := range report.Checks {
 		fmt.Printf("  %s %-18s %s\n", tui.IconSuccess, check.Name, check.Message)
@@ -453,7 +453,7 @@ func printInitPreview(
 	lock *registry.LockFile,
 	compose *generator.ComposeFile,
 ) {
-	fmt.Println(tui.TitleStyle.Render("Deployment preview"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Deployment preview"))
 	fmt.Println()
 	fmt.Printf("  Exposure: %s  Routing: %s  Media: %s  VPN: %s\n",
 		cfg.Expose.Mode,

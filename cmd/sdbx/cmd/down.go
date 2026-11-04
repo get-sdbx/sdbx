@@ -30,14 +30,14 @@ func runDown(command *cobra.Command, _ []string) error {
 
 	compose := docker.NewCompose(projectDir)
 
-	fmt.Println(tui.InfoStyle.Render("Stopping SDBX services..."))
+	fmt.Println(tui.Render(tui.InfoStyle, "Stopping SDBX services..."))
 
 	if err := compose.Down(commandContext(command)); err != nil {
 		return fmt.Errorf("failed to stop services: %w", err)
 	}
 
 	fmt.Println()
-	fmt.Println(tui.SuccessStyle.Render("✓ All services stopped"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ All services stopped"))
 
 	return nil
 }

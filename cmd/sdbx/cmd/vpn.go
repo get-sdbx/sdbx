@@ -44,7 +44,7 @@ func runVPNStatus(command *cobra.Command, _ []string) error {
 		}
 		fmt.Println(string(data))
 	} else {
-		fmt.Println(tui.TitleStyle.Render("SDBX VPN Status"))
+		fmt.Println(tui.Render(tui.TitleStyle, "SDBX VPN Status"))
 		fmt.Println()
 		fmt.Printf("  Configured:       %t\n", status.Configured)
 		fmt.Printf("  Gluetun healthy:  %t\n", status.GluetunHealthy)
@@ -58,9 +58,9 @@ func runVPNStatus(command *cobra.Command, _ []string) error {
 		fmt.Printf("  Protection proven: %t\n", status.ProtectionProven)
 		fmt.Println()
 		if status.ProtectionProven {
-			fmt.Println(tui.SuccessStyle.Render("✓ " + status.Message))
+			fmt.Println(tui.Render(tui.SuccessStyle, "✓ "+status.Message))
 		} else {
-			fmt.Println(tui.ErrorStyle.Render("✗ " + status.Message))
+			fmt.Println(tui.Render(tui.ErrorStyle, "✗ "+status.Message))
 		}
 	}
 

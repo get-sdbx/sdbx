@@ -28,6 +28,13 @@ from the public history.
 - Update age to 1.3.2, go-oidc to 3.21.0, and the Go cryptography, system,
   terminal, and text modules to their reviewed maintenance releases.
 
+### Changed
+
+- Upgrade the interactive CLI to Huh 2, Bubble Tea 2, and Lip Gloss 2 while
+  preserving adaptive colors, plain piped output, and terminal escape handling.
+- Use the YAML organization's maintained YAML v3 module for configuration,
+  catalog, lock, and generated runtime parsing and serialization.
+
 ### Fixed
 
 - Allow LAN HTTPS to use Traefik's local/default certificate. Strict SNI

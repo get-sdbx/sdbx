@@ -146,9 +146,9 @@ func runAddonList(command *cobra.Command, _ []string) error {
 	}
 
 	if addonListAll {
-		fmt.Println(tui.TitleStyle.Render("Available Addons"))
+		fmt.Println(tui.Render(tui.TitleStyle, "Available Addons"))
 	} else {
-		fmt.Println(tui.TitleStyle.Render("Enabled Addons"))
+		fmt.Println(tui.Render(tui.TitleStyle, "Enabled Addons"))
 	}
 	fmt.Println()
 
@@ -174,25 +174,17 @@ func runAddonList(command *cobra.Command, _ []string) error {
 			status = "available"
 		}
 
-		fmt.Printf("  %s %-14s %s  %s\n",
-			style.Render(icon),
-			tui.EscapeText(addon.Name),
-			tui.MutedStyle.Render(status),
-			tui.MutedStyle.Render("— "+tui.EscapeText(addon.Description)),
-		)
+		fmt.Printf("  %s %-14s %s  %s\n", tui.Render(style, icon), tui.EscapeText(addon.Name), tui.Render(tui.MutedStyle, status), tui.Render(tui.MutedStyle, "— "+tui.EscapeText(addon.Description)))
 		displayed++
 	}
 
 	if displayed == 0 {
-		fmt.Println(tui.MutedStyle.Render("  No addons enabled"))
+		fmt.Println(tui.Render(tui.MutedStyle, "  No addons enabled"))
 		fmt.Println()
-		fmt.Printf("Use '%s' to see available addons\n", tui.CommandStyle.Render("sdbx addon list --all"))
+		fmt.Printf("Use '%s' to see available addons\n", tui.Render(tui.CommandStyle, "sdbx addon list --all"))
 	} else {
 		fmt.Println()
-		fmt.Printf("%s enabled, %s available\n",
-			tui.SuccessStyle.Render(fmt.Sprintf("%d", enabled)),
-			tui.MutedStyle.Render(fmt.Sprintf("%d", len(addons)-enabled)),
-		)
+		fmt.Printf("%s enabled, %s available\n", tui.Render(tui.SuccessStyle, fmt.Sprintf("%d", enabled)), tui.Render(tui.MutedStyle, fmt.Sprintf("%d", len(addons)-enabled)))
 	}
 
 	return nil
@@ -237,34 +229,24 @@ func runAddonSearch(command *cobra.Command, args []string) error {
 	}
 
 	if len(addons) == 0 {
-		fmt.Println(tui.MutedStyle.Render("No addons found matching your query"))
+		fmt.Println(tui.Render(tui.MutedStyle, "No addons found matching your query"))
 		return nil
 	}
 
 	if query != "" {
-		fmt.Println(tui.TitleStyle.Render(
+		fmt.Println(tui.Render(tui.TitleStyle,
 			fmt.Sprintf("Search Results for '%s'", tui.EscapeText(query)),
 		))
 	} else {
-		fmt.Println(tui.TitleStyle.Render("Available Addons"))
+		fmt.Println(tui.Render(tui.TitleStyle, "Available Addons"))
 	}
 	fmt.Println()
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
-		tui.MutedStyle.Render("NAME"),
-		tui.MutedStyle.Render("CATEGORY"),
-		tui.MutedStyle.Render("SOURCE"),
-		tui.MutedStyle.Render("DESCRIPTION"),
-	)
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", tui.Render(tui.MutedStyle, "NAME"), tui.Render(tui.MutedStyle, "CATEGORY"), tui.Render(tui.MutedStyle, "SOURCE"), tui.Render(tui.MutedStyle, "DESCRIPTION"))
 
 	for _, addon := range addons {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
-			tui.SuccessStyle.Render(tui.EscapeText(addon.Name)),
-			tui.RenderCategory(string(addon.Category)),
-			tui.MutedStyle.Render(tui.EscapeText(addon.Source)),
-			truncateDesc(tui.EscapeText(addon.Description), 40),
-		)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", tui.Render(tui.SuccessStyle, tui.EscapeText(addon.Name)), tui.RenderCategory(string(addon.Category)), tui.Render(tui.MutedStyle, tui.EscapeText(addon.Source)), truncateDesc(tui.EscapeText(addon.Description), 40))
 	}
 	if err := w.Flush(); err != nil {
 		return fmt.Errorf("render addon list: %w", err)
@@ -273,8 +255,7 @@ func runAddonSearch(command *cobra.Command, args []string) error {
 	fmt.Println()
 	fmt.Printf("%s %d addons. Use '%s' for details.\n",
 		tui.IconPackage,
-		len(addons),
-		tui.CommandStyle.Render("sdbx addon info <name>"),
+		len(addons), tui.Render(tui.CommandStyle, "sdbx addon info <name>"),
 	)
 
 	return nil
@@ -320,29 +301,21 @@ func runAddonInfo(command *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render(
-		tui.IconPackage + " " + tui.EscapeText(def.Metadata.Name),
+	fmt.Println(tui.Render(tui.TitleStyle,
+		tui.IconPackage+" "+tui.EscapeText(def.Metadata.Name),
 	))
 	fmt.Println()
 
 	// Status badge
 	if isEnabled {
-		fmt.Printf("  %s  %s  %s\n",
-			tui.SuccessStyle.Render(tui.IconRunning+" enabled"),
-			tui.MutedStyle.Render("|"),
-			tui.RenderCategory(string(def.Metadata.Category)),
-		)
+		fmt.Printf("  %s  %s  %s\n", tui.Render(tui.SuccessStyle, tui.IconRunning+" enabled"), tui.Render(tui.MutedStyle, "|"), tui.RenderCategory(string(def.Metadata.Category)))
 	} else {
-		fmt.Printf("  %s  %s  %s\n",
-			tui.MutedStyle.Render(tui.IconStopped+" not enabled"),
-			tui.MutedStyle.Render("|"),
-			tui.RenderCategory(string(def.Metadata.Category)),
-		)
+		fmt.Printf("  %s  %s  %s\n", tui.Render(tui.MutedStyle, tui.IconStopped+" not enabled"), tui.Render(tui.MutedStyle, "|"), tui.RenderCategory(string(def.Metadata.Category)))
 	}
 	fmt.Println()
 
 	// Description
-	fmt.Println(tui.MutedStyle.Render("  " + tui.EscapeText(def.Metadata.Description)))
+	fmt.Println(tui.Render(tui.MutedStyle, "  "+tui.EscapeText(def.Metadata.Description)))
 	fmt.Println()
 
 	// Details section
@@ -374,9 +347,9 @@ func runAddonInfo(command *cobra.Command, args []string) error {
 
 	fmt.Println(tui.RenderDivider(50))
 	if !isEnabled {
-		fmt.Printf("  %s Enable with: %s\n", tui.IconArrow, tui.CommandStyle.Render("sdbx addon enable "+addonName))
+		fmt.Printf("  %s Enable with: %s\n", tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx addon enable "+addonName))
 	} else {
-		fmt.Printf("  %s Disable with: %s\n", tui.IconArrow, tui.CommandStyle.Render("sdbx addon disable "+addonName))
+		fmt.Printf("  %s Disable with: %s\n", tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx addon disable "+addonName))
 	}
 
 	return nil
@@ -400,16 +373,14 @@ func runAddonEnable(command *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("%s Enabled: %s", tui.IconSuccess, addonName)))
+	fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("%s Enabled: %s", tui.IconSuccess, addonName)))
 	fmt.Println()
 	fmt.Printf("  %s Runtime files regenerated. Run %s to start the service\n",
-		tui.IconArrow,
-		tui.CommandStyle.Render("sdbx up"))
+		tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx up"))
 	if manager.Config.Expose.Mode == config.ExposeModeCloudflared {
 		fmt.Printf(
 			"  %s Reconcile the remote tunnel with %s before expecting a public route\n",
-			tui.IconArrow,
-			tui.CommandStyle.Render("sdbx tunnel routes"),
+			tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx tunnel routes"),
 		)
 	}
 
@@ -434,16 +405,14 @@ func runAddonDisable(command *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("%s Disabled: %s", tui.IconSuccess, addonName)))
+	fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("%s Disabled: %s", tui.IconSuccess, addonName)))
 	fmt.Println()
 	fmt.Printf("  %s Runtime files regenerated. Run %s to apply changes\n",
-		tui.IconArrow,
-		tui.CommandStyle.Render("sdbx up"))
+		tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx up"))
 	if manager.Config.Expose.Mode == config.ExposeModeCloudflared {
 		fmt.Printf(
 			"  %s Remove retired Published application mappings after reviewing %s\n",
-			tui.IconArrow,
-			tui.CommandStyle.Render("sdbx tunnel routes"),
+			tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx tunnel routes"),
 		)
 	}
 

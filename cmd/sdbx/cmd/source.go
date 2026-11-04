@@ -137,16 +137,16 @@ func runSourceList(_ *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Service Sources"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Service Sources"))
 	fmt.Println()
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "NAME\tTYPE\tPRIORITY\tREF\tURL\tSTATUS")
 
 	for _, src := range cfg.Sources {
-		status := tui.SuccessStyle.Render("active")
+		status := tui.Render(tui.SuccessStyle, "active")
 		if !src.Enabled {
-			status = tui.MutedStyle.Render("disabled")
+			status = tui.Render(tui.MutedStyle, "disabled")
 		}
 
 		url := src.URL
@@ -173,7 +173,7 @@ func runSourceList(_ *cobra.Command, _ []string) error {
 	}
 
 	fmt.Println()
-	fmt.Printf("Use '%s' to add a new source\n", tui.CommandStyle.Render("sdbx source add <name> <url>"))
+	fmt.Printf("Use '%s' to add a new source\n", tui.Render(tui.CommandStyle, "sdbx source add <name> <url>"))
 
 	return nil
 }
@@ -219,7 +219,7 @@ func runSourceAdd(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Source trust policy"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Source trust policy"))
 	fmt.Printf("  %s\n", tui.RenderKeyValue("Name", newSource.Name))
 	fmt.Printf("  %s\n", tui.RenderKeyValue("URL", newSource.URL))
 	fmt.Printf("  %s\n", tui.RenderKeyValue("Commit", newSource.Ref))
@@ -250,11 +250,11 @@ func runSourceAdd(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(tui.SuccessStyle.Render(
+	fmt.Println(tui.Render(tui.SuccessStyle,
 		fmt.Sprintf("✓ Added source: %s", tui.EscapeText(name)),
 	))
 	fmt.Println()
-	fmt.Printf("Run '%s' to fetch and verify the pinned catalog\n", tui.CommandStyle.Render("sdbx source update "+name))
+	fmt.Printf("Run '%s' to fetch and verify the pinned catalog\n", tui.Render(tui.CommandStyle, "sdbx source update "+name))
 
 	return nil
 }
@@ -295,7 +295,7 @@ func runSourceRemove(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ Removed source: %s", name)))
+	fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ Removed source: %s", name)))
 
 	return nil
 }
@@ -321,7 +321,7 @@ func runSourceUpdate(command *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to verify %s: %w", name, err)
 		}
 
-		fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ Verified source: %s", name)))
+		fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ Verified source: %s", name)))
 	} else {
 		fmt.Println("Verifying all Git sources...")
 
@@ -333,18 +333,18 @@ func runSourceUpdate(command *cobra.Command, args []string) error {
 
 			fmt.Printf("  Verifying %s...", src.Name())
 			if err := src.Update(ctx); err != nil {
-				fmt.Printf(" %s\n", tui.ErrorStyle.Render("failed"))
+				fmt.Printf(" %s\n", tui.Render(tui.ErrorStyle, "failed"))
 				updateErrors = append(updateErrors, fmt.Errorf("%s: %w", src.Name(), err))
 				continue
 			}
-			fmt.Printf(" %s\n", tui.SuccessStyle.Render("done"))
+			fmt.Printf(" %s\n", tui.Render(tui.SuccessStyle, "done"))
 		}
 
 		fmt.Println()
 		if len(updateErrors) > 0 {
 			return fmt.Errorf("one or more sources failed verification: %w", errors.Join(updateErrors...))
 		}
-		fmt.Println(tui.SuccessStyle.Render("✓ All Git sources verified"))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ All Git sources verified"))
 	}
 
 	return nil
@@ -369,7 +369,7 @@ func runSourceInfo(command *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Source: " + tui.EscapeText(name)))
+	fmt.Println(tui.Render(tui.TitleStyle, "Source: "+tui.EscapeText(name)))
 	fmt.Println()
 
 	fmt.Printf("Type:     %s\n", tui.EscapeText(src.Type()))
@@ -396,7 +396,7 @@ func runSourceInfo(command *cobra.Command, args []string) error {
 			}
 			addonTag := ""
 			if def.Conditions.RequireAddon {
-				addonTag = tui.MutedStyle.Render(" (addon)")
+				addonTag = tui.Render(tui.MutedStyle, " (addon)")
 			}
 			fmt.Printf("  - %s%s\n", tui.EscapeText(svcName), addonTag)
 		}

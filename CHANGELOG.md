@@ -37,6 +37,9 @@ from the public history.
 
 ### Fixed
 
+- Resolve the verified service graph before staging runtime updates so existing
+  Arr configuration, API keys, and Unpackerr integration copies are preserved
+  when a command reloads the project without an active graph in memory.
 - Allow LAN HTTPS to use Traefik's local/default certificate. Strict SNI
   previously rejected every LAN TLS handshake before routing; direct ACME
   mode keeps strict SNI checking.

@@ -187,6 +187,19 @@ func GenerateProjectTransactional(
 	if err := securefs.EnsureDir(stageSecrets, 0o700); err != nil {
 		return err
 	}
+	// Resolve active services before selecting application state to preserve.
+	targetGenerator := NewGeneratorWithLock(
+		cfg,
+		projectRoot,
+		reg,
+		lock,
+		cliVersion,
+	).WithManagedRoots(configTarget, secretsTarget)
+	targetGraph, err := targetGenerator.Plan()
+	if err != nil {
+		return fmt.Errorf("plan promoted runtime ownership: %w", err)
+	}
+
 	if err := seedTransactionState(
 		cfg,
 		configTarget,
@@ -225,17 +238,6 @@ func GenerateProjectTransactional(
 		if err := options.ValidateStage(stageProject); err != nil {
 			return fmt.Errorf("validate staged project: %w", err)
 		}
-	}
-	targetGenerator := NewGeneratorWithLock(
-		cfg,
-		projectRoot,
-		reg,
-		lock,
-		cliVersion,
-	).WithManagedRoots(configTarget, secretsTarget)
-	targetGraph, err := targetGenerator.Plan()
-	if err != nil {
-		return fmt.Errorf("plan promoted runtime ownership: %w", err)
 	}
 
 	roots := []transactionRootMapping{

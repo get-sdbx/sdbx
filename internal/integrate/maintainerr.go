@@ -41,6 +41,7 @@ type maintainerrArrSetting struct {
 }
 
 type maintainerrDownloadSetting struct {
+	Type          string  `json:"download_client_type,omitempty"`
 	URL           string  `json:"download_client_url"`
 	Username      string  `json:"download_client_username"`
 	Password      string  `json:"download_client_password"`
@@ -295,21 +296,39 @@ func (i *Integrator) integrateMaintainerrDownloadClient(ctx context.Context, cli
 		result.Success, result.Message = true, "Not applicable"
 		return result
 	}
-	var current maintainerrDownloadSetting
-	if err := client.getJSON(ctx, "/download-client", &current); err != nil {
+	var response struct {
+		maintainerrDownloadSetting
+		ClientType json.RawMessage `json:"download_client_type"`
+	}
+	if err := client.getJSON(ctx, "/download-client", &response); err != nil {
 		result.Message, result.Error = "Failed to read download client", err
 		return result
+	}
+	current := response.maintainerrDownloadSetting
+	if len(response.ClientType) > 0 {
+		if err := json.Unmarshal(response.ClientType, &current.Type); err != nil {
+			result.Message, result.Error = "Failed to read download client type", err
+			return result
+		}
 	}
 	ratio := current.FallbackRatio
 	if ratio < 0.5 {
 		ratio = 0.5
 	}
 	desired := maintainerrDownloadSetting{
+		Type:          "qbittorrent",
 		URL:           service.URL,
 		Username:      "admin",
 		Password:      service.APIKey,
 		DeleteData:    false,
 		FallbackRatio: ratio,
+	}
+	matches := current == desired
+	if len(response.ClientType) == 0 {
+		// Older APIs omit the type; an explicit null in newer APIs needs repair.
+		legacyDesired := desired
+		legacyDesired.Type = ""
+		matches = current == legacyDesired
 	}
 	if err := client.test(ctx, "download-client", desired); err != nil {
 		if !errors.Is(err, errMaintainerrPortScopedQBTCookie) {
@@ -317,7 +336,7 @@ func (i *Integrator) integrateMaintainerrDownloadClient(ctx context.Context, cli
 			return result
 		}
 		const limitation = "qBittorrent cleanup unavailable because Maintainerr does not yet support port-scoped session cookies; data deletion remains disabled"
-		if current == desired {
+		if matches {
 			result.Success, result.Message = true, limitation
 			return result
 		}
@@ -333,7 +352,7 @@ func (i *Integrator) integrateMaintainerrDownloadClient(ctx context.Context, cli
 		result.Success, result.Message = true, "Stored non-destructive settings; "+limitation
 		return result
 	}
-	if current == desired {
+	if matches {
 		result.Success, result.Message = true, "Already configured, verified, and data deletion disabled"
 		return result
 	}

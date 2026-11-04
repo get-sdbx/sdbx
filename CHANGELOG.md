@@ -37,6 +37,8 @@ from the public history.
 
 ### Fixed
 
+- Send the explicit qBittorrent client type required by Maintainerr while
+  keeping data deletion disabled and accepting legacy settings responses.
 - Resolve the verified service graph before staging runtime updates so existing
   Arr configuration, API keys, and Unpackerr integration copies are preserved
   when a command reloads the project without an active graph in memory.

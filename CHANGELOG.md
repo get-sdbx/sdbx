@@ -37,6 +37,8 @@ from the public history.
 
 ### Fixed
 
+- Include Qui's required request header for cookie-authenticated integration
+  writes and credential recovery without relaxing its CSRF protection.
 - Send the explicit qBittorrent client type required by Maintainerr while
   keeping data deletion disabled and accepting legacy settings responses.
 - Resolve the verified service graph before staging runtime updates so existing

@@ -229,6 +229,12 @@ func TestQuiRotatesCredentialAndRepairsManagedInstance(t *testing.T) {
 	passwordChanges := 0
 	instanceUpdates := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet && r.URL.Path != "/api/auth/login" {
+			if _, err := r.Cookie("user_session"); err != nil || r.Header.Get("X-Requested-With") == "" {
+				http.Error(w, "authenticated writes require the request header", http.StatusForbidden)
+				return
+			}
+		}
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/auth/check-setup":
 			_ = json.NewEncoder(w).Encode(quiSetupState{SetupRequired: false})

@@ -27,7 +27,7 @@ permissions:
 spec:
   image:
     repository: traefik
-    tag: v3.7.10
+    tag: v3.7.17
     registry: docker.io
   container:
     name_template: "sdbx-{{ .Name }}"

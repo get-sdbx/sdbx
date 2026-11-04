@@ -3,8 +3,8 @@
 set -Eeuo pipefail
 IFS=$'\n\t'
 
-readonly grype_image="anchore/grype@sha256:391bfda62888fb4e98ff5c4c81598f7431a3c1eac3f8519d69d1ff00df247c1d"
-readonly grype_version="0.112.0"
+readonly grype_image="anchore/grype@sha256:6b06708b036f74b2cd70e94b706b4586af96d1932e6ac46255940b2e39dd44a9"
+readonly grype_version="0.121.1"
 readonly default_output_dir="output/catalog-image-audit"
 repository_root="$(
     cd "$(dirname "${BASH_SOURCE[0]}")/.."

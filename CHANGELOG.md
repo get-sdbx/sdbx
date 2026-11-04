@@ -19,8 +19,12 @@ from the public history.
 
 ### Security
 
-- Build with Go 1.26.8 to include the standard-library security fixes missing
-  from Go 1.26.5.
+- Build with Go 1.27.3 for current standard-library HTTP, TLS, and certificate
+  security fixes.
+- Refresh the official catalog image digests for Linux amd64 and arm64, including
+  Traefik 3.7.17 and Cloudflared 2026.10.7.
+- Update OIDC JWT parsing through go-jose 4.1.8 and refresh compatible Go
+  dependencies, pinned CI actions, and build/security tooling.
 - Update age to 1.3.2, go-oidc to 3.21.0, and the Go cryptography, system,
   terminal, and text modules to their reviewed maintenance releases.
 

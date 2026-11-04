@@ -132,6 +132,58 @@ func TestOIDCAuthorizerVerifiesIssuerSignatureAudienceExpiryAndClaims(t *testing
 	if _, err := authorizer.Authorize(request); err == nil {
 		t.Fatal("forged OIDC token was accepted")
 	}
+
+	// Embedded keys are attacker-controlled before issuer signature validation.
+	// Reject private material and oversized moduli before expensive RSA parsing.
+	oversizedModulus := new(big.Int).Lsh(big.NewInt(1), 8192).Bytes()
+	for name, test := range map[string]struct {
+		jwk  map[string]string
+		want string
+	}{
+		"oversized-rsa": {
+			jwk: map[string]string{
+				"kty": "RSA", "e": "AQAB",
+				"n": base64.RawURLEncoding.EncodeToString(oversizedModulus),
+			},
+			want: "modulus too large",
+		},
+		"private-rsa": {
+			jwk: map[string]string{
+				"kty": "RSA", "e": encodeRSAExponent(key.E),
+				"n": base64.RawURLEncoding.EncodeToString(key.N.Bytes()),
+				"d": base64.RawURLEncoding.EncodeToString(key.D.Bytes()),
+				"p": base64.RawURLEncoding.EncodeToString(key.Primes[0].Bytes()),
+				"q": base64.RawURLEncoding.EncodeToString(key.Primes[1].Bytes()),
+			},
+			want: "private parameters",
+		},
+		"symmetric-key": {
+			jwk:  map[string]string{"kty": "oct", "k": "AQAB"},
+			want: "private parameters",
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			header, err := json.Marshal(map[string]any{
+				"alg": "RS256", "kid": "test-key", "jwk": test.jwk,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			parts := strings.Split(valid, ".")
+			parts[0] = base64.RawURLEncoding.EncodeToString(header)
+			raw := strings.Join(parts, ".")
+			if _, err := authorizer.verifier.Verify(context.Background(), raw); err == nil ||
+				!strings.Contains(err.Error(), test.want) {
+				t.Fatalf("embedded JWK error = %v, want %q", err, test.want)
+			}
+			request := httptest.NewRequest(http.MethodGet, "/v1/summary", nil)
+			request.Header.Set("Authorization", "Bearer "+raw)
+			if _, err := authorizer.Authorize(request); err == nil ||
+				err.Error() != "OIDC token verification failed" {
+				t.Fatalf("authorization error = %v, want redacted refusal", err)
+			}
+		})
+	}
 }
 
 func TestOIDCDiscoveryRejectsCrossOriginRedirect(t *testing.T) {

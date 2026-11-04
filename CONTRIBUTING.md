@@ -25,7 +25,7 @@ request. Follow [SECURITY.md](SECURITY.md) for private vulnerability reports.
 
 Required for the full local gate:
 
-- Go 1.26.8 or newer;
+- Go 1.27.3 or newer;
 - Git and Make;
 - Docker Engine 24.0 or newer;
 - Docker Compose plugin 5.0 or newer.

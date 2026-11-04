@@ -21,7 +21,7 @@ permissions:
 spec:
   image:
     repository: ghcr.io/recyclarr/recyclarr
-    tag: latest
+    tag: "8.8.1"
     registry: ghcr.io
   container:
     name_template: "sdbx-{{ .Name }}"

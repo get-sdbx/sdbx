@@ -19,13 +19,31 @@ from the public history.
 
 ### Security
 
-- Build with Go 1.26.8 to include the standard-library security fixes missing
-  from Go 1.26.5.
+- Build with Go 1.27.3 for current standard-library HTTP, TLS, and certificate
+  security fixes.
+- Refresh the official catalog image digests for Linux amd64 and arm64, including
+  Traefik 3.7.17 and Cloudflared 2026.10.7.
+- Update OIDC JWT parsing through go-jose 4.1.8 and refresh compatible Go
+  dependencies, pinned CI actions, and build/security tooling.
 - Update age to 1.3.2, go-oidc to 3.21.0, and the Go cryptography, system,
   terminal, and text modules to their reviewed maintenance releases.
 
+### Changed
+
+- Upgrade the interactive CLI to Huh 2, Bubble Tea 2, and Lip Gloss 2 while
+  preserving adaptive colors, plain piped output, and terminal escape handling.
+- Use the YAML organization's maintained YAML v3 module for configuration,
+  catalog, lock, and generated runtime parsing and serialization.
+
 ### Fixed
 
+- Include Qui's required request header for cookie-authenticated integration
+  writes and credential recovery without relaxing its CSRF protection.
+- Send the explicit qBittorrent client type required by Maintainerr while
+  keeping data deletion disabled and accepting legacy settings responses.
+- Resolve the verified service graph before staging runtime updates so existing
+  Arr configuration, API keys, and Unpackerr integration copies are preserved
+  when a command reloads the project without an active graph in memory.
 - Allow LAN HTTPS to use Traefik's local/default certificate. Strict SNI
   previously rejected every LAN TLS handshake before routing; direct ACME
   mode keeps strict SNI checking.

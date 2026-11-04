@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/doctor"
 	"github.com/get-sdbx/sdbx/internal/generator"
@@ -92,9 +92,9 @@ func runDoctor(command *cobra.Command, _ []string) error {
 		titleStyle := lipgloss.NewStyle().
 			Bold(true).
 			Foreground(tui.ColorPrimary)
-		fmt.Println(titleStyle.Render("SDBX Doctor // trace the ghost"))
+		fmt.Println(tui.Render(titleStyle, "SDBX Doctor // trace the ghost"))
 		fmt.Println()
-		fmt.Println(tui.MutedStyle.Render("Running diagnostics..."))
+		fmt.Println(tui.Render(tui.MutedStyle, "Running diagnostics..."))
 		fmt.Println()
 	}
 
@@ -153,11 +153,8 @@ func runDoctor(command *cobra.Command, _ []string) error {
 			durationStr = fmt.Sprintf(" (%s)", check.Duration.Round(time.Millisecond))
 		}
 
-		fmt.Printf("  %s %s %s%s\n",
-			style.Render(icon),
-			name,
-			report.Checks[index].Message,
-			tui.MutedStyle.Render(durationStr),
+		fmt.Printf("  %s %s %s%s\n", tui.Render(style, icon), name,
+			report.Checks[index].Message, tui.Render(tui.MutedStyle, durationStr),
 		)
 		if report.Checks[index].Remediation != "" {
 			fmt.Printf("    %s %s\n", tui.IconArrow, report.Checks[index].Remediation)
@@ -167,15 +164,15 @@ func runDoctor(command *cobra.Command, _ []string) error {
 	// Summary
 	fmt.Println()
 	if report.Healthy {
-		fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ All %d checks passed", report.Summary.Passed)))
+		fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ All %d checks passed", report.Summary.Passed)))
 	} else {
-		fmt.Println(tui.ErrorStyle.Render(fmt.Sprintf(
+		fmt.Println(tui.Render(tui.ErrorStyle, fmt.Sprintf(
 			"✗ %d of %d checks failed",
 			report.Summary.Failed,
 			report.Summary.Total,
 		)))
 		fmt.Println()
-		fmt.Println(tui.MutedStyle.Render("Fix the failed checks and run 'sdbx doctor' again."))
+		fmt.Println(tui.Render(tui.MutedStyle, "Fix the failed checks and run 'sdbx doctor' again."))
 		return markCLIErrorReported(fmt.Errorf(
 			"%d diagnostic check(s) failed",
 			report.Summary.Failed,

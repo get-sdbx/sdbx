@@ -28,8 +28,8 @@ import (
 	"github.com/get-sdbx/sdbx/internal/registry"
 	sdbxsecrets "github.com/get-sdbx/sdbx/internal/secrets"
 	"github.com/get-sdbx/sdbx/internal/securefs"
+	"go.yaml.in/yaml/v3"
 	"golang.org/x/sys/unix"
-	"gopkg.in/yaml.v3"
 )
 
 const (

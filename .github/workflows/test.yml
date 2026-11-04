@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  GO_VERSION: "1.26.8"
+  GO_VERSION: "1.27.3"
 
 jobs:
   quality:
@@ -252,7 +252,7 @@ jobs:
 
       - name: Install pinned Docker Compose
         env:
-          COMPOSE_VERSION: v5.5.1
+          COMPOSE_VERSION: v5.7.0
         run: |
           set -Eeuo pipefail
           base="https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}"
@@ -320,9 +320,9 @@ jobs:
       - name: Install pinned SBOM generator
         run: |
           go install \
-            -ldflags="-s -w -X main.version=1.50.0 -X main.gitDescription=v1.50.0" \
-            github.com/anchore/syft/cmd/syft@v1.50.0
-          go install github.com/anchore/grant/cmd/grant@v0.6.8
+            -ldflags="-s -w -X main.version=1.56.0 -X main.gitDescription=v1.56.0" \
+            github.com/anchore/syft/cmd/syft@v1.56.0
+          go install github.com/anchore/grant/cmd/grant@v0.7.0
 
       - name: Prove release reproducibility
         run: make release-reproducibility

@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/charmbracelet/huh"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/huh/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/generator"
 	"github.com/get-sdbx/sdbx/internal/registry"
@@ -164,7 +164,7 @@ func runInit(cmd *cobra.Command, _ []string) error {
 		if err := generator.RecoverProjectTransaction(cwd); err != nil {
 			return err
 		}
-		fmt.Println(tui.InfoStyle.Render("Recovered an interrupted initializer transaction."))
+		fmt.Println(tui.Render(tui.InfoStyle, "Recovered an interrupted initializer transaction."))
 	}
 
 	entries, err := os.ReadDir(cwd)
@@ -203,9 +203,9 @@ func runInit(cmd *cobra.Command, _ []string) error {
 		fmt.Println(tui.LogoStyled())
 		fmt.Println()
 
-		tagline := lipgloss.NewStyle().
-			Foreground(tui.ColorHot).
-			Render("/dev/tty0 :: bootstrap the box, keep the receipts")
+		tagline := tui.Render(lipgloss.NewStyle().
+			Foreground(tui.ColorHot),
+			"/dev/tty0 :: bootstrap the box, keep the receipts")
 		fmt.Println(tagline)
 		fmt.Println()
 
@@ -219,7 +219,7 @@ func runInit(cmd *cobra.Command, _ []string) error {
 				return fmt.Errorf("confirmation prompt failed: %w", err)
 			}
 			if !confirm {
-				fmt.Println(tui.MutedStyle.Render("Aborted."))
+				fmt.Println(tui.Render(tui.MutedStyle, "Aborted."))
 				return nil
 			}
 		}
@@ -236,7 +236,7 @@ func runInit(cmd *cobra.Command, _ []string) error {
 				return fmt.Errorf("confirmation prompt failed: %w", err)
 			}
 			if !confirm {
-				fmt.Println(tui.MutedStyle.Render("Aborted."))
+				fmt.Println(tui.Render(tui.MutedStyle, "Aborted."))
 				return nil
 			}
 		}
@@ -313,16 +313,16 @@ func runInit(cmd *cobra.Command, _ []string) error {
 			return fmt.Errorf("confirmation prompt failed: %w", err)
 		}
 		if !confirm {
-			fmt.Println(tui.MutedStyle.Render("Aborted."))
+			fmt.Println(tui.Render(tui.MutedStyle, "Aborted."))
 			return nil
 		}
 	}
 	if initDryRun {
-		fmt.Println(tui.SuccessStyle.Render("✓ Dry run complete. No files were written."))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ Dry run complete. No files were written."))
 		return nil
 	}
 
-	fmt.Printf("  %s Generating and validating staged project...\n", tui.InfoStyle.Render(tui.IconSpinner))
+	fmt.Printf("  %s Generating and validating staged project...\n", tui.Render(tui.InfoStyle, tui.IconSpinner))
 	if err := generator.GenerateProjectTransactional(
 		cfg,
 		cwd,
@@ -1012,10 +1012,10 @@ func printConfigSummary(cfg *config.Config) {
 	valueStyle := lipgloss.NewStyle().
 		Foreground(tui.ColorText)
 
-	fmt.Println(headerStyle.Render("CONFIGURATION // REVIEW BEFORE WRITE"))
+	fmt.Println(tui.Render(headerStyle, "CONFIGURATION // REVIEW BEFORE WRITE"))
 
 	printRow := func(label, value string) {
-		fmt.Printf("  %s %s\n", labelStyle.Render(label+":"), valueStyle.Render(value))
+		fmt.Printf("  %s %s\n", tui.Render(labelStyle, label+":"), tui.Render(valueStyle, value))
 	}
 
 	printRow("Domain", cfg.Domain)
@@ -1036,7 +1036,7 @@ func printConfigSummary(cfg *config.Config) {
 	if cfg.VPNEnabled {
 		printRow("VPN", fmt.Sprintf("%s (%s)", cfg.VPNProvider, cfg.VPNCountry))
 	} else {
-		printRow("VPN", tui.WarningStyle.Render("disabled — torrent traffic is unprotected"))
+		printRow("VPN", tui.Render(tui.WarningStyle, "disabled — torrent traffic is unprotected"))
 	}
 	printRow("Peer Port", fmt.Sprintf("%d/tcp+udp", cfg.TorrentPort))
 
@@ -1085,8 +1085,7 @@ func printSuccessMessage(cfg *config.Config, graph *registry.ResolutionGraph) {
 	if cfg.VPNEnabled {
 		steps = append(steps, fmt.Sprintf(
 			"%d. Add VPN provider credentials to %s",
-			step,
-			tui.CommandStyle.Render(filepath.Join(cfg.ConfigPath, "gluetun", "gluetun.env")),
+			step, tui.Render(tui.CommandStyle, filepath.Join(cfg.ConfigPath, "gluetun", "gluetun.env")),
 		))
 		step++
 	}
@@ -1094,14 +1093,12 @@ func printSuccessMessage(cfg *config.Config, graph *registry.ResolutionGraph) {
 	if cfg.Expose.Mode == config.ExposeModeCloudflared {
 		steps = append(steps, fmt.Sprintf(
 			"%d. Configure every Published application mapping shown by %s",
-			step,
-			tui.CommandStyle.Render("sdbx tunnel routes"),
+			step, tui.Render(tui.CommandStyle, "sdbx tunnel routes"),
 		))
 		step++
 		steps = append(steps, fmt.Sprintf(
 			"%d. Add the remote-managed tunnel connector token to %s",
-			step,
-			tui.CommandStyle.Render(filepath.Join(cfg.SecretsPath, "cloudflared_tunnel_token.txt")),
+			step, tui.Render(tui.CommandStyle, filepath.Join(cfg.SecretsPath, "cloudflared_tunnel_token.txt")),
 		))
 		step++
 	}
@@ -1109,26 +1106,24 @@ func printSuccessMessage(cfg *config.Config, graph *registry.ResolutionGraph) {
 	if cfg.PlexEnabled {
 		steps = append(steps, fmt.Sprintf(
 			"%d. Add a fresh Plex claim token to %s before first start",
-			step,
-			tui.CommandStyle.Render(filepath.Join(cfg.SecretsPath, "plex_claim_token.txt")),
+			step, tui.Render(tui.CommandStyle, filepath.Join(cfg.SecretsPath, "plex_claim_token.txt")),
 		))
 		step++
 	}
 
-	steps = append(steps, fmt.Sprintf("%d. Run %s to start services", step, tui.CommandStyle.Render("sdbx up")))
+	steps = append(steps, fmt.Sprintf("%d. Run %s to start services", step, tui.Render(tui.CommandStyle, "sdbx up")))
 	step++
 
 	steps = append(steps, fmt.Sprintf(
 		"%d. Run %s after services settle to apply idempotent credentials and integrations",
-		step,
-		tui.CommandStyle.Render("sdbx integrate"),
+		step, tui.Render(tui.CommandStyle, "sdbx integrate"),
 	))
 	step++
 
-	steps = append(steps, fmt.Sprintf("%d. Login at %s (User: %s)", step, tui.CommandStyle.Render(autheliaURL), cfg.AdminUser))
+	steps = append(steps, fmt.Sprintf("%d. Login at %s (User: %s)", step, tui.Render(tui.CommandStyle, autheliaURL), cfg.AdminUser))
 	step++
 
-	steps = append(steps, fmt.Sprintf("%d. Run %s to verify setup", step, tui.CommandStyle.Render("sdbx doctor")))
+	steps = append(steps, fmt.Sprintf("%d. Run %s to verify setup", step, tui.Render(tui.CommandStyle, "sdbx doctor")))
 
 	message := strings.Join(steps, "\n")
 	fmt.Print(tui.RenderSuccessBox("Project initialized successfully!", message))

@@ -46,6 +46,11 @@ func (q *quiClient) endpoint(path string) string {
 	return strings.TrimRight(q.config.URL, "/") + path
 }
 
+// quiMutationHeaders satisfies the cookie-authenticated write guard.
+func quiMutationHeaders() map[string]string {
+	return map[string]string{"X-Requested-With": "XMLHttpRequest"}
+}
+
 func (q *quiClient) setupState(ctx context.Context) (*quiSetupState, error) {
 	body, err := q.client.Get(ctx, q.endpoint("/api/auth/check-setup"), nil)
 	if err != nil {
@@ -60,7 +65,7 @@ func (q *quiClient) setupState(ctx context.Context) (*quiSetupState, error) {
 }
 
 func (q *quiClient) login(ctx context.Context, password string) error {
-	_, err := q.client.Post(ctx, q.endpoint("/api/auth/login"), nil, map[string]string{
+	_, err := q.client.Post(ctx, q.endpoint("/api/auth/login"), quiMutationHeaders(), map[string]string{
 		"username": "admin",
 		"password": password,
 	})
@@ -71,7 +76,7 @@ func (q *quiClient) login(ctx context.Context, password string) error {
 }
 
 func (q *quiClient) setup(ctx context.Context, password string) error {
-	_, err := q.client.Post(ctx, q.endpoint("/api/auth/setup"), nil, map[string]string{
+	_, err := q.client.Post(ctx, q.endpoint("/api/auth/setup"), quiMutationHeaders(), map[string]string{
 		"username": "admin",
 		"password": password,
 	})
@@ -85,7 +90,7 @@ func (q *quiClient) changePassword(ctx context.Context, current, next string) er
 	_, err := q.client.Put(
 		ctx,
 		q.endpoint("/api/auth/change-password"),
-		nil,
+		quiMutationHeaders(),
 		map[string]string{
 			"currentPassword": current,
 			"newPassword":     next,
@@ -129,7 +134,7 @@ func (q *quiClient) saveInstance(
 		payload["useHardlinks"] = false
 		payload["useReflinks"] = false
 		payload["fallbackToRegularMode"] = false
-		body, err = q.client.Post(ctx, q.endpoint("/api/instances"), nil, payload)
+		body, err = q.client.Post(ctx, q.endpoint("/api/instances"), quiMutationHeaders(), payload)
 	} else {
 		payload["hasLocalFilesystemAccess"] = current.HasLocalFilesystemAccess
 		payload["useHardlinks"] = current.UseHardlinks
@@ -140,7 +145,7 @@ func (q *quiClient) saveInstance(
 		body, err = q.client.Put(
 			ctx,
 			q.endpoint("/api/instances/"+strconv.Itoa(current.ID)),
-			nil,
+			quiMutationHeaders(),
 			payload,
 		)
 	}
@@ -155,7 +160,7 @@ func (q *quiClient) testInstance(ctx context.Context, id int) error {
 	body, err := q.client.Post(
 		ctx,
 		q.endpoint("/api/instances/"+strconv.Itoa(id)+"/test"),
-		nil,
+		quiMutationHeaders(),
 		nil,
 	)
 	wipeCredentialBytes(body)

@@ -18,7 +18,7 @@ import (
 	"github.com/get-sdbx/sdbx/internal/commandexec"
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/registry"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 func TestAutheliaRulesComeFromResolvedGraph(t *testing.T) {
@@ -1129,7 +1129,7 @@ func TestLiveGeneratedTraefikV3Config(t *testing.T) {
 		"--volume",
 		filepath.Join(outputDir, "configs", "traefik", "dynamic")+
 			":/etc/traefik/dynamic:ro",
-		"traefik:v3.7.10",
+		"traefik:v3.7.17",
 		"--configFile=/etc/traefik/traefik.yml",
 	)
 	output, err := command.CombinedOutput()

@@ -178,7 +178,7 @@ func runBackupCreate(command *cobra.Command, _ []string) error {
 	manager := backup.NewManager(projectDir)
 
 	if !IsJSONOutput() {
-		fmt.Println(tui.TitleStyle.Render("Creating Backup"))
+		fmt.Println(tui.Render(tui.TitleStyle, "Creating Backup"))
 		fmt.Println()
 	}
 
@@ -215,15 +215,15 @@ func runBackupCreate(command *cobra.Command, _ []string) error {
 	}
 
 	// Human-readable output
-	fmt.Println(tui.SuccessStyle.Render("✓ Backup created successfully"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Backup created successfully"))
 	fmt.Println()
-	fmt.Printf("%s  %s\n", tui.MutedStyle.Render("Name:"), tui.EscapeText(b.Name))
-	fmt.Printf("%s  %s\n", tui.MutedStyle.Render("Path:"), tui.EscapeText(b.Path))
-	fmt.Printf("%s  %s\n", tui.MutedStyle.Render("Size:"), formatBytes(size))
-	fmt.Printf("%s  %s\n", tui.MutedStyle.Render("Time:"), b.Metadata.Timestamp.Format("2006-01-02 15:04:05"))
+	fmt.Printf("%s  %s\n", tui.Render(tui.MutedStyle, "Name:"), tui.EscapeText(b.Name))
+	fmt.Printf("%s  %s\n", tui.Render(tui.MutedStyle, "Path:"), tui.EscapeText(b.Path))
+	fmt.Printf("%s  %s\n", tui.Render(tui.MutedStyle, "Size:"), formatBytes(size))
+	fmt.Printf("%s  %s\n", tui.Render(tui.MutedStyle, "Time:"), b.Metadata.Timestamp.Format("2006-01-02 15:04:05"))
 	if len(b.Metadata.Omissions) > 0 {
 		fmt.Println()
-		fmt.Println(tui.MutedStyle.Render(
+		fmt.Println(tui.Render(tui.MutedStyle,
 			"Omitted reproducible or ephemeral filesystem entries:",
 		))
 		for _, omission := range b.Metadata.Omissions {
@@ -277,15 +277,15 @@ func runBackupList(command *cobra.Command, _ []string) error {
 
 	// Human-readable output
 	if len(backups) == 0 {
-		fmt.Println(tui.MutedStyle.Render("No backups found"))
+		fmt.Println(tui.Render(tui.MutedStyle, "No backups found"))
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Available Backups"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Available Backups"))
 	fmt.Println()
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w, tui.TableHeaderStyle.Render("NAME")+"\t"+tui.TableHeaderStyle.Render("DATE")+"\t"+tui.TableHeaderStyle.Render("SIZE")+"\t"+tui.TableHeaderStyle.Render("HOSTNAME"))
+	fmt.Fprintln(w, tui.Render(tui.TableHeaderStyle, "NAME")+"\t"+tui.Render(tui.TableHeaderStyle, "DATE")+"\t"+tui.Render(tui.TableHeaderStyle, "SIZE")+"\t"+tui.Render(tui.TableHeaderStyle, "HOSTNAME"))
 
 	for _, b := range backups {
 		size, _ := b.GetSize()
@@ -333,9 +333,9 @@ func runBackupRestore(command *cobra.Command, args []string) error {
 	ctx := command.Context()
 
 	if !IsJSONOutput() {
-		fmt.Println(tui.TitleStyle.Render("Restoring Backup"))
+		fmt.Println(tui.Render(tui.TitleStyle, "Restoring Backup"))
 		fmt.Println()
-		fmt.Printf("%s  %s\n", tui.MutedStyle.Render("Backup:"), tui.EscapeText(backupName))
+		fmt.Printf("%s  %s\n", tui.Render(tui.MutedStyle, "Backup:"), tui.EscapeText(backupName))
 		fmt.Println()
 	}
 
@@ -389,9 +389,9 @@ func runBackupRestore(command *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Println(tui.SuccessStyle.Render("✓ Backup restored successfully"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Backup restored successfully"))
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render("Run 'sdbx up' to apply the restored configuration"))
+	fmt.Println(tui.Render(tui.MutedStyle, "Run 'sdbx up' to apply the restored configuration"))
 
 	return nil
 }
@@ -528,7 +528,7 @@ func runBackupDelete(command *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Println(tui.SuccessStyle.Render("✓ Backup deleted successfully"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Backup deleted successfully"))
 
 	return nil
 }

@@ -39,7 +39,7 @@ func runRestart(command *cobra.Command, args []string) error {
 	ctx := command.Context()
 
 	if len(args) == 0 {
-		fmt.Println(tui.InfoStyle.Render("Restarting all services..."))
+		fmt.Println(tui.Render(tui.InfoStyle, "Restarting all services..."))
 		start := time.Now()
 
 		if _, err := restartAllServices(ctx, compose); err != nil {
@@ -47,7 +47,7 @@ func runRestart(command *cobra.Command, args []string) error {
 		}
 
 		fmt.Println()
-		fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ All services restarted in %s", time.Since(start).Round(time.Millisecond))))
+		fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ All services restarted in %s", time.Since(start).Round(time.Millisecond))))
 	} else {
 		var restartErrors []error
 		restartedByDependency := map[string]bool{}
@@ -62,7 +62,7 @@ func runRestart(command *cobra.Command, args []string) error {
 			fmt.Printf("Restarting %s...\n", service)
 			dependentRestarted, err := restartService(ctx, compose, service)
 			if err != nil {
-				fmt.Println(tui.ErrorStyle.Render(fmt.Sprintf(
+				fmt.Println(tui.Render(tui.ErrorStyle, fmt.Sprintf(
 					"  ✗ Failed to restart %s: %s",
 					service,
 					redactCLIError(err.Error()),
@@ -74,7 +74,7 @@ func runRestart(command *cobra.Command, args []string) error {
 					restartedByDependency["qbittorrent"] = true
 					message += " (qBittorrent rejoined the VPN network namespace)"
 				}
-				fmt.Println(tui.SuccessStyle.Render(message))
+				fmt.Println(tui.Render(tui.SuccessStyle, message))
 			}
 		}
 		if len(restartErrors) > 0 {

@@ -6,15 +6,15 @@
       "kind": "addon",
       "repository": "ghcr.io/advplyr/audiobookshelf",
       "tag": "latest",
-      "indexDigest": "sha256:180acad33d69c99ed208676465d8edcb268fa46967735579a7810859885b1a8e",
+      "indexDigest": "sha256:b897c33f05972fb1bf484f7487bc878fa91ec8691335c1db6e2929c3a7658efa",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:e388e90e381ae3fa8660346612b2955f2c555ede81c9c286e2218bdf966b4de8"
+          "digest": "sha256:37c2057e150694970442579815c646fe6bdc01c95b9d1547c4c9068be8844ef3"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:14a6492c743f2acfa00bcd96ec2a5c0c95e311f567718d29cb3c7f3772dc773f"
+          "digest": "sha256:8c7e6c54460a6db508b520ff70e7025a5c0285f6ecc1574b6ba484dedc989f83"
         }
       ]
     },
@@ -23,15 +23,15 @@
       "kind": "core",
       "repository": "authelia/authelia",
       "tag": "latest",
-      "indexDigest": "sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b",
+      "indexDigest": "sha256:bd97cff4fcbf715b5ff1f9ae286afbe6033afce385302520b0368122d43a6f54",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:b5f415d5f14b154c2aa2b186d9f329d879e223da36e115cd871db4c261d5af54"
+          "digest": "sha256:a9931f4443882fcc43bc368bffd40b51ff1867045d46c8dc2e87fb2b03a32178"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:68277b28658a69bb3f512c2c23c41c7df7d9311d0e506e64e26c96dcd75d0539"
+          "digest": "sha256:36c60b9d8a070dc7cca38652177bce4d2243c0873b88f1cabd752b3e1a893a82"
         }
       ]
     },
@@ -40,15 +40,15 @@
       "kind": "addon",
       "repository": "ghcr.io/autobrr/autobrr",
       "tag": "latest",
-      "indexDigest": "sha256:7e8ce4ec9397685762dc7d8426c976cb15bd36522fac91dfd3648a4c57c6d358",
+      "indexDigest": "sha256:72bb5fe5e8c73f85660f92502d9015b21b07156495f039b55864633b9f8b7a89",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:e67d3c40528d532c09c582bbeb3ed932ec8a1a97c1c91b96fec27382437a883f"
+          "digest": "sha256:c635fa0cab186ab6e3e4604277d8a75f3619cde356d2cbb71c6ee20f5a8db765"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:7c5a8806d5485500c24e034eb37634a85f9832e001026b90de42239179a0b967"
+          "digest": "sha256:edf22593c851bc79d2a3fe36923f1ba1a63e150985399ca46bfbcf0c83bc6f88"
         }
       ]
     },
@@ -57,15 +57,15 @@
       "kind": "addon",
       "repository": "linuxserver/bazarr",
       "tag": "latest",
-      "indexDigest": "sha256:ab401a0f361cfad328e444838b13d5b334b189d0f556fc91a3623eb581df36df",
+      "indexDigest": "sha256:7ef0e58216900dbce30b123e0eb65f5cb30e36f126de9474acdd2022fb069c54",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:d3f17fc44deac69dc5b4ea96d8218ba50945788e4d2008908bd403b74025eea2"
+          "digest": "sha256:5730b1bccef8e0b2b12f8ea704c85195a400824afc3ecaa8e1e66dc09200fdd8"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:78d5c294616952b89ed0a22082ebfdf47a1351894841df8c74ea43fa6dfedb6f"
+          "digest": "sha256:a5134d8e8c891fb059e0e7f656918be7f237e11058a1f977d08bced6ab650d2b"
         }
       ]
     },
@@ -74,15 +74,15 @@
       "kind": "addon",
       "repository": "lscr.io/linuxserver/calibre-web",
       "tag": "latest",
-      "indexDigest": "sha256:a7277fd8884b3d77e8659a2d82b0974af9812d4c1f4040c98b910da21e764a36",
+      "indexDigest": "sha256:f9c692fba85ade1ce71b98364b860f72855055a59198894cc8c2ea49fc98a840",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:4076fd451b44f9f1fdb244b2bff23f1a3142633192c52572349f2940b09c3123"
+          "digest": "sha256:769d39723d6ed66378f9569013c2151663c5fd4447d24f55744a4b3011699f37"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:4f454dae539f2b21754fac93e34a1a9476ff81d6cf9feeaaa9b9e10ea6420566"
+          "digest": "sha256:118463afdda7dca64e29f947a28248f200d7154827a93142ac57fd17b029a943"
         }
       ]
     },
@@ -90,16 +90,16 @@
       "service": "cloudflared",
       "kind": "core",
       "repository": "cloudflare/cloudflared",
-      "tag": "2026.7.3",
-      "indexDigest": "sha256:e39ee8da81ad5e05d77f38d2f51c60ca51bf2a8450ac3abab50c17fdb91d91bf",
+      "tag": "2026.10.7",
+      "indexDigest": "sha256:4955524aeaa379e154023d5a027c250f7b35041a2e7e950cf13f144bc9b9c5ba",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:b392761b711c0e5649d9b64e1fc9a10ba0563fa3e712ed7c26bde5cc1fbe9059"
+          "digest": "sha256:32f933aa6fe1f69c5885b93f3c92cc3f60cca8f0530868bc3bc2cc446114a385"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:00f96f93af72339696087594e9cc78a93518ce90e72248781e69d8c72235a7ae"
+          "digest": "sha256:17ab7aa52b3a9805b36c81cbe353bad657fb6395d63c81e12021beaea95f03d3"
         }
       ]
     },
@@ -108,15 +108,15 @@
       "kind": "addon",
       "repository": "ghcr.io/imputnet/cobalt",
       "tag": "11",
-      "indexDigest": "sha256:63186dd68afd57ce3bb1f62cc4c139f5fa95b9c3e87a3cf5c6e4c7a570523f62",
+      "indexDigest": "sha256:28540f81d2cffbd9d089c08438e39a7689a7cee7e9a5b0f60de93a22d19f5dbe",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:df14a3b3fe4390d4e1c2d4761ed58981d34aa5fc82d0df2091bab890e7dfaa8b"
+          "digest": "sha256:59dc9bc86312105d621f678fd917e51a8436e5e2afdce388795760c6be44617f"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:6215aed30feb01bca9fe894d7fc642d845d3550042c6412cbb894ca095fe5398"
+          "digest": "sha256:8cad72749dccd9cf0d1e3e008443ecf1d348aa54eb8e7c0c17c47ab2208172d3"
         }
       ]
     },
@@ -125,15 +125,15 @@
       "kind": "addon",
       "repository": "ghcr.io/cross-seed/cross-seed",
       "tag": "latest",
-      "indexDigest": "sha256:a1fed512261fd968c55cb03c51cff9c6620aa76a34b3b591afca95c890aa8225",
+      "indexDigest": "sha256:9279fa3b4c6f09915614ec819c6dc97e1e844d863b35c009ababd54bad0489d5",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:93418ffe42ccda770706b10294b46f8642bd1f6da4ca57b4c11b1b220f54e3d3"
+          "digest": "sha256:7f3233173b2602691e5bbeb4de1484cafcb2746d3cfdfae2649707046daaef74"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:9555dc70f6753fef32d54bfc1ff504899377a6a0b73687f95d58fa27dfa0a7c7"
+          "digest": "sha256:57311d83c9f665d3ba5a75fffbb156bebae313119f544fee1bcdad88c0f5f1be"
         }
       ]
     },
@@ -142,15 +142,15 @@
       "kind": "addon",
       "repository": "ghcr.io/manimatter/decluttarr",
       "tag": "latest",
-      "indexDigest": "sha256:c06d48426b612b845f2406c2d045f266468a6390faf87aea796d497a2935ec95",
+      "indexDigest": "sha256:fd3dc206c17df32190cda1bed2ef3ee1cb9726bd108aa7e97e83e47cb3e72d78",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:65e8ac53362f30d123188a7b2321749c59c93486c541a49260f278d42982bb22"
+          "digest": "sha256:85ac86bd46b1ef247e0847652e3ed93c14f891227f93ae529133c271dcdd4a61"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:aa81a4a6d0b9f7c48f267da0c2a71e015fd1218549289fd6914ac7603aaa0981"
+          "digest": "sha256:903a3a628f7de7a03bae55ab5fa502d5e5af9fc92fd10548ab535b82f56762d8"
         }
       ]
     },
@@ -176,15 +176,15 @@
       "kind": "addon",
       "repository": "ghcr.io/flaresolverr/flaresolverr",
       "tag": "latest",
-      "indexDigest": "sha256:139dfee1c6f89249c8d665d1333a42e8ec74ec0a86bc6bb1c8461e10d3a66a47",
+      "indexDigest": "sha256:c80ae007ce2ccdcd217a12426e4f039ef763ff90738c808d38810c3e59323767",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:258523d25e4e07028c3a206f0e03ae807b26a50a201dd320f09a18464ecf86fa"
+          "digest": "sha256:4ad0ed7de64622f9823594bf7bc237149158fca881f875aafbdd8456f6467134"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:96ea0bb7b589785f802bf586b00440ca96bfa12b27c3a6a69f0077ef5300fa31"
+          "digest": "sha256:91c0774e7d634f8b55a69d5027fa13a7fcad9b59b420efb286364fc8236634f1"
         }
       ]
     },
@@ -193,15 +193,15 @@
       "kind": "core",
       "repository": "qmcgaw/gluetun",
       "tag": "latest",
-      "indexDigest": "sha256:988d9cb1982f688ce51f3511057b90c5c8d01889db60a4d56e5230aebf1d3339",
+      "indexDigest": "sha256:4af0c804003481e100180e1f8d4d5e9c48163fedc0f88d061881b615aef9d183",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:4fabcc11bc0c43e56de00d6705e1e60005877e0bee00d6e4dbf5d22dd0bf891c"
+          "digest": "sha256:3403690e92f774f100550afffec9e72d0061e02e70dc45fedba50d3c26ea9a7e"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:b6c9ec4195d76b39839735cd83ab7fe9d1e2fc21ffb977f0bfb8ec12ea61e109"
+          "digest": "sha256:917af8d58dd5e18c7c5a58398477bba077f25b3e9c421e62fe204cae11d37ab3"
         }
       ]
     },
@@ -210,15 +210,15 @@
       "kind": "addon",
       "repository": "ghcr.io/schaka/janitorr",
       "tag": "jvm-stable",
-      "indexDigest": "sha256:270e9113c71182d30929f253ff6ff49c63078f4556487a668602c4114c7d665a",
+      "indexDigest": "sha256:eecb604b6307f4ba5674bec7e3fc142d7212361571a1a9dc1f39e0fd069a4434",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:159349b47e6fb4ae211c799369bd8ffa2657b8865e4fc037b5d32a4acec47b3f"
+          "digest": "sha256:eb8f3f3ff5c92d1dc01475807252082ffdb0df8bde9805b169e60dead711b1d2"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:3332fd69ac5120c1973e80c83e703c2c521895d3928c5f832d62d85d01ee273d"
+          "digest": "sha256:2937aeb98c2355d71ee20ba5c5f54a55995d63c35b61843e5da213f910229bee"
         }
       ]
     },
@@ -227,15 +227,15 @@
       "kind": "core",
       "repository": "linuxserver/jellyfin",
       "tag": "latest",
-      "indexDigest": "sha256:b8dcc7b71d0ea872b74314da4b995c0cf282b1778438c295996e7be88c70fdda",
+      "indexDigest": "sha256:b7eabe1f098f4e850bfd63d6721369117195410a471db1a41748ab768b81a639",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:bb455a7a3073d7977323e04f3bd2012a7798aa0e0e66f2ba144b48df9dac9a88"
+          "digest": "sha256:542ccd921277f204001edace37d9316cba1ccbd15ca70d109829a171436f82e0"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:1637ae7afa27b76602221347f8eb4beee50517325ec6fd0f8148bc79d0a3dd88"
+          "digest": "sha256:11468b38e7cbf8047b0cd2c0aab8bbb2384a0d559cf0f3853c754dc0be1cdbcd"
         }
       ]
     },
@@ -244,15 +244,15 @@
       "kind": "addon",
       "repository": "kometateam/kometa",
       "tag": "latest",
-      "indexDigest": "sha256:a3d5637a58ea1a826824d996738430c76cd16db1d5677665901a80ad3b82b35c",
+      "indexDigest": "sha256:93b0909d1a34d75985c2258f451aac4ece4216d02f0c4914a0a4fa4be39a88c0",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:39a84f8c18b0ae1521bbf370aa503a0671bdda1295d7b9d6b3ec040b64156f33"
+          "digest": "sha256:a23c4b63f57d901ec21e288cdf3de7c5e5768e581bee1796272f9064925a3a78"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:57cdf6ff7092edf440c2d775cb7eaf2d34dda739151e665f3ebedd4a73c2ba1c"
+          "digest": "sha256:87a2546a81bde64953db3af7b1da09cdc33234c87a49ed769dd9dc414a0d6a5a"
         }
       ]
     },
@@ -261,15 +261,15 @@
       "kind": "addon",
       "repository": "gotson/komga",
       "tag": "latest",
-      "indexDigest": "sha256:c4f9885fc077e2e9cd684dc95e8f6cfa5e33b100b46712b2de7f5cc2ff59e6fb",
+      "indexDigest": "sha256:1d89b79f6cee732438c0c51f876373ad1c6a0d6cdae47c008bfa24e1d1bed748",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:dcea6d911ba902b66b61a6970ab3640ac4aa258ea6e60821ff26e3a7bc400d03"
+          "digest": "sha256:2c72fdc2448075c73d5cfddd22963441e497c8aca2f6e7c69fd4e1250d08099b"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:f233ff7bd29b84f2d030da3e4344b5dba41e7f000bce82701834e26e6486eff9"
+          "digest": "sha256:8a1002c71a2003da3e5f546a818f42388f90f6cc7f34dea0a88ff9108862b348"
         }
       ]
     },
@@ -278,15 +278,15 @@
       "kind": "addon",
       "repository": "linuxserver/lidarr",
       "tag": "latest",
-      "indexDigest": "sha256:60be9a1faad3dfba5a711163fc18526845e2ce7b50b463dd9effae7f766c9beb",
+      "indexDigest": "sha256:9fddcf5c613361edfce390d4e6b7c364282e71e90a40ce7793077fed788f6e63",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:baeaf799787200711ccf64c68b6951193b000e6bb1b2d703e864f7b97e2ed9ce"
+          "digest": "sha256:32d576b97dadac6ea045fa884e7bf3db24428c4c9e3c2f7a6ac9fef4b4a16462"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:629e594a37de9d718bd388518ef7f5ea710f8c35b57fa10dda6c27d8f5f17cfd"
+          "digest": "sha256:be3915e7b1755d82e2452aae0b693a13418e1224a33548271fdb2dcf21b38a4a"
         }
       ]
     },
@@ -295,15 +295,15 @@
       "kind": "addon",
       "repository": "ghcr.io/maintainerr/maintainerr",
       "tag": "latest",
-      "indexDigest": "sha256:ce7ff52afa146dfc05c2c2304df8141e0086f14a803bdbef0d870e5b914f0dee",
+      "indexDigest": "sha256:33d86e5f03ed25204788b1e9cd9a2b3f0299cf49fae968220484b57008962399",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:821211cf5f359ecbe5234c2d8a5ce8d02e335b9ab0a56d6bc80db6518229c8db"
+          "digest": "sha256:c5574a7f3939b46b68461250fe5e60c4895649e97ade91184be2e02ec0960cee"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:9ab844d1a78049eac2b7de1fcf53f24e65d1af9868943928f742055830fd55f1"
+          "digest": "sha256:b5c352eebe88b26e46f04ec95ed7ad8c1f2e3c0fd1b7878613d72a26417e2bdb"
         }
       ]
     },
@@ -312,15 +312,15 @@
       "kind": "addon",
       "repository": "deluan/navidrome",
       "tag": "latest",
-      "indexDigest": "sha256:9012939114fbb1bb641b81cf96dec5ded15f0aafefe8d47a511d7cb919658e40",
+      "indexDigest": "sha256:38dc2727bfcfd5ede290f8ada114fc90368146f265ae4701ddddbcbe2a44ee52",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:38246ebb80d6f7e2724eecab4acafa7b14ec66ae800b2454aa6da4c19f80a9ce"
+          "digest": "sha256:59ce76e6e06193fbfbb1736a93b8468227e1ea663fc7b25b1da13fbb97f5197b"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:83813e88d8b5dec7d559135ae7707c84ee3f913066c822d212f258706e565ece"
+          "digest": "sha256:bb5b2e422a8777e19daeb9995b7ca22f34097c8529f3192f37eefc80fe7653a5"
         }
       ]
     },
@@ -329,15 +329,15 @@
       "kind": "addon",
       "repository": "ghcr.io/notifiarr/notifiarr",
       "tag": "latest",
-      "indexDigest": "sha256:a9a1f37f924d740107874675df6b6a5edd87e5f66ca72ad27481a4bdfd42d162",
+      "indexDigest": "sha256:2b0a8784d8a43177cbc5a19110e7eb066d9321572c3352eda79c0a89898c7735",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:32aeeebb2bfeac4bf6252cecb40adc3d0100e838cc8f15e7e018e297f5cede03"
+          "digest": "sha256:27d992ea7feafed4f8f0aa4e278bc9f81017965fe39386c91188dd6d19118345"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:80a8e794b59c4ec9339e7b1a0dd6fde562dbeed7b863dab436211ce72555d083"
+          "digest": "sha256:e58f21564562923ff762d90f2750d3d35f82a4c7d5a8dfc200fedd5209978718"
         }
       ]
     },
@@ -346,15 +346,15 @@
       "kind": "addon",
       "repository": "linuxserver/nzbhydra2",
       "tag": "latest",
-      "indexDigest": "sha256:75a0d411cfc4d27fa0dfcd0c723f2fa08ad97a3c4d2d71b704c9f4bcfc492cfe",
+      "indexDigest": "sha256:aea72229164f1ebf18aa66abb3b3b688e7ea011598b785ed600732978cd18fe6",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:582f0b4854d7806adfd9f454b4a98717c420c3b12f4075058cc503e2448074fb"
+          "digest": "sha256:9da4ce82c7f8d61f9d32c7a8e11dc65d577cb62d61ea0451ccba6f4b69458278"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:e92314e139fbbedb540b6aa2fab61163753cc3766867e4af864e5d71630c8cac"
+          "digest": "sha256:5dbe60f9741ccf38cff4b91f93692dded6c6eed67ece16f5094998ba84ae0084"
         }
       ]
     },
@@ -363,15 +363,15 @@
       "kind": "core",
       "repository": "linuxserver/plex",
       "tag": "latest",
-      "indexDigest": "sha256:507713a14f9586f827d00c81381ecdcd438009172342b322b62a0e2b65081fdf",
+      "indexDigest": "sha256:0c2f1122a4275efeea953a9882359f3809b27279d3c3022392e8e610a2eccc67",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:e2de8b6305fd59fcb4a2fe38c84d7b6089a74afbe1f80e495d9ad6d1f6b407c7"
+          "digest": "sha256:2babffe6d5fdffb9ddbbdd7d5f76ad0af9571ab1f526f7df2264eacb28e13c2e"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:e6deac9660447bd6f8d2aa707a85d1a6c05b04327e79743e7739a7b4d91699a3"
+          "digest": "sha256:907ec382b1326efc3af8eccff3c4fa8f62d0514404f37cd9667243dbcc0f9735"
         }
       ]
     },
@@ -380,15 +380,15 @@
       "kind": "addon",
       "repository": "ghcr.io/dictionarry-hub/profilarr",
       "tag": "latest",
-      "indexDigest": "sha256:7a9b5112ff227320d17c65ab643a5d875713e6235991ef04a8e482ec51427902",
+      "indexDigest": "sha256:352e42dec74ecfd68d13bb198fbc6d9346e3a8c55003026e1814e59319a2176d",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:26816532c8351c9029c97ebcb7c97e3f6efb76d426b48e8e5ca92093b7fbd1a8"
+          "digest": "sha256:0a735eb2b901a8a177cd07992cab5b01caa1a74a41d03aa9d30261c13cd158d4"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:37589d7f1475ae50ef3a82b382a018ecd9d184816ff0d839fc106060cc0239f7"
+          "digest": "sha256:d1ca99749891769287f348ffca41466273567b8e66543b41d5a3fce2a338561f"
         }
       ]
     },
@@ -397,15 +397,15 @@
       "kind": "addon",
       "repository": "linuxserver/prowlarr",
       "tag": "latest",
-      "indexDigest": "sha256:2f3d31307beba3ba2dd226d191f5f5c14ee3b4d8b49277c64683f5ed97083179",
+      "indexDigest": "sha256:04be30163fbaf48d6aeee7b5893c9f6614ffbad6d853971df0d6dcdf01c7f104",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:6380cfdb5f42c5faf36898973220c39b34143879becc37dc3ce6fee0662725d9"
+          "digest": "sha256:31cb2def3155509d3e1720a59afbe83ea2f3dbe96121d5b3ef24892385bd11c6"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:800f7bfec82017a53b36bf5a618f075fcc4e324ef1ec31ffcfc71b18c1601475"
+          "digest": "sha256:7b3a2b8580f7aaeef2fed00946e903b2ac4897a1737e5eca4e78c773c5c63f7a"
         }
       ]
     },
@@ -414,15 +414,15 @@
       "kind": "addon",
       "repository": "lscr.io/linuxserver/pyload-ng",
       "tag": "latest",
-      "indexDigest": "sha256:1027d179918098b4b870b7886c44139a6dd40f8aa3f99f8e6c382d47c1ccc261",
+      "indexDigest": "sha256:8505c2a9b6ef6dafb7e57daa91d896b8bb11f3a396c939a7dc6c47533b89ec79",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:586bd6058de924eaf255a7852a9948cca5c5cec0a3046e3f5f11cd558f4fe4b5"
+          "digest": "sha256:32f1153b33593ac4c5bb024f6c0cbb44e00b941c8f5105a37e910bdac869c71e"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:043a752b461be7c7eabd67acbf72a0f276df84aa1bc8489c0512b35da1820012"
+          "digest": "sha256:7f9a40e2476b84399060eac01a3c3303f4424a80856acc292e98ee8dd4817625"
         }
       ]
     },
@@ -431,15 +431,15 @@
       "kind": "addon",
       "repository": "ghcr.io/stuffanthings/qbit_manage",
       "tag": "latest",
-      "indexDigest": "sha256:d888d415075dc6fb6843f77465c6eb5688e6d78f15d7bd6a00da1cdd99a92120",
+      "indexDigest": "sha256:0153204c727b8cd219c87cd22d5e5833e392436923577455e3c84ceb73835c7d",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:1fa4ff13712077049ab987b602ea93596328c8e3c8ad1a45924c012c8858e42c"
+          "digest": "sha256:61e65a469aa96a2161b94d7f5fb1b852e4f8797e08249d85574b7582b2a0e750"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:9796ed6581f5812365fb81c8f6b63550c6f591a07788569b80af22ae4580c940"
+          "digest": "sha256:e2707894e56021c9baab61a2d8e68cecf621325ae3a240663137256993d3ffad"
         }
       ]
     },
@@ -448,15 +448,15 @@
       "kind": "core",
       "repository": "linuxserver/qbittorrent",
       "tag": "latest",
-      "indexDigest": "sha256:b024436f8ca665d16d9a997d26fd27fdf867ee5566ba09f32764e7b2976d3e02",
+      "indexDigest": "sha256:05c1454f9a32967affc1f34f67f8cc0cc57dd805dca45489fe797095a6286556",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:1a4641fa759dee784708ed277ece10adbbc5810ebb8bb9fdfe1cf00031f5ab2b"
+          "digest": "sha256:53b6b44f1c99fae7c823cf2cebebe75372f8080c95a31269491cc2672b474957"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:fe3cb06fa08f7906028dc274687285fd99032ad25aca3b2871900cd37f62e2b7"
+          "digest": "sha256:9f29881c9b20817bc3138db4e7efbc59ee038c934450aadc18b12e387f5de584"
         }
       ]
     },
@@ -465,15 +465,15 @@
       "kind": "addon",
       "repository": "ghcr.io/autobrr/qui",
       "tag": "latest",
-      "indexDigest": "sha256:c1531b69a116b2572f69c76e6e02990b20ca04ef6550c883009df9ebcade1aba",
+      "indexDigest": "sha256:a5b2f5faf6388cce257137c88e4b189458fd799cf9119ed476c980e5a69341b2",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:5db2755cc9e5a8af53746ab54104bfd1421f3ab4e6f73d263655237bb11a85b3"
+          "digest": "sha256:492dc25fbd565c1d8110f714bf0a45aab0dc01f42d50b78918174c0f055978ad"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:26f1e77b762c42ed587ee1bc07fb532a06ebecbe86a778463654baab589b51e9"
+          "digest": "sha256:193550854e325e5c8bc76f5000d68409f4e3e0bba99016344ed75c75f8baaf12"
         }
       ]
     },
@@ -482,15 +482,15 @@
       "kind": "addon",
       "repository": "linuxserver/radarr",
       "tag": "latest",
-      "indexDigest": "sha256:e35056574cdc695a9ee745aa1ecda9eab3842450bf4b7b8471b023790fa3861d",
+      "indexDigest": "sha256:ade5937813c6ae415b29db729386e53fea3ecf067a019849bafbe2d2a6ec02ba",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:3ded1c07339bdb99607a9e16b9bc2b135ef5359ea129a01d61fa744f3d9032d7"
+          "digest": "sha256:6c8e1bca60c0100ebff5fef5c98d4a72255786b98ce4700440b4d2c52dad37d3"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:4bdcd773543ebef7147c17a870db02c406c83ab546d33b0a448ef3d6784f3ef4"
+          "digest": "sha256:695d7b0a315dc2ab40b4b6d3852f64a51ba86045836e3b0dba620a131989bf5e"
         }
       ]
     },
@@ -498,16 +498,16 @@
       "service": "recyclarr",
       "kind": "addon",
       "repository": "ghcr.io/recyclarr/recyclarr",
-      "tag": "latest",
-      "indexDigest": "sha256:55afe316d3e4e4e3b9120cef7c79436b1b5311f6a18d4ef4b7653e720499c90a",
+      "tag": "8.8.1",
+      "indexDigest": "sha256:3e9c41b9ec29bbf65fe846864058730d321a21f7695d8c0d9437b73e34d50ad9",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:bd0254f1bcc7c08947c5297b012c832bda58ebd39a366a6078ede7ef1969e3da"
+          "digest": "sha256:1a8370c4e830ee3b46709225cc888013e20f667c6bc87593fd58ecfbf149afbf"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:fcdf5f689f8a8db895106dfe97a8842646f2a7113d7dbf0fe7bbec484d12a7ea"
+          "digest": "sha256:58bd04c0af2da8b9ed00027fd01b5464f89b1349df71a86b849d0633cdc5ff71"
         }
       ]
     },
@@ -516,15 +516,15 @@
       "kind": "addon",
       "repository": "linuxserver/sabnzbd",
       "tag": "latest",
-      "indexDigest": "sha256:302be8972d4627222a0701634f2f9025826d760d856414aa6e67c0a66833e5be",
+      "indexDigest": "sha256:a7cfba459929f73b83c98b476a845076dc72524af80b24fcb4200684e6b1b675",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:f9e35bb39bcaaf51295a90453eb58f90f8416b511d178db0bd2b1720fe40cb27"
+          "digest": "sha256:2b69019ef0b01bcdb9fb5d6641516bd57cb73b8f98b1a34f61ab749c5ea63376"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:a3a91b72d939de028f3658b3162c27a65f78b2b3c2327d8746231edb9f33d7b7"
+          "digest": "sha256:781c712c26735aa02eaa5414665a5160037a9787bb625fae975a53f31a68cc68"
         }
       ]
     },
@@ -533,15 +533,15 @@
       "kind": "addon",
       "repository": "ghcr.io/seerr-team/seerr",
       "tag": "latest",
-      "indexDigest": "sha256:f4768de5f616248d723e05891f3345a1402123775d03bf0890dbfedc0831bda1",
+      "indexDigest": "sha256:d8fab675b55ad293ded98fd71efcfd46054cbad9746534ae1cc4794a88c0b3be",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:b21cf91bb7a10d70446e104e7b7b9c9c386aa22beeac535a3271cbfc5843d142"
+          "digest": "sha256:2636191726a315dbd75228537f7be74b2fa7498998bb22e37b5b5c8756018fba"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:d62cf12dadc38f11095dbe13762ab2b908874d7ff51f080bd6f0f697867d22bf"
+          "digest": "sha256:fa923742add388260962c4724a8205affda065b617a7742d1b0fbcfc52a77d48"
         }
       ]
     },
@@ -550,15 +550,15 @@
       "kind": "addon",
       "repository": "linuxserver/sonarr",
       "tag": "latest",
-      "indexDigest": "sha256:24acea2956a0ccb11f103877d9f4f8576600fb34bff34820ed749c2256dab89f",
+      "indexDigest": "sha256:386c962ee6e260e3a5656b25df2ed056bcc9b6410e197d075f9547fd14c23bca",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:f6bf16c4c5a0c6c99833eab891671ded0f06f553f30c7b0702e98f455c5642cc"
+          "digest": "sha256:ee40ad01f650ef45d07b07eb149258104fbd07c23f6300eb9ab07227e536704f"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:644dc9f66266431457d6c78d39604b97dccc05ab41f41f0c60d4b1a4c8519708"
+          "digest": "sha256:ccf2b6e26f9d10708ba426ee1e8b4d95f072fa6d23174e1e9e90fdb2a248d0fa"
         }
       ]
     },
@@ -567,15 +567,15 @@
       "kind": "addon",
       "repository": "stashapp/stash",
       "tag": "latest",
-      "indexDigest": "sha256:df744af5a0c976e2ec671052ecc1f8a9aa757fa12b8f9930b59910b7295f0da6",
+      "indexDigest": "sha256:1099ffd7cc53f165916a07644874448011308a46eadbcd4edd328786e59b5eb9",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:736e7cd8f61c815c08fd3048792982a61e619735bb1808cd279f0f2fa857c4b0"
+          "digest": "sha256:989f4aaf71b91a45cae75c502e52104739cd9a503db17b185d6cdeff30cc321a"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:cb368067ac6fcf895979adb7b4f96f45ab0048679ff1d6f0a31011b1a2750bac"
+          "digest": "sha256:5e1cfea3ba98a47c6a331bbf33e8975fe57af1d0687c4177ca365c91a8e286f9"
         }
       ]
     },
@@ -584,15 +584,15 @@
       "kind": "addon",
       "repository": "linuxserver/tautulli",
       "tag": "latest",
-      "indexDigest": "sha256:f0c3e7228c84ad0539f9d5aa9f56c79ef19f6c8d0ad61199d803d32a7b0e080b",
+      "indexDigest": "sha256:529c7eabcc40554c1dc48f33f1f3cc3b1438462d73e0ec2dac8ac0b66aeeb8d4",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:f9f7126b2b29f7376179cbfe6468f9e5a046d47e4ab24d02f02db4ebdbbfaf2f"
+          "digest": "sha256:fbd7c3b3e0facd104999920c17aec0b583854635a33aae8d43d53d32bf6805b0"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:d0253a4ffddb9bac77aa954353224bfe102240ad088165489b627d41a42f4d50"
+          "digest": "sha256:030252963d8133d5f2a8db4339e6a354d3b630a9321d8fb3d2807b1639ba1640"
         }
       ]
     },
@@ -601,15 +601,15 @@
       "kind": "addon",
       "repository": "ghcr.io/haveagitgat/tdarr",
       "tag": "latest",
-      "indexDigest": "sha256:eaeb1b39242685915b50f299a89f15e8ec4ef47f54d4b5b5ceee7e9d2a81c412",
+      "indexDigest": "sha256:0880fd036a4ac6ef8a2fef2a7b8ddedf5d0898c9ee1a495580356dc922f54d62",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:fd46b1419a99978d58edd0c955f899fd8a7d3dbaa678c2da30f6cd80e6d57ad9"
+          "digest": "sha256:6086d5188815958603c81052739aa8fa0a26f392dc5d41c71058e6d7d33c4dbd"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:7a2f1a343ba8dd0dd43cbd69592a8e7fadf63cd2355f10a660ea77ef195e3b02"
+          "digest": "sha256:e6ee10f019125e652a25475f50cd587c19c2b0e5ed34147abbab3e5d7c916be0"
         }
       ]
     },
@@ -617,16 +617,16 @@
       "service": "traefik",
       "kind": "core",
       "repository": "traefik",
-      "tag": "v3.7.10",
-      "indexDigest": "sha256:9c3b91d5fb7770853ca5c1124a23c34bf2d9b47ffaebeab2614cbaf410dcb2ac",
+      "tag": "v3.7.17",
+      "indexDigest": "sha256:68ae5fe5b64ca166704b746a9e8afcd385e36b3f569a5691401bf652d57b3748",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:0ae6898c4a6ad568e8eabad0839b1660eb54a72aa43089ead05c6f624f866b23"
+          "digest": "sha256:c999a937a1bb51ba36c79adf2c9db1d1bb196896b66d524d30ef4945606d565f"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:8f34ac785161ddfe26f4e291982967e92962c126120526a519c4cff521179436"
+          "digest": "sha256:bde69ad80e54ac1acc94097a7327ab95e953139feedc96dbd75fc6c281d3ee7c"
         }
       ]
     },
@@ -635,15 +635,15 @@
       "kind": "addon",
       "repository": "ghcr.io/unpackerr/unpackerr",
       "tag": "latest",
-      "indexDigest": "sha256:89e13608521ece21dd300c39229fd595a55fbf4b8152771af5670a7455b5c747",
+      "indexDigest": "sha256:22b4693fbeaae4bd927905d63b59b8f67b4a1446682d965ac876c61a48976658",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:bf54c00dd0579a00bd0023839259f6db121b997544ffa7755f244bdf5ec338bf"
+          "digest": "sha256:13ca1fe4fed336464958698e64f6c3eab38f53280db48a8bddffb2b0f98e6544"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:5f0339c80a257ab69e7c249983efc957d03ddc7c0623a009c0c66707a3effe24"
+          "digest": "sha256:ea65d2e4a7253736b8fa4e9bc24f5a89b30b33ff9cfc4fa3a6c09012d84e35d4"
         }
       ]
     },
@@ -652,15 +652,15 @@
       "kind": "addon",
       "repository": "ghcr.io/hotio/whisparr",
       "tag": "v3",
-      "indexDigest": "sha256:93db4f70e19bb8f8dfa8860f8ef6b3bc3102e21089764d1e3cdbc04b6c901714",
+      "indexDigest": "sha256:5fb39f643946bc3872b105988ba81679318cc534431eafb44d8e24f8fdaa864e",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:6e2e7072a718fc850686ead3695971c1afc3e43fd7d46d95fd653d12e86e5584"
+          "digest": "sha256:215bae5e7b56e915317efb6f4503eb88ab9edb41df65e9f051118c15984252d5"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:652e3d28afe342bf5e87631302052bcce7b624251b13ad12401d93edbd009650"
+          "digest": "sha256:79758b846f6800d10d28c277519a4d203e39c1db70932679cf20731f3d258e09"
         }
       ]
     },
@@ -669,15 +669,15 @@
       "kind": "addon",
       "repository": "ghcr.io/wizarrrr/wizarr",
       "tag": "latest",
-      "indexDigest": "sha256:606f9b88b0303daae11f595e424756b588d9365021c53dcb4d1369f2efc0543c",
+      "indexDigest": "sha256:08f2c6de534ec7d36d39a4f55b7c5c379021ca881dc519c702aad0ddafbdc67a",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:be7087954f92badb16248073a347aadc771577a98c9c0c16b4cc010b143bbf50"
+          "digest": "sha256:5e1b78572088a4b79dc784aa4847f82a0387b5d5538ecd16d3af49bf5b5bb4b2"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:bc0ffc9e4cabd6081db26733281e606001290d55f7fcfb33abf66a07f6399d58"
+          "digest": "sha256:c5691ecd2f41a02cd2792c3550626e2531ec9385dee4e836ed9dbedc7b9c1dc9"
         }
       ]
     }

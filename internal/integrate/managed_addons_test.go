@@ -229,6 +229,12 @@ func TestQuiRotatesCredentialAndRepairsManagedInstance(t *testing.T) {
 	passwordChanges := 0
 	instanceUpdates := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet && r.URL.Path != "/api/auth/login" {
+			if _, err := r.Cookie("user_session"); err != nil || r.Header.Get("X-Requested-With") == "" {
+				http.Error(w, "authenticated writes require the request header", http.StatusForbidden)
+				return
+			}
+		}
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/auth/check-setup":
 			_ = json.NewEncoder(w).Encode(quiSetupState{SetupRequired: false})
@@ -494,5 +500,71 @@ func TestWizarrRestoresPreviousCredentialAfterFailedRotation(t *testing.T) {
 	stored, err := sdbxsecrets.ReadSecret(project.SecretsPath, "wizarr_admin_password.txt")
 	if err != nil || stored != previous {
 		t.Fatalf("previous secret was not restored: err=%v", err)
+	}
+}
+
+func TestMaintainerrDownloadClientUsesRequiredClientType(t *testing.T) {
+	for _, test := range []struct {
+		name       string
+		legacy     bool
+		clientType any
+		wantSaves  int
+	}{
+		{name: "configured", clientType: "qbittorrent"},
+		{name: "unconfigured", clientType: nil, wantSaves: 1},
+		{name: "other-client", clientType: "transmission", wantSaves: 1},
+		{name: "legacy", legacy: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			saves := 0
+			clientType := test.clientType
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch {
+				case r.Method == http.MethodGet && r.URL.Path == "/api/settings/download-client":
+					settings := map[string]any{
+						"download_client_url": "http://sdbx-gluetun:8080", "download_client_username": "admin",
+						"download_client_password": "current-qbt", "download_client_delete_data": false,
+						"download_client_fallback_ratio": 1.0,
+					}
+					if !test.legacy {
+						settings["download_client_type"] = clientType
+					}
+					_ = json.NewEncoder(w).Encode(settings)
+				case r.Method == http.MethodPost && (r.URL.Path == "/api/settings/test/download-client" || r.URL.Path == "/api/settings/download-client"):
+					var body map[string]any
+					if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+						t.Fatal(err)
+					}
+					if body["download_client_type"] != "qbittorrent" || body["download_client_delete_data"] != false {
+						http.Error(w, "invalid download client contract", http.StatusBadRequest)
+						return
+					}
+					if r.URL.Path == "/api/settings/download-client" {
+						saves++
+						clientType = "qbittorrent"
+					}
+					_ = json.NewEncoder(w).Encode(maintainerrResult{Status: "OK", Code: 1})
+				default:
+					http.NotFound(w, r)
+				}
+			}))
+			defer server.Close()
+			cfg := DefaultConfig()
+			cfg.Timeout, cfg.RetryAttempts = time.Second, 0
+			cfg.Services = map[string]*ServiceConfig{
+				"qbittorrent": {Name: "qbittorrent", URL: "http://sdbx-gluetun:8080", APIKey: "current-qbt", Enabled: true},
+			}
+			integrator := NewIntegrator(cfg)
+			client := newMaintainerrClient(integrator.httpClient, &ServiceConfig{URL: server.URL})
+			for range 2 {
+				result := integrator.integrateMaintainerrDownloadClient(context.Background(), client)
+				if !result.Success {
+					t.Fatalf("integration failed: %v", result.Error)
+				}
+			}
+			if saves != test.wantSaves {
+				t.Fatalf("save count = %d, want %d", saves, test.wantSaves)
+			}
+		})
 	}
 }

@@ -46,10 +46,10 @@ func runOpen(command *cobra.Command, args []string) error {
 	routes, aliases := graphOpenRoutes(verified)
 
 	if len(args) == 0 {
-		fmt.Println(tui.TitleStyle.Render("SDBX Service URLs"))
+		fmt.Println(tui.Render(tui.TitleStyle, "SDBX Service URLs"))
 		fmt.Println()
 		if len(routes) == 0 {
-			fmt.Println(tui.MutedStyle.Render("The active locked graph has no routed services."))
+			fmt.Println(tui.Render(tui.MutedStyle, "The active locked graph has no routed services."))
 			return nil
 		}
 		for _, route := range routes {

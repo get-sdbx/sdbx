@@ -11,12 +11,12 @@ Image tags below are update-discovery inputs. Official first-run locks use the r
 | Service | Category | Activation | Launcher | Route auth | Application auth | Image input | Description |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | [`authelia`](https://www.authelia.com) | `auth` | Always | `Hidden` | `public` | `identity-provider` | `authelia/authelia:latest` | Single Sign-On Multi-Factor portal |
-| [`cloudflared`](https://www.cloudflare.com/products/tunnel/) | `networking` | When cloudflared | `Hidden` | `Not routed` | `none` | `cloudflare/cloudflared:2026.7.3` | Remote-managed Cloudflare Tunnel connector |
+| [`cloudflared`](https://www.cloudflare.com/products/tunnel/) | `networking` | When cloudflared | `Hidden` | `Not routed` | `none` | `cloudflare/cloudflared:2026.10.7` | Remote-managed Cloudflare Tunnel connector |
 | [`gluetun`](https://github.com/qdm12/gluetun) | `networking` | When vpn_enabled | `Hidden` | `Not routed` | `none` | `qmcgaw/gluetun:latest` | VPN client with kill switch for Docker containers |
 | [`jellyfin`](https://jellyfin.org) | `media` | When jellyfin_enabled | `media` | `native-auth` | `service-managed` | `linuxserver/jellyfin:latest` | Open-source media server (Plex alternative) |
 | [`plex`](https://www.plex.tv) | `media` | When plex_enabled | `media` | `native-auth` | `service-managed` | `linuxserver/plex:latest` | Media server for streaming movies, TV, and music |
 | [`qbittorrent`](https://www.qbittorrent.org) | `downloads` | Always | `downloads` | `admin-only` | `sdbx-managed-password` | `linuxserver/qbittorrent:latest` | Free and open-source BitTorrent client |
-| [`traefik`](https://traefik.io) | `networking` | Always | `Hidden` | `Not routed` | `none` | `traefik:v3.7.10` | Modern HTTP reverse proxy and load balancer |
+| [`traefik`](https://traefik.io) | `networking` | Always | `Hidden` | `Not routed` | `none` | `traefik:v3.7.17` | Modern HTTP reverse proxy and load balancer |
 
 ## Addons
 
@@ -45,7 +45,7 @@ Image tags below are update-discovery inputs. Official first-run locks use the r
 | [`qbit-manage`](https://github.com/StuffAnThings/qbit_manage) | `downloads` | Explicit addon or preset | `downloads` | `admin-only` | `none` | `ghcr.io/stuffanthings/qbit_manage:latest` | Scheduled qBittorrent tagging, cleanup, and data management |
 | [`qui`](https://getqui.com) | `downloads` | Explicit addon or preset | `downloads` | `admin-only` | `none` | `ghcr.io/autobrr/qui:latest` | Modern multi-instance qBittorrent Web UI and workflow engine |
 | [`radarr`](https://radarr.video) | `media` | Explicit addon or preset | `media` | `admin-only` | `sdbx-managed-forms` | `linuxserver/radarr:latest` | Movie collection automation and management |
-| [`recyclarr`](https://recyclarr.dev) | `utility` | Explicit addon or preset | `Hidden` | `Not routed` | `none` | `ghcr.io/recyclarr/recyclarr:latest` | Scheduled quality-profile synchronization for Sonarr and Radarr |
+| [`recyclarr`](https://recyclarr.dev) | `utility` | Explicit addon or preset | `Hidden` | `Not routed` | `none` | `ghcr.io/recyclarr/recyclarr:8.8.1` | Scheduled quality-profile synchronization for Sonarr and Radarr |
 | [`sabnzbd`](https://sabnzbd.org) | `downloads` | Explicit addon or preset | `downloads` | `admin-only` | `none` | `linuxserver/sabnzbd:latest` | Usenet binary downloader with complete and incomplete queues |
 | [`seerr`](https://seerr.dev) | `media` | Explicit addon or preset | `media` | `native-auth` | `service-managed` | `ghcr.io/seerr-team/seerr:latest` | Media request and discovery portal for Plex and Jellyfin |
 | [`sonarr`](https://sonarr.tv) | `media` | Explicit addon or preset | `media` | `admin-only` | `sdbx-managed-forms` | `linuxserver/sonarr:latest` | TV Shows automation and management |

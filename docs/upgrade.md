@@ -20,6 +20,17 @@ SDBX separates changes that have different rollback boundaries:
 No SDBX command can guarantee rollback of an upstream application's database
 schema. Preserve application-consistent state separately.
 
+The current maintenance candidate updates Go to 1.27.3, Traefik to 3.7.17,
+Cloudflared to 2026.10.7, and the reviewed catalog image digests. Recyclarr now
+uses its stable `8.8.1` tag because upstream no longer publishes `latest`.
+Review application upgrade guides before applying the new images, especially
+when crossing a major version such as Jellyfin 10 to 12.
+
+If the broker uses an OIDC issuer, check its published JWKS before upgrading:
+go-jose 4.1.8 rejects RSA keys larger than 4096 bits and private key material in
+token headers. Supported issuer keys, signature validation, issuer and audience
+checks remain required; do not relax these checks to accept a rejected key.
+
 ## Before any change
 
 Record and verify the baseline:

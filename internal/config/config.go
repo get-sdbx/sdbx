@@ -15,7 +15,7 @@ import (
 
 	"github.com/get-sdbx/sdbx/internal/securefs"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 const (

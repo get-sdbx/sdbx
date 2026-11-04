@@ -11,7 +11,7 @@ import (
 	"github.com/get-sdbx/sdbx/internal/config"
 	verifiedproject "github.com/get-sdbx/sdbx/internal/project"
 	"github.com/get-sdbx/sdbx/internal/registry"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 // RestoreHooks returns the transactional state-restore policy. Project intent,

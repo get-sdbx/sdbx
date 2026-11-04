@@ -821,3 +821,68 @@ func TestApplyFailureCanRollBackPreviouslyPromotedFile(t *testing.T) {
 		t.Fatalf("rolled-back mode = %o, want 600", info.Mode().Perm())
 	}
 }
+
+func TestGenerateRuntimeTransactionalPreservesArrStateWithoutActiveGraph(t *testing.T) {
+	for _, external := range []bool{false, true} {
+		for _, stale := range []bool{false, true} {
+			t.Run(fmt.Sprintf("external=%t/stale=%t", external, stale), func(t *testing.T) {
+				projectDir := t.TempDir()
+				cfg, reg, _ := transactionFixture(t, projectDir)
+				configRoot := filepath.Join(projectDir, "configs")
+				if external {
+					managedRoot := t.TempDir()
+					configRoot = filepath.Join(managedRoot, "configs")
+					cfg.ConfigPath = configRoot
+					cfg.SecretsPath = filepath.Join(managedRoot, "secrets")
+				}
+				cfg.Addons = []string{"sonarr", "radarr", "prowlarr", "lidarr", "unpackerr"}
+				lock, _, err := reg.GenerateLockFileWithOptions(context.Background(), cfg, registry.LockOptions{
+					CLIVersion: "v1.0.0", ImageResolver: transactionImageResolver{},
+				})
+				if err != nil {
+					t.Fatal(err)
+				}
+				if stale {
+					cfg.ActiveServices = map[string]bool{"unrelated-service": true}
+				} else {
+					cfg.ActiveServices = nil // A config freshly loaded by a new CLI process.
+				}
+				original := make(map[string]string)
+				keys := make(map[string]string)
+				for _, name := range []string{"sonarr", "radarr", "prowlarr", "lidarr"} {
+					keys[name] = strings.TrimPrefix(transactionDigest(name), "sha256:")[:32]
+					original[name] = fmt.Sprintf("<Config>\n  <ApiKey>%s</ApiKey>\n  <AuthenticationMethod>Forms</AuthenticationMethod>\n  <AuthenticationRequired>Enabled</AuthenticationRequired>\n  <InstanceName>existing-%s</InstanceName>\n</Config>\n", keys[name], name)
+					path := filepath.Join(configRoot, name, "config.xml")
+					if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+						t.Fatal(err)
+					}
+					if err := os.WriteFile(path, []byte(original[name]), 0o600); err != nil {
+						t.Fatal(err)
+					}
+				}
+				if err := GenerateProjectTransactional(cfg, projectDir, reg, lock, "v1.0.0", ProjectTransactionOptions{RuntimeOnly: true}); err != nil {
+					t.Fatal(err)
+				}
+				for name, want := range original {
+					body, err := os.ReadFile(filepath.Join(configRoot, name, "config.xml"))
+					if err != nil {
+						t.Fatal(err)
+					}
+					if string(body) != want {
+						t.Errorf("%s application configuration was replaced", name)
+					}
+					if name != "prowlarr" {
+						secretsRoot := resolveTransactionRoot(projectDir, cfg.SecretsPath, "secrets")
+						copy, err := os.ReadFile(filepath.Join(secretsRoot, "unpackerr_"+name+"_api_key.txt"))
+						if err != nil {
+							t.Fatal(err)
+						}
+						if string(copy) != keys[name] {
+							t.Errorf("%s integration copy does not preserve the existing API key", name)
+						}
+					}
+				}
+			})
+		}
+	}
+}

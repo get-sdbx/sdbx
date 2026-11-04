@@ -32,7 +32,7 @@ if command -v grant >/dev/null 2>&1; then
     grant_command=(grant)
 elif command -v go >/dev/null 2>&1; then
     grant_command=(
-        go run github.com/anchore/grant/cmd/grant@v0.6.8
+        go run github.com/anchore/grant/cmd/grant@v0.7.0
     )
 else
     fail "Grant is unavailable and Go cannot run the pinned fallback"

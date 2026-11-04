@@ -21,7 +21,7 @@ permissions:
 spec:
   image:
     repository: cloudflare/cloudflared
-    tag: "2026.7.3"
+    tag: "2026.10.7"
     registry: docker.io
   container:
     name_template: "sdbx-{{ .Name }}"

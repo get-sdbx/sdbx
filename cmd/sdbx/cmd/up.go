@@ -73,7 +73,7 @@ func runUp(command *cobra.Command, _ []string) error {
 
 	compose := docker.NewCompose(projectDir)
 
-	fmt.Println(tui.InfoStyle.Render("Starting SDBX services..."))
+	fmt.Println(tui.Render(tui.InfoStyle, "Starting SDBX services..."))
 	fmt.Println()
 
 	// Start services
@@ -84,7 +84,7 @@ func runUp(command *cobra.Command, _ []string) error {
 
 	elapsed := time.Since(start)
 	fmt.Println()
-	fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ Services started in %s", elapsed.Round(time.Millisecond))))
+	fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ Services started in %s", elapsed.Round(time.Millisecond))))
 	fmt.Println()
 	fmt.Println("Run 'sdbx status' to view service health")
 	fmt.Println("Run 'sdbx doctor' to verify configuration")

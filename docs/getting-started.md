@@ -32,7 +32,7 @@ docker compose version
 docker buildx version
 ```
 
-When building from source, install Go 1.26.8 or newer and Make. Signed-release
+When building from source, install Go 1.27.3 or newer and Make. Signed-release
 installation additionally requires Cosign v3.
 
 ## 2. Install SDBX

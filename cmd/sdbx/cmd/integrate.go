@@ -249,12 +249,12 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 			)
 		}
 
-		fmt.Println(tui.WarningStyle.Render(
+		fmt.Println(tui.Render(tui.WarningStyle,
 			"⚠ No services with usable integration credentials were found",
 		))
 		fmt.Println()
-		fmt.Println(tui.MutedStyle.Render("Make sure services are enabled and running."))
-		fmt.Println(tui.MutedStyle.Render("Run 'sdbx up', then retry integration."))
+		fmt.Println(tui.Render(tui.MutedStyle, "Make sure services are enabled and running."))
+		fmt.Println(tui.Render(tui.MutedStyle, "Run 'sdbx up', then retry integration."))
 		return fmt.Errorf(
 			"no services with usable integration credentials were found",
 		)
@@ -291,11 +291,11 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 	integrator := integrate.NewIntegrator(cfg)
 
 	if !IsJSONOutput() {
-		fmt.Println(tui.TitleStyle.Render("Service Integration"))
+		fmt.Println(tui.Render(tui.TitleStyle, "Service Integration"))
 		fmt.Println()
 
 		if integrateDryRun {
-			fmt.Println(tui.WarningStyle.Render("🔍 DRY RUN MODE - No changes will be made"))
+			fmt.Println(tui.Render(tui.WarningStyle, "🔍 DRY RUN MODE - No changes will be made"))
 			fmt.Println()
 		}
 
@@ -304,7 +304,7 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 		}
 
 		// Show services with credentials ready for API-driven phases.
-		fmt.Println(tui.MutedStyle.Render("Services with API credentials detected:"))
+		fmt.Println(tui.Render(tui.MutedStyle, "Services with API credentials detected:"))
 		names := sortedIntegrationServiceNames(services)
 		if len(names) == 0 {
 			fmt.Println("  • none")
@@ -316,7 +316,7 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 		fmt.Println()
 
 		if !integrateDryRun {
-			fmt.Println(tui.MutedStyle.Render("Waiting for services to be ready..."))
+			fmt.Println(tui.Render(tui.MutedStyle, "Waiting for services to be ready..."))
 			fmt.Println()
 		}
 	}
@@ -392,17 +392,17 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 	}
 
 	// Human-readable output
-	fmt.Println(tui.TitleStyle.Render("Integration Results"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Integration Results"))
 	fmt.Println()
 
 	successCount := 0
 	if len(results) == 0 {
-		fmt.Println(tui.MutedStyle.Render(
+		fmt.Println(tui.Render(tui.MutedStyle,
 			"No API integrations are ready; local initialization actions are previewed above.",
 		))
 	} else {
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-		fmt.Fprintln(w, tui.TableHeaderStyle.Render("INTEGRATION")+"\t"+tui.TableHeaderStyle.Render("STATUS")+"\t"+tui.TableHeaderStyle.Render("MESSAGE"))
+		fmt.Fprintln(w, tui.Render(tui.TableHeaderStyle, "INTEGRATION")+"\t"+tui.Render(tui.TableHeaderStyle, "STATUS")+"\t"+tui.Render(tui.TableHeaderStyle, "MESSAGE"))
 
 		for _, result := range results {
 			if result.Success {
@@ -417,9 +417,7 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 			}
 
 			fmt.Fprintf(w, "%s\t%s\t%s\n",
-				redactCLIError(result.Service),
-				statusStyle.Render(status),
-				redactCLIError(result.Message),
+				redactCLIError(result.Service), tui.Render(statusStyle, status), redactCLIError(result.Message),
 			)
 		}
 		if err := w.Flush(); err != nil {
@@ -431,17 +429,17 @@ func runIntegrate(command *cobra.Command, _ []string) (runErr error) {
 
 	// Summary
 	if len(results) == 0 {
-		fmt.Println(tui.SuccessStyle.Render("✓ Local initialization preview completed"))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ Local initialization preview completed"))
 	} else if successCount == len(results) {
-		fmt.Println(tui.SuccessStyle.Render(fmt.Sprintf("✓ All %d integrations completed successfully", len(results))))
+		fmt.Println(tui.Render(tui.SuccessStyle, fmt.Sprintf("✓ All %d integrations completed successfully", len(results))))
 	} else {
 		failCount := len(results) - successCount
-		fmt.Println(tui.WarningStyle.Render(fmt.Sprintf("⚠ %d succeeded, %d failed", successCount, failCount)))
+		fmt.Println(tui.Render(tui.WarningStyle, fmt.Sprintf("⚠ %d succeeded, %d failed", successCount, failCount)))
 	}
 
 	if integrateDryRun {
 		fmt.Println()
-		fmt.Println(tui.MutedStyle.Render("This was a dry run. Run without --dry-run to apply changes."))
+		fmt.Println(tui.Render(tui.MutedStyle, "This was a dry run. Run without --dry-run to apply changes."))
 	}
 
 	if successCount != len(results) {
@@ -551,7 +549,7 @@ func printHostInitializationPreview(initialization map[string]any) {
 	if len(initialization) == 0 {
 		return
 	}
-	fmt.Println(tui.MutedStyle.Render("Local initialization preview:"))
+	fmt.Println(tui.Render(tui.MutedStyle, "Local initialization preview:"))
 	names := make([]string, 0, len(initialization))
 	for name := range initialization {
 		names = append(names, name)
@@ -617,14 +615,14 @@ func reportQBTInit(res *integrate.QBTInitResult) {
 	}
 	switch res.Action {
 	case "stamped", "rotated":
-		fmt.Println(tui.SuccessStyle.Render("✓ qBittorrent initialised"))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ qBittorrent initialised"))
 		fmt.Printf("  • permanent admin password set (run `sdbx secrets show qbittorrent --confirm reveal`)\n")
 	case "skipped-already-init":
 		// silent — already done
 	case "skipped-not-enabled":
 		// silent — qBT not in this stack
 	case "skipped-no-conf":
-		fmt.Println(tui.WarningStyle.Render("⚠ qBittorrent post-init deferred"))
+		fmt.Println(tui.Render(tui.WarningStyle, "⚠ qBittorrent post-init deferred"))
 		fmt.Printf("  %s\n", redactCLIError(res.Reason))
 	}
 }
@@ -635,12 +633,12 @@ func reportFBInit(res *integrate.FBInitResult) {
 	}
 	switch res.Action {
 	case "stamped", "rotated":
-		fmt.Println(tui.SuccessStyle.Render("✓ filebrowser initialised"))
+		fmt.Println(tui.Render(tui.SuccessStyle, "✓ filebrowser initialised"))
 		fmt.Printf("  • permanent admin password set (run `sdbx secrets show filebrowser --confirm reveal`)\n")
 	case "skipped-already-init", "skipped-not-enabled":
 		// silent
 	case "skipped-not-running":
-		fmt.Println(tui.WarningStyle.Render("⚠ filebrowser post-init deferred"))
+		fmt.Println(tui.Render(tui.WarningStyle, "⚠ filebrowser post-init deferred"))
 		fmt.Printf("  %s\n", redactCLIError(res.Reason))
 	}
 }

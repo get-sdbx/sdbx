@@ -52,7 +52,7 @@ func runGenerate(command *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to commit runtime transaction: %w", err)
 	}
 
-	fmt.Println(tui.SuccessStyle.Render("✓ Runtime files regenerated"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "✓ Runtime files regenerated"))
 	return nil
 }
 

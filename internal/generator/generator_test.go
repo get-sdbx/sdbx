@@ -11,7 +11,7 @@ import (
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/integrate"
 	"github.com/get-sdbx/sdbx/internal/registry"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 func newTestGenerator(t *testing.T, cfg *config.Config, outputDir string) *Generator {

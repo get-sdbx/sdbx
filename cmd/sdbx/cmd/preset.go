@@ -78,23 +78,20 @@ func runPresetList(_ *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	fmt.Println(tui.TitleStyle.Render("Recommended addon stacks"))
+	fmt.Println(tui.Render(tui.TitleStyle, "Recommended addon stacks"))
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render("Each preset bundles a coherent set of addons. Apply with `sdbx preset apply <name>`."))
+	fmt.Println(tui.Render(tui.MutedStyle, "Each preset bundles a coherent set of addons. Apply with `sdbx preset apply <name>`."))
 	fmt.Println()
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w,
-		tui.TableHeaderStyle.Render("NAME")+"\t"+
-			tui.TableHeaderStyle.Render("TITLE")+"\t"+
-			tui.TableHeaderStyle.Render("ADDONS"))
+	fmt.Fprintln(w, tui.Render(tui.TableHeaderStyle, "NAME")+"\t"+tui.Render(tui.TableHeaderStyle, "TITLE")+"\t"+tui.Render(tui.TableHeaderStyle, "ADDONS"))
 	for _, p := range col.Presets {
 		titleWithIcon := strings.TrimSpace(p.Icon + " " + p.Title)
 		fmt.Fprintf(w, "%s\t%s\t%d\n", p.Name, titleWithIcon, len(p.Addons))
 	}
 	_ = w.Flush()
 	fmt.Println()
-	fmt.Println(tui.MutedStyle.Render("Run `sdbx preset show <name>` for the full description + addon list."))
+	fmt.Println(tui.Render(tui.MutedStyle, "Run `sdbx preset show <name>` for the full description + addon list."))
 	return nil
 }
 
@@ -115,7 +112,7 @@ func runPresetShow(_ *cobra.Command, args []string) error {
 	}
 
 	header := strings.TrimSpace(p.Icon + " " + p.Title)
-	fmt.Println(tui.TitleStyle.Render(header))
+	fmt.Println(tui.Render(tui.TitleStyle, header))
 	fmt.Println()
 	fmt.Println(strings.TrimSpace(p.Description))
 	fmt.Println()
@@ -124,7 +121,7 @@ func runPresetShow(_ *cobra.Command, args []string) error {
 		fmt.Printf("  • %s\n", a)
 	}
 	fmt.Println()
-	fmt.Printf("Apply with: %s\n", tui.CommandStyle.Render("sdbx preset apply "+p.Name))
+	fmt.Printf("Apply with: %s\n", tui.Render(tui.CommandStyle, "sdbx preset apply "+p.Name))
 	return nil
 }
 
@@ -180,9 +177,9 @@ func runPresetApply(command *cobra.Command, args []string) error {
 
 	// Next-steps hint
 	fmt.Println()
-	fmt.Println(tui.SuccessStyle.Render("Next:"))
-	fmt.Printf("  %s %s    # start the new services\n", tui.IconArrow, tui.CommandStyle.Render("sdbx up"))
-	fmt.Printf("  %s %s   # wire service-to-service integrations\n", tui.IconArrow, tui.CommandStyle.Render("sdbx integrate"))
+	fmt.Println(tui.Render(tui.SuccessStyle, "Next:"))
+	fmt.Printf("  %s %s    # start the new services\n", tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx up"))
+	fmt.Printf("  %s %s   # wire service-to-service integrations\n", tui.IconArrow, tui.Render(tui.CommandStyle, "sdbx integrate"))
 	return nil
 }
 
@@ -191,23 +188,22 @@ func printBulkResults(p *presets.Preset, results []addons.BulkResult) {
 		return
 	}
 	header := strings.TrimSpace(p.Icon + " " + p.Title)
-	fmt.Println(tui.TitleStyle.Render("Applying preset: " + header))
+	fmt.Println(tui.Render(tui.TitleStyle, "Applying preset: "+header))
 	fmt.Println()
 	enabled, kept, missing := 0, 0, 0
 	for _, r := range results {
 		switch r.Action {
 		case "enabled":
-			fmt.Printf("  %s %s\n", tui.SuccessStyle.Render("✓ enabled"), r.Name)
+			fmt.Printf("  %s %s\n", tui.Render(tui.SuccessStyle, "✓ enabled"), r.Name)
 			enabled++
 		case "already-enabled":
-			fmt.Printf("  %s %s\n", tui.MutedStyle.Render("• kept (already enabled)"), r.Name)
+			fmt.Printf("  %s %s\n", tui.Render(tui.MutedStyle, "• kept (already enabled)"), r.Name)
 			kept++
 		case "missing-from-registry":
-			fmt.Printf("  %s %s %s\n", tui.WarningStyle.Render("⚠ missing"), r.Name, tui.MutedStyle.Render("(not in registry — run `sdbx source update`?)"))
+			fmt.Printf("  %s %s %s\n", tui.Render(tui.WarningStyle, "⚠ missing"), r.Name, tui.Render(tui.MutedStyle, "(not in registry — run `sdbx source update`?)"))
 			missing++
 		}
 	}
 	fmt.Println()
-	fmt.Printf("%s %d enabled, %d kept, %d missing\n",
-		tui.SuccessStyle.Render("✓"), enabled, kept, missing)
+	fmt.Printf("%s %d enabled, %d kept, %d missing\n", tui.Render(tui.SuccessStyle, "✓"), enabled, kept, missing)
 }

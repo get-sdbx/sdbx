@@ -11,7 +11,7 @@ import (
 	"github.com/get-sdbx/sdbx/internal/registry"
 	sdbxsecrets "github.com/get-sdbx/sdbx/internal/secrets"
 	"github.com/get-sdbx/sdbx/internal/securefs"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 const (

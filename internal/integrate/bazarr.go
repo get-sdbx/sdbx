@@ -12,7 +12,7 @@ import (
 
 	"github.com/get-sdbx/sdbx/internal/config"
 	"github.com/get-sdbx/sdbx/internal/securefs"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 const bazarrSettingsMaxSize = 1 << 20

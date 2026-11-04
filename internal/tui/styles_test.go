@@ -1,16 +1,18 @@
 package tui
 
 import (
+	"image/color"
 	"math"
-	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
+	"charm.land/lipgloss/v2/compat"
+	"github.com/charmbracelet/colorprofile"
 )
 
 func TestColorPalette(t *testing.T) {
-	colors := map[string]lipgloss.AdaptiveColor{
+	colors := map[string]compat.AdaptiveColor{
 		"ColorIdentity": ColorIdentity,
 		"ColorSignal":   ColorSignal,
 		"ColorBlue":     ColorBlue,
@@ -24,20 +26,24 @@ func TestColorPalette(t *testing.T) {
 		"ColorText":     ColorText,
 	}
 
-	for name, color := range colors {
-		for variant, value := range map[string]string{
-			"light": color.Light,
-			"dark":  color.Dark,
+	for name, paletteColor := range colors {
+		for variant, value := range map[string]color.Color{
+			"light": paletteColor.Light,
+			"dark":  paletteColor.Dark,
 		} {
-			if len(value) != 7 || !strings.HasPrefix(value, "#") {
-				t.Errorf("%s %s value %q is not a six-digit hex color", name, variant, value)
+			if value == nil {
+				t.Errorf("%s %s color is nil", name, variant)
+				continue
+			}
+			if _, _, _, alpha := value.RGBA(); alpha != 0xffff {
+				t.Errorf("%s %s color is not opaque", name, variant)
 			}
 		}
 	}
 }
 
 func TestAdaptiveTextColorsMeetWCAGContrast(t *testing.T) {
-	colors := map[string]lipgloss.AdaptiveColor{
+	colors := map[string]compat.AdaptiveColor{
 		"identity": ColorIdentity,
 		"signal":   ColorSignal,
 		"blue":     ColorBlue,
@@ -55,16 +61,16 @@ func TestAdaptiveTextColorsMeetWCAGContrast(t *testing.T) {
 	}
 
 	for name, color := range colors {
-		if ratio := contrastRatio(t, color.Light, "#FFFFFF"); ratio < 4.5 {
+		if ratio := contrastRatio(t, color.Light, lipgloss.Color("#FFFFFF")); ratio < 4.5 {
 			t.Errorf("%s light contrast = %.2f, want at least 4.5", name, ratio)
 		}
-		if ratio := contrastRatio(t, color.Dark, "#000000"); ratio < 4.5 {
+		if ratio := contrastRatio(t, color.Dark, lipgloss.Color("#000000")); ratio < 4.5 {
 			t.Errorf("%s dark contrast = %.2f, want at least 4.5", name, ratio)
 		}
 	}
 }
 
-func contrastRatio(t *testing.T, foreground, background string) float64 {
+func contrastRatio(t *testing.T, foreground, background color.Color) float64 {
 	t.Helper()
 	foregroundLuminance := relativeLuminance(t, foreground)
 	backgroundLuminance := relativeLuminance(t, background)
@@ -73,18 +79,14 @@ func contrastRatio(t *testing.T, foreground, background string) float64 {
 	return (lighter + 0.05) / (darker + 0.05)
 }
 
-func relativeLuminance(t *testing.T, value string) float64 {
+func relativeLuminance(t *testing.T, value color.Color) float64 {
 	t.Helper()
-	if len(value) != 7 || value[0] != '#' {
-		t.Fatalf("invalid color %q", value)
+	if value == nil {
+		t.Fatal("color is nil")
 	}
-	channels := make([]float64, 3)
-	for index := range channels {
-		raw, err := strconv.ParseUint(value[1+index*2:3+index*2], 16, 8)
-		if err != nil {
-			t.Fatalf("parse color %q: %v", value, err)
-		}
-		channel := float64(raw) / 255
+	red, green, blue, _ := value.RGBA()
+	channels := []float64{float64(red) / 65535, float64(green) / 65535, float64(blue) / 65535}
+	for index, channel := range channels {
 		if channel <= 0.04045 {
 			channels[index] = channel / 12.92
 		} else {
@@ -92,6 +94,32 @@ func relativeLuminance(t *testing.T, value string) float64 {
 		}
 	}
 	return 0.2126*channels[0] + 0.7152*channels[1] + 0.0722*channels[2]
+}
+
+func TestRenderRespectsTerminalColorProfile(t *testing.T) {
+	original := lipgloss.Writer.Profile
+	t.Cleanup(func() { lipgloss.Writer.Profile = original })
+	style := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#5B21B6"))
+	for _, test := range []struct {
+		name    string
+		profile colorprofile.Profile
+		color   bool
+	}{
+		{"plain-pipe", colorprofile.NoTTY, false},
+		{"ansi-terminal", colorprofile.ANSI, true},
+		{"truecolor-terminal", colorprofile.TrueColor, true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			lipgloss.Writer.Profile = test.profile
+			got := Render(style, "service")
+			if strings.Contains(got, "\x1b[") != test.color {
+				t.Fatalf("color output = %q, want color=%v", got, test.color)
+			}
+			if !test.color && got != "service" {
+				t.Fatalf("plain output = %q, want service", got)
+			}
+		})
+	}
 }
 
 func TestStatusIcons(t *testing.T) {
